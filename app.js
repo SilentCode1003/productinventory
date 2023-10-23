@@ -7,6 +7,13 @@ const { SetMongo } = require("./routes/controller/mogoose");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
+var categoryRouter = require("./routes/category");
+var deployRouter = require("./routes/deploy");
+var employeeRouter = require("./routes/employee");
+var itemsRouter = require("./routes/items");
+var productRouter = require("./routes/product");
+var repairRouter = require("./routes/repair");
+var returnRouter = require("./routes/return");
 
 var app = express();
 
@@ -25,6 +32,14 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/category", categoryRouter);
+app.use("/deploy", deployRouter);
+app.use("/employee", employeeRouter);
+app.use("/items", itemsRouter);
+app.use("/product", productRouter);
+app.use("/repair", repairRouter);
+app.use("/return", returnRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
