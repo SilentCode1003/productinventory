@@ -1,0 +1,16 @@
+:root {
+  --clr-base: #700b12;
+  --clr-top: #911f27;
+  --clr-btn: #dd5353;
+  --clr-default: #eb1c23;
+  --clr-white: #fff;
+  --clr-bg-table: #ff6459;
+}
+
+.bg-gradient-primary {
+  background-image: linear-gradient(
+    180deg,
+    var(--clr-top) 10%,
+    var(--clr-top) 100%
+  ) !important;
+}
