@@ -1,37 +1,281 @@
-
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="/logout">Logout</a>
-                </div>
-            </div>
+<!-- LOADER -->
+<div class="loader-wrapper">
+    <div class="spinner"></div>
+  </div>
+  <!-- LOADER -->
+  <div class="loader-wrapper">
+    <span class="loader"><span class="loader-inner"></span></span>
+  </div>
+  
+  <!-- Logout Modal-->
+  <div
+    class="modal fade"
+    id="logoutModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <button
+            class="close"
+            type="button"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
         </div>
+        <div class="modal-body">
+          Select "Logout" below if you are ready to end your current session.
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">
+            Cancel
+          </button>
+          <button name="logoutBtn" id="logoutBtn" class="btn btn-primary">
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="/vendor/jquery/jquery.min.js"></script>
-    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="/javascripts/js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="/vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="/javascripts/js/demo/chart-area-demo.js"></script>
-    <script src="/javascripts/js/demo/chart-pie-demo.js"></script>
+  </div>
+  
+  <!-- Bootstrap core JavaScript-->
+  <script src="/vendor/jquery/jquery.min.js"></script>
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Core plugin JavaScript-->
+  <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+  
+  <!-- Custom scripts for all pCreated bys-->
+  <script src="/javascripts/js/sb-admin-2.min.js"></script>
+  
+  <!-- PCreated by level plugins -->
+  <script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  
+  <!-- PCreated by level custom scripts -->
+  <script src="/javascripts/js/demo/datatables-demo.js"></script>
+  
+  <!-- SWAL-->
+  <script src="/javascripts/sweetalert.min.js"></script>
+  
+  <!-- XLSX -->
+  <script src="/javascripts/xlsx.mini.min.js"></script>
+  
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="/javascripts/bootstrap-select.min.js"></script>
+  
+  <!-- DATETIMEPICKER -->
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="/stylesheets/css/DateTimePicker.min.css"
+  />
+  <script
+    type="text/javascript"
+    src="/javascripts/DateTimePicker.min.js"
+  ></script>
+  
+  <script>
+    hidespinner();
+  
+    function showspinner() {
+      console.log("show loader");
+      $(".loader-wrapper").show();
+    }
+  
+    function hidespinner() {
+      console.log("hide loader");
+  
+      setTimeout(() => {
+        $(".loader-wrapper").hide();
+      }, 1500);
+    }
+  
+    function success(title, text) {
+      swal({
+        title: title,
+        text: text,
+        icon: "success",
+      });
+    }
+    function warning(title, text) {
+      swal({
+        title: title,
+        text: text,
+        icon: "warning",
+      });
+    }
+    function info(title, text) {
+      swal({
+        title: title,
+        text: text,
+        icon: "info",
+      });
+    }
+    function errormsg(err) {
+      swal({
+        title: "Error!",
+        text: err,
+        icon: "error",
+      });
+    }
+  
+    $(document).on("click", "#logoutBtn", function () {
+      $.ajax({
+        type: "POST",
+        url: "/login/logout",
+        success: function (result) {
+          success("Logout", "Successfully");
+          location.replace("/");
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    });
+  
+    const numberInputs = document.querySelectorAll(".number-validator");
+  
+    numberInputs.forEach(function (input) {
+      input.addEventListener("input", function () {
+        const inputValue = this.value;
+  
+        if (inputValue.length === 1 && inputValue === "0") {
+          this.value = "";
+        } else if (!/^\d*$/.test(inputValue)) {
+          this.value = inputValue.replace(/\D/g, "");
+        }
+      });
+    });
+  
+    function ClearTable(name) {
+      $(`#${name}`).find("tr:gt(0)").remove();
+    }
+  
+    function ConvertToCurrency(val) {
+      return `₱ ${parseFloat(val)
+        .toFixed(2)
+        .replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
+    }
+  
+    function RemoveCurrencyFormatting(val) {
+      return val.replace(/[^\d.-]/g, "");
+    }
+  
+    function formatCurrency(value) {
+          if (!value) {
+              return '₱0.00';
+          }
+          var formattedValue = parseFloat(value).toFixed(2);
+          return '₱' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+      }
+  
+      $(document).ready(function () {
+          if ($('.collapse-item.active').length > 0) {
+              $('.collapse-item.active').closest('.collapse').addClass('show');
+          }
+  
+          $('.collapse-item').click(function () {
+              $('.collapse-item').removeClass('active');
+              $(this).addClass('active');
+          });
+  
+          var path = window.location.pathname;
+  
+          $('.collapse-item').each(function () {
+              var href = $(this).attr('href');
+              if (path === href) {
+                  $(this).addClass('active');
+                  $(this).closest('.collapse').addClass('show');
+              }
+          });
+  
+          function adjustCollapse() {
+              if ($(window).width() <= 767) {
+                  $('.collapse').removeClass('show');
+                  $('.row.d-flex.justify-content-center.align-items-center').removeClass('login-height');
+              } else {
+                  $('.collapse-item.active').closest('.collapse').addClass('show');
+              }
+          }
+          adjustCollapse();
+  
+          $(window).resize(function () {
+              adjustCollapse();
+          });
+  
+          $(document).on('click', function (event) {
+              if ($(window).width() <= 767) {
+                  if (!$(event.target).closest('.collapse').length) {
+                      $('.collapse').removeClass('show');
+                  }
+              }
+  
+          });
+      });
+  
+      $('.customdropdown').click(function () {
+          $(this).attr('tabindex', 1).focus();
+          $(this).toggleClass('active');
+          $(this).find('.customdropdown-menu').slideToggle(300);
+      });
+      $('.customdropdown').focusout(function () {
+          $(this).removeClass('active');
+          $(this).find('.customdropdown-menu').slideUp(300);
+      });
+      $('.customdropdown .customdropdown-menu li').click(function () {
+          $(this).parents('.customdropdown').find('span').text($(this).text());
+          $(this).parents('.customdropdown').find('input').attr('value', $(this).attr('id'));
+      });
+  
+      $(document).ready(function () {
+          let isSidebarOpen = localStorage.getItem('isSidebarOpen') === 'true';
+  
+          function updateSidebarState() {
+              $("body").toggleClass("sidebar-toggled", isSidebarOpen);
+              $(".sidebar").toggleClass("toggled", isSidebarOpen);
+  
+              if (isSidebarOpen) {
+                  $('.sidebar .collapse').collapse('hide');
+              }
+          }
+  
+          updateSidebarState();
+  
+          $("#sidebarToggle, #sidebarToggleTop").on('click', function (e) {
+              isSidebarOpen = !isSidebarOpen;
+  
+              localStorage.setItem('isSidebarOpen', isSidebarOpen);
+  
+              updateSidebarState();
+          });
+      });
+  
+      const toggleButton = document.getElementById("toggleButton");
+      const toggleView = document.querySelector(".toggle-view");
+      let isOpen = false; 
+      if (toggleButton != null && toggleView != null){
+          toggleButton.addEventListener("click", function() {
+              if (!isOpen) {
+                  toggleView.style.display = "block";
+                  toggleView.style.height = toggleView.scrollHeight + "px"; 
+                  toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i>';
+              } else {
+                  toggleView.style.height = "0";
+                  setTimeout(() => {
+                  toggleView.style.display = "none";
+                  }, 500);
+                  toggleButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+              }
+  
+              isOpen = !isOpen;
+          });
+      }
+  </script>
+  

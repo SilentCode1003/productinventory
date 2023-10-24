@@ -46,7 +46,16 @@ class EmployeeModel {
 }
 
 class ProductModel {
-  constructor(serial, category, podate, ponumber, warrantydate, status) {
+  constructor(
+    assetcontrol,
+    serial,
+    category,
+    podate,
+    ponumber,
+    warrantydate,
+    status
+  ) {
+    this.assetcontrol = assetcontrol;
     this.serial = serial;
     this.category = category;
     this.podate = podate;
@@ -57,8 +66,9 @@ class ProductModel {
 }
 
 class DeployModel {
-  constructor(id, serial, date, deployby, deployto) {
+  constructor(id, assetcontrol, serial, date, deployby, deployto) {
     this.id = id;
+    this.assetcontrol = assetcontrol;
     this.serial = serial;
     this.date = date;
     this.deployby = deployby;
@@ -67,8 +77,9 @@ class DeployModel {
 }
 
 class ReturnModel {
-  constructor(id, serial, date, returnby, returnfrom) {
+  constructor(id, assetcontrol, serial, date, returnby, returnfrom) {
     this.id = id;
+    this.assetcontrol = assetcontrol;
     this.serial = serial;
     this.date = date;
     this.returnby = returnby;
@@ -77,8 +88,9 @@ class ReturnModel {
 }
 
 class RepairModel {
-  constructor(id, serial, date, repairby) {
+  constructor(id, assetcontrol, serial, date, repairby) {
     this.id = id;
+    this.assetcontrol = assetcontrol;
     this.serial = serial;
     this.date = date;
     this.repairby = repairby;
@@ -92,5 +104,5 @@ module.exports = {
   ProductModel,
   DeployModel,
   ReturnModel,
-  RepairModel
+  RepairModel,
 };
