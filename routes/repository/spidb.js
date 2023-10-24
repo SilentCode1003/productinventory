@@ -179,18 +179,112 @@ exports.SelectResult = (sql, callback) => {
 };
 
 exports.InsertTable = (tablename, data, callback) => {
-  if (tablename == "master_employee") {
-    let sql = `INSERT INTO master_employee(
-        me_firstname,
-        me_middlename,
-        me_lastname,
-        me_position,
-        me_accesstype,
-        me_contactno,
-        me_datehire,
-        me_status,
-        me_createdby,
-        me_createddate) VALUES ?`;
+  if (tablename == "master_item") {
+    let sql = `INSERT INTO master_item(
+      mi_name,
+      mi_category,
+      mi_status,
+      mi_createdby,
+      mi_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "master_category") {
+    let sql = `INSERT INTO master_category(
+      mc_name,
+      mc_status,
+      mc_createdby,
+      mc_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "employee") {
+    let sql = `INSERT INTO employee(
+      e_fullname,
+      e_position,
+      e_department,
+      e_username,
+      e_password,
+      e_access,
+      e_status,
+      e_createdby,
+      e_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "product") {
+    let sql = `INSERT INTO product(
+      p_serial,
+      p_category,
+      p_podate,
+      p_ponumber,
+      p_warrantydate,
+      p_status) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "deploy") {
+    let sql = `INSERT INTO deploy(
+      d_assetcontrol,
+      d_serial,
+      d_date,
+      d_deployby,
+      d_deployto) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "return") {
+    let sql = `INSERT INTO return(
+      r_assetcontroll,
+      r_serial,
+      r_date,
+      r_returnby,
+      r_returnfrom) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "repair") {
+    let sql = `INSERT INTO repair(
+      r_assetcontrol,
+      r_serial,
+      r_date,
+      r_repairby) VALUES ?`;
 
     this.Insert(sql, data, (err, result) => {
       if (err) {

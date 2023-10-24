@@ -34,13 +34,13 @@ exports.MasterItem = (data) => {
   );
 };
 
-exports.MasterItem = (data) => {
+exports.MasterCategory = (data) => {
   let dataResult = [];
 
   data.forEach((key, item) => {
     dataResult.push({
       id: key.mc_id,
-      inamed: key.mc_name,
+      name: key.mc_name,
       status: key.mc_status,
       createdby: key.mc_createdby,
       createddate: key.mc_createddate,
