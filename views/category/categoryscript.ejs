@@ -1,0 +1,234 @@
+<script>
+    $(document).ready(function () {
+      let categorycode = "";
+      let status = "";
+  
+      LoadTable();
+  
+      $("#category-dataTable tbody").on("click", "tr", function () {
+        var dataRow = [];
+        $(this)
+          .closest("tr")
+          .find("td")
+          .each(function () {
+            dataRow.push($(this).text());
+          });
+        console.log(dataRow);
+        categorycode = dataRow[0];
+        status = dataRow[2];
+      });
+  
+      $(document).on("click", "#editBtn", function () {
+        $("#categorycodemodal").val(categorycode);
+        $("#categoryModal").modal("show");
+        console.log(categorycode);
+      });
+  
+      $(document).on("click", "#addBtn", function () {
+        let categoryname = $("#categoryname").val();
+  
+        var message = "";
+  
+        if (categoryname == "") {
+          message += "Category Name";
+        }
+  
+        if (message != "") {
+          warning("Required", `Please fill up ${message}`);
+        } else {
+          $.ajax({
+            type: "POST",
+            url: "/category/save",
+            data: {
+              categoryname: categoryname,
+            },
+            success: function (result) {
+              if (result.msg == "success") {
+                LoadTable();
+                success("Saved", "Successfully");
+              }
+  
+              if (result.msg == "exist") {
+                warning("Exist", `${categoryname} has already registered!`);
+              }
+            },
+            error: function (err) {
+              errormsg(err);
+            },
+          });
+        }
+      });
+  
+      //Edit Update
+      $(document).on("click", "#saveBtn", function () {
+        let categorynamemodal = $("#categorynamemodal").val();
+  
+        var message = "";
+  
+        if (categorynamemodal == "") {
+          message += "ACCESS TYPE NAME ";
+        }
+  
+        if (message != "") {
+          warning("Required", `Please fill up ${message}`);
+        } else {
+          $.ajax({
+            type: "POST",
+            url: "/category/edit",
+            data: {
+              categorynamemodal: categorynamemodal,
+              categorycode: categorycode,
+            },
+            success: function (result) {
+              if (result.msg == "success") {
+                LoadTable();
+                success("Saved", "Successfully");
+              }
+  
+              if (result.msg == "exist") {
+                warning("Exist", `${categorynamemodal} already exist!`);
+              }
+            },
+            error: function (err) {
+              errormsg(err);
+            },
+          });
+        }
+      });
+  
+      //Status Update
+      $(document).on("click", "#activeBtn", function () {
+        console.log(categorycode);
+        console.log(status);
+        $.ajax({
+          type: "POST",
+          url: "/category/status",
+          data: {
+            status: status,
+            categorycode: categorycode,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Saved", "Successfully");
+            }
+  
+            if (result.msg == "notexist") {
+              warning(`${categorycode} does not exist!`);
+            }
+          },
+          error: function (err) {
+            errormsg(err);
+          },
+        });
+      });
+  
+      $(document).on("click", "#inactiveBtn", function () {
+        console.log(categorycode);
+        console.log(status);
+        $.ajax({
+          type: "POST",
+          url: "/category/status",
+          data: {
+            status: status,
+            categorycode: categorycode,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Saved", "Successfully");
+            }
+  
+            if (result.msg == "notexist") {
+              warning(`${categorycode} does not exist!`);
+            }
+          },
+          error: function (err) {
+            errormsg(err);
+          },
+        });
+      });
+  
+      $("#search").on("keyup", function () {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("category-dataTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[1];
+          if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
+        }
+      });
+  
+      function LoadTable() {
+        $("#category-dataTable").DataTable({
+          destroy: true,
+          processing: true,
+          serverSide: true,
+          paging: false,
+          searching: false,
+          info: false,
+          scrollY: 400,
+          scrollCollapse: true,
+          serverMethod: "GET",
+          ajax: {
+            url: "/category/load",
+            dataSrc: (json) => {
+              var finalData = [];
+              var data = json.data;
+  
+              console.log(data);
+              $.each(data, (key, item) => {
+                var action = "";
+                var status = item.status;
+  
+                if (status == "ACTIVE") {
+                  action =
+                    '<button id="editBtn" class="btn btn-outline-primary" name="editBtn" data-toggle="modal" data-target="#categoryModal">EDIT</button> <button id="inactiveBtn" class="btn btn-outline-primary" name="inactiveBtn">INACTIVE</button>';
+                }
+                if (status == "INACTIVE") {
+                  action =
+                    '<button id="editBtn" class="btn btn-outline-primary" name="editBtn" data-toggle="modal" data-target="#categoryModal">EDIT</button> <button id="activeBtn" class="btn btn-outline-primary" name="activeBtn">ACTIVE</button>';
+                }
+  
+                finalData.push({
+                  categorycode: item.categorycode,
+                  categoryname: item.categoryname,
+                  status: item.status,
+                  createdby: item.createdby,
+                  createddate: item.createddate,
+                  action: action,
+                });
+              });
+  
+              return finalData;
+            },
+          },
+          columnDefs: [
+            {
+              targets: 1,
+              className: "td-indent",
+            },
+          ],
+          columns: [
+            { data: "categorycode" },
+            { data: "categoryname" },
+            { data: "status" },
+            { data: "createdby" },
+            { data: "createddate" },
+            { data: "action" },
+          ],
+          initComplete: function () {},
+        });
+      }
+    });
+  </script>
+  

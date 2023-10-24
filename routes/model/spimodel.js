@@ -98,6 +98,7 @@ exports.Product = (data) => {
 
   data.forEach((key, item) => {
     dataResult.push({
+      assetcontrol: key.p_assetcontrol,
       serial: key.p_serial,
       category: key.p_category,
       podate: key.p_podate,
@@ -126,6 +127,7 @@ exports.Deploy = (data) => {
   data.forEach((key, item) => {
     dataResult.push({
       id: key.d_id,
+      assetcontrol: key.d_assetcontrol,
       serial: key.d_serial,
       date: key.d_date,
       deployby: key.d_deployby,
@@ -151,6 +153,7 @@ exports.Return = (data) => {
   data.forEach((key, item) => {
     dataResult.push({
       id: key.r_id,
+      assetcontrol: key.r_assetcontrol,
       serial: key.r_serial,
       date: key.r_date,
       returnby: key.r_returnby,
@@ -176,6 +179,7 @@ exports.Return = (data) => {
   data.forEach((key, item) => {
     dataResult.push({
       id: key.r_id,
+      assetcontrol: key.r_assetcontrol,
       serial: key.r_serial,
       date: key.r_date,
       repairby: key.r_repairby,
