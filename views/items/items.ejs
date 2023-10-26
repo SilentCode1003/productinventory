@@ -1,0 +1,177 @@
+<!-- Modal -->
+<div
+  class="modal fade bd-example-modal-lg"
+  id="itemsModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+  data-keyboard="false"
+  data-backdrop="static"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Category</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-2">
+          <div class="col-lg-12">
+            <div class="card-body">
+              <div class="row mb-2">
+                <div class="col-md-12">
+                  <label class="form-label" for="itemscodemodal"
+                    >Item ID</label
+                  >
+                  <input
+                    id="itemscodemodal"
+                    name="itemscodemodal"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter new itemcode"
+                    aria-label="itemscodemodal"
+                    aria-describedby="basic-addon1"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <label class="form-label" for="itemsnamemodal"
+                    >Category Name</label
+                  >
+                  <input
+                    id="itemsnamemodal"
+                    name="itemsnamemodal"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter new item name"
+                    aria-label="itemsnamemodal"
+                    aria-describedby="basic-addon1"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+          data-dismiss="modal"
+        >
+          <i class="fa fa-times" aria-hidden="true"></i> Close
+        </button>
+        <button
+          type="button"
+          id="saveBtn"
+          class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+        >
+          <i class="fa fa-check" aria-hidden="true"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PCreated by Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-3">
+  <h1 class="page-title">Item</h1>
+</div>
+<!-- Content Row -->
+<div class="row mb-2">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label" for="itemsname">Item Description</label>
+            <input
+              id="itemsname"
+              name="itemsname"
+              type="text"
+              class="form-control"
+              placeholder="Enter your item description"
+              aria-label="itemsname"
+              aria-describedby="basic-addon1"
+            />
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="customdropdown">
+                <div class="select selectcategory">
+                    <span id="selectedcategory">Select Category</span>
+                    <i class="fa fa-chevron-left"></i>
+                </div>
+                <input type="hidden" name="categoryid" id="categoryid">
+                <ul class="customdropdown-menu categorylist">
+                </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-md-4 text-left mt-4">
+            <button
+              id="addBtn"
+              name="addBtn"
+              class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm w-75"
+            >
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <h6 class="m-0 font-weight-bold table-title">Item Table</h6>
+      </div>
+      <div class="col-md-6">
+        <input
+          id="search"
+          name="search"
+          type="text"
+          class="form-control"
+          placeholder="Search Item Name"
+          aria-label="search"
+          aria-describedby="basic-addon1"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="table-responsive">
+      <table
+        class="table table-bordered"
+        id="items-dataTable"
+        width="100%"
+        cellspacing="10"
+      >
+        <thead class="table-dark">
+          <tr>
+            <th class="col-1 text-start">ID</th>
+            <th class="col-3 text-center">Name</th>
+            <th class="col-3 text-center">Category</th>
+            <th class="col-3 text-center">Created by</th>
+            <th class="col-3 text-center">Created date</th>
+            <th class="col-1 text-center">Status</th>
+            <th class="col-2 text-end">Action</th>
+          </tr>
+        </thead>
+
+        <tbody class="table-light"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

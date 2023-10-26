@@ -1,0 +1,276 @@
+<script>
+  $(document).ready(function () {
+    let itemscode = "";
+    let itemsname = "";
+    let status = "";
+
+    LoadTable();
+    LoadList();
+
+    $("#items-dataTable tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
+        });
+      console.log(dataRow);
+      itemscode = dataRow[0];
+      itemsname = dataRow[1];
+      category = dataRow[2];
+      status = dataRow[5];
+    });
+
+    $(document).on("click", "#editBtn", function () {
+      $("#itemscodemodal").val(itemscode);
+      $("#itemsnamemodal").val(itemsname);
+      $("#itemsModal").modal("show");
+      console.log(itemscode);
+    });
+
+    $(document).on("click", "#addBtn", function () {
+      let itemsname = $("#itemsname").val();
+      let categoryid = $("#categoryid").val();
+
+      var message = "";
+
+      if (itemsname == "") {
+        message += "Item Name";
+      }
+
+      if (categoryid == "") {
+        message += "Category Name";
+      }
+
+      if (message != "") {
+        warning("Required", `Please fill up ${message}`);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/items/save",
+          data: {
+            itemsname: itemsname,
+            categoryid: categoryid,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Saved", "Successfully");
+            }
+
+            if (result.msg == "exist") {
+              warning("Exist", `${itemsname} has already registered!`);
+            }
+          },
+          error: function (err) {
+            errormsg(err);
+          },
+        });
+      }
+    });
+
+    //Edit Update
+    $(document).on("click", "#saveBtn", function () {
+      let itemsnamemodal = $("#itemsnamemodal").val();
+
+      var message = "";
+
+      if (itemsnamemodal == "") {
+        message += "ACCESS TYPE NAME ";
+      }
+
+      if (message != "") {
+        warning("Required", `Please fill up ${message}`);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/items/edit",
+          data: {
+            itemsnamemodal: itemsnamemodal,
+            itemscode: itemscode,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Saved", "Successfully");
+            }
+
+            if (result.msg == "exist") {
+              warning("Exist", `${itemsnamemodal} already exist!`);
+            }
+          },
+          error: function (err) {
+            errormsg(err);
+          },
+        });
+      }
+    });
+
+    //Status Update
+    $(document).on("click", "#activeBtn", function () {
+      console.log(itemscode);
+      console.log(status);
+      $.ajax({
+        type: "POST",
+        url: "/items/status",
+        data: {
+          status: status,
+          itemscode: itemscode,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${itemscode} does not exist!`);
+          }
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    });
+
+    $(document).on("click", "#inactiveBtn", function () {
+      console.log(itemscode);
+      console.log(status);
+      $.ajax({
+        type: "POST",
+        url: "/items/status",
+        data: {
+          status: status,
+          itemscode: itemscode,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${itemscode} does not exist!`);
+          }
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    });
+
+    $("#search").on("keyup", function () {
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("search");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("items-dataTable");
+      tr = table.getElementsByTagName("tr");
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1];
+        if (td) {
+          txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    });
+
+    function LoadTable() {
+      $("#items-dataTable").DataTable({
+        destroy: true,
+        processing: true,
+        serverSide: true,
+        paging: false,
+        searching: false,
+        info: false,
+        scrollY: 400,
+        scrollCollapse: true,
+        serverMethod: "GET",
+        ajax: {
+          url: "/items/load",
+          dataSrc: (json) => {
+            var finalData = [];
+            var data = json.data;
+
+            console.log(data);
+            $.each(data, (key, item) => {
+              var action = "";
+              var status = item.status;
+
+              if (status == "ACTIVE") {
+                action =
+                  '<button id="editBtn" class="btn btn-outline-primary" name="editBtn" data-toggle="modal" data-target="#itemsModal">EDIT</button> <button id="inactiveBtn" class="btn btn-outline-primary" name="inactiveBtn">INACTIVE</button>';
+              }
+              if (status == "INACTIVE") {
+                action =
+                  '<button id="editBtn" class="btn btn-outline-primary" name="editBtn" data-toggle="modal" data-target="#itemsModal">EDIT</button> <button id="activeBtn" class="btn btn-outline-primary" name="activeBtn">ACTIVE</button>';
+              }
+
+              finalData.push({
+                id: item.id,
+                name: item.name,
+                category: item.category,
+                status: item.status,
+                createdby: item.createdby,
+                createddate: item.createddate,
+                action: action,
+              });
+            });
+
+            return finalData;
+          },
+        },
+        columnDefs: [
+          {
+            targets: 1,
+            className: "td-indent",
+          },
+        ],
+        columns: [
+          { data: "id" },
+          { data: "name" },
+          { data: "category" },
+          { data: "createdby" },
+          { data: "createddate" },
+          { data: "status" },
+          { data: "action" },
+        ],
+        initComplete: function () {},
+      });
+    }
+
+    $(".categorylist").on("click", "li", function () {
+      var selectedOption = $(this).text();
+      var selectedcategoryId = $(this).data("categoryid");
+
+      $("#selectedcategory").text(selectedOption);
+      $("#categoryid").val(selectedcategoryId).change();
+    });
+
+    function LoadList() {
+      $.ajax({
+        type: "GET",
+        url: "/category/load",
+        success: function (result) {
+          let container = result.data;
+          let categoryname = container[0];
+
+          console.log(categoryname);
+
+          var listItem = $("<li></li>")
+            .text(categoryname.name)
+            .data("categoryid", categoryname.id);
+
+          $(".categorylist").append(listItem);
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    }
+  });
+</script>
