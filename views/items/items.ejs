@@ -77,7 +77,7 @@
 
 <!-- PCreated by Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-3">
-  <h1 class="page-title">Item</h1>
+  <h1 class="cyber-title">Item</h1>
 </div>
 <!-- Content Row -->
 <div class="row mb-2">
@@ -117,7 +117,7 @@
             <button
               id="addBtn"
               name="addBtn"
-              class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm w-75"
+              class="d-none d-sm-inline-block btn btn-sm btn-outline-cyberpower shadow-sm w-75"
             >
               <i class="fa fa-plus" aria-hidden="true"></i>
               Add
@@ -130,47 +130,41 @@
 </div>
 
 <!-- DataTales Example -->
-<div class="card shadow mb-4">
-  <div class="card-header py-3">
-    <div class="row mb-4">
+<div class="card shadow mb-4 table-size">
+  <div class="progress progress-sm mb-2">
+    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+      aria-valuemax="100"></div>
+  </div>
+  <div class="card-header card-bg align-content-center">
+    <div class="row">
       <div class="col-md-3">
-        <h6 class="m-0 font-weight-bold table-title">Item Table</h6>
+        <h5 class="m-0 font-weight-bold cyber-title mt-2">Item Table</h5>
       </div>
-      <div class="col-md-6">
-        <input
-          id="search"
-          name="search"
-          type="text"
-          class="form-control"
-          placeholder="Search Item Name"
-          aria-label="search"
-          aria-describedby="basic-addon1"
-        />
+      <div class="col-md-8 mt-1">
+        <input id="search" name="search" type="text" class="form-control" placeholder="Search Item Name"
+          aria-label="search" aria-describedby="basic-addon1" />
       </div>
     </div>
   </div>
 
   <div class="card-body">
-    <div class="table-responsive">
-      <table
-        class="table table-bordered"
-        id="items-dataTable"
-        width="100%"
-        cellspacing="10"
-      >
-        <thead class="table-dark">
+    <div class="table-responsive scrollable-table-container">
+      <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+        <thead class="table-dark table-header">
           <tr>
-            <th class="col-1 text-start">ID</th>
-            <th class="col-3 text-center">Name</th>
-            <th class="col-3 text-center">Category</th>
-            <th class="col-3 text-center">Created by</th>
-            <th class="col-3 text-center">Created date</th>
-            <th class="col-1 text-center">Status</th>
-            <th class="col-2 text-end">Action</th>
+            <tr>
+              <th class="col-1">ID</th>
+              <th class="col-2">Name</th>
+              <th class="col-1">Category</th>
+              <th class="col-2">Created by</th>
+              <th class="col-2">Created date</th>
+              <th class="col-1">Status</th>
+              <th class="col-2">Action</th>
+            </tr>
           </tr>
         </thead>
 
-        <tbody class="table-light"></tbody>
+        <tbody class="no-border"></tbody>
       </table>
     </div>
   </div>
