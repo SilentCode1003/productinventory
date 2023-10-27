@@ -19,10 +19,11 @@ router.get("/load", (req, res) => {
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
-      console.log(result);
 
       if (result.length != 0) {
         let data = MasterCategory(result);
+
+        console.log(data);
         res.json({
           msg: "success",
           data: data,
