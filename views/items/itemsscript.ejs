@@ -266,15 +266,17 @@
         url: "/category/load",
         success: function (result) {
           let container = result.data;
-          let categoryname = container[0];
+          $.each(container, (key, item) => {
+            let categoryname = item.name;
+            let categoryid = item.id;
+            console.log(categoryname);
 
-          console.log(categoryname);
+            var listItem = $("<li></li>")
+              .text(categoryname)
+              .data("categoryid", categoryid);
 
-          var listItem = $("<li></li>")
-            .text(categoryname.name)
-            .data("categoryid", categoryname.id);
-
-          $(".categorylist").append(listItem);
+            $(".categorylist").append(listItem);
+          });
         },
         error: function (err) {
           errormsg(err);
