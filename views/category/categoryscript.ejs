@@ -6,7 +6,7 @@
 
     LoadTable();
 
-    $("#category-dataTable tbody").on("click", "tr", function () {
+    $("#datatable tbody").on("click", "tr", function () {
       var dataRow = [];
       $(this)
         .closest("tr")
@@ -156,7 +156,7 @@
       var input, filter, table, tr, td, i, txtValue;
       input = document.getElementById("search");
       filter = input.value.toUpperCase();
-      table = document.getElementById("category-dataTable");
+      table = document.getElementById("datatable");
       tr = table.getElementsByTagName("tr");
       for (i = 0; i < tr.length; i++) {
         td = tr[i].getElementsByTagName("td")[1];
@@ -171,65 +171,75 @@
       }
     });
 
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $('#datatable tbody');
+      tableBody.empty();
+
+      if (data.length === 0) {
+          const tr = $('<tr>').append($('<td>', {
+              colspan: 6,
+              class: 'text-center',
+              text: 'No Data Matched'
+          }));
+          tableBody.append(tr);
+      } else {
+          data.forEach(item => {
+              let action = '';
+              if (item.status === 'ACTIVE') {
+                  action = `
+                      <button id="editBtn" class="btn btn-outline-cyberpower shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#accessModal">EDIT</button>
+                      <button id="inactiveBtn" class="btn btn-outline-cyberpower shadow-sm w-100 mt-1" name="inactiveBtn">INACTIVE</button>`;
+              } else if (item.status === 'INACTIVE') {
+                  action = `
+                      <button id="editBtn" class="btn btn-outline-cyberpower shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#accessModal">EDIT</button>
+                      <button id="activeBtn" class="btn btn-outline-cyberpower shadow-sm w-100 mt-1" name="activeBtn">ACTIVE</button>`;
+              }
+
+              const tr = $('<tr>').append(
+                  $('<td>', { text: item.id, 'data-label': 'ID', class: 'custom-mobile-align' }),
+                  $('<td>', { text: item.name, 'data-label': 'Category', class: 'custom-mobile-align' }),
+                  $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
+                  $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align' }),
+                  $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align' }),
+                  $('<td>', { html: action, 'data-label': 'Action' })
+              );
+
+              tableBody.append(tr);
+          });
+      }
+    }
+    
     function LoadTable() {
-      $("#category-dataTable").DataTable({
-        destroy: true,
-        processing: true,
-        serverSide: true,
-        paging: false,
-        searching: false,
-        info: false,
-        scrollY: 400,
-        scrollCollapse: true,
-        serverMethod: "GET",
-        ajax: {
-          url: "/category/load",
-          dataSrc: (json) => {
-            var finalData = [];
-            var data = json.data;
+      $(".progress").hide();
+      $(".progress").slideDown();
 
-            console.log(data);
-            $.each(data, (key, item) => {
-              var action = "";
-              var status = item.status;
-
-              if (status == "ACTIVE") {
-                action =
-                  '<button id="editBtn" class="btn btn-outline-primary" name="editBtn" data-toggle="modal" data-target="#categoryModal">EDIT</button> <button id="inactiveBtn" class="btn btn-outline-primary" name="inactiveBtn">INACTIVE</button>';
+      $.ajax({
+          url: '/category/load',
+          method: 'GET',
+          dataType: 'json',
+          xhrFields: {
+              onprogress: function (e) {
+                  if (e.lengthComputable) {
+                      var percentComplete = (e.loaded / e.total) * 100;
+                      $(".progress-bar").css("width", percentComplete + "%");
+                  }
               }
-              if (status == "INACTIVE") {
-                action =
-                  '<button id="editBtn" class="btn btn-outline-primary" name="editBtn" data-toggle="modal" data-target="#categoryModal">EDIT</button> <button id="activeBtn" class="btn btn-outline-primary" name="activeBtn">ACTIVE</button>';
-              }
-
-              finalData.push({
-                id: item.id,
-                name: item.name,
-                status: item.status,
-                createdby: item.createdby,
-                createddate: item.createddate,
-                action: action,
-              });
-            });
-
-            return finalData;
           },
-        },
-        columnDefs: [
-          {
-            targets: 1,
-            className: "td-indent",
+          success: function (data) {
+              setTimeout(function () {
+                  $(".progress").slideUp(function () {
+                      if (data.msg === 'success') {
+                          populatedatatable(data.data);
+                      } else {
+                          console.error(data.msg);
+                      }
+                  });
+              }, 1000);
           },
-        ],
-        columns: [
-          { data: "id" },
-          { data: "name" },
-          { data: "status" },
-          { data: "createdby" },
-          { data: "createddate" },
-          { data: "action" },
-        ],
-        initComplete: function () {},
+          error: function (error) {
+              console.error(error);
+          }
       });
     }
   });

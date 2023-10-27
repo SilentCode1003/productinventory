@@ -1,14 +1,6 @@
 <!-- Modal -->
-<div
-  class="modal fade bd-example-modal-lg"
-  id="categoryModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
-  data-keyboard="false"
-  data-backdrop="static"
->
+<div class="modal fade bd-example-modal-lg" id="categoryModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -20,35 +12,16 @@
             <div class="card-body">
               <div class="row mb-2">
                 <div class="col-md-12">
-                  <label class="form-label" for="categorycodemodal"
-                    >Category Code</label
-                  >
-                  <input
-                    id="categorycodemodal"
-                    name="categorycodemodal"
-                    type="text"
-                    class="form-control"
-                    placeholder="Enter new category"
-                    aria-label="fullname"
-                    aria-describedby="basic-addon1"
-                    disabled
-                  />
+                  <label class="form-label" for="categorycodemodal">Category Code</label>
+                  <input id="categorycodemodal" name="categorycodemodal" type="text" class="form-control"
+                    placeholder="Enter new category" aria-label="fullname" aria-describedby="basic-addon1" disabled />
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-12">
-                  <label class="form-label" for="categorynamemodal"
-                    >Category Name</label
-                  >
-                  <input
-                    id="categorynamemodal"
-                    name="categorynamemodal"
-                    type="text"
-                    class="form-control"
-                    placeholder="Enter new category"
-                    aria-label="fullname"
-                    aria-describedby="basic-addon1"
-                  />
+                  <label class="form-label" for="categorynamemodal">Category Name</label>
+                  <input id="categorynamemodal" name="categorynamemodal" type="text" class="form-control"
+                    placeholder="Enter new category" aria-label="fullname" aria-describedby="basic-addon1" />
                 </div>
               </div>
             </div>
@@ -56,18 +29,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button
-          type="button"
-          class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
-          data-dismiss="modal"
-        >
+        <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+          data-dismiss="modal">
           <i class="fa fa-times" aria-hidden="true"></i> Close
         </button>
-        <button
-          type="button"
-          id="saveBtn"
-          class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
-        >
+        <button type="button" id="saveBtn" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
           <i class="fa fa-check" aria-hidden="true"></i> Save
         </button>
       </div>
@@ -77,34 +43,25 @@
 
 <!-- PCreated by Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-3">
-  <h1 class="page-title">Category</h1>
+  <h1 class="cyber-title">Category</h1>
 </div>
 <!-- Content Row -->
 <div class="row mb-2">
   <div class="col-lg-12">
     <div class="card">
       <div class="card-body">
-        <div class="row">
-          <label class="form-label" for="categoryname">Category Name</label>
-        </div>
-        <div class="row">
+        <div class="row align-content-center">
           <div class="col-md-8">
-            <input
-              id="categoryname"
-              name="categoryname"
-              type="text"
-              class="form-control"
-              placeholder="Enter your category name"
-              aria-label="Username"
-              aria-describedby="basic-addon1"
-            />
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon2">Category</span>
+              </div>
+              <input id="categoryname" name="categoryname" type="text" class="form-control"
+                placeholder="Enter Position Name" aria-label="categoryname" aria-describedby="basic-addon1" />
+            </div>
           </div>
-          <div class="col-md-4 text-center mt-1">
-            <button
-              id="addBtn"
-              name="addBtn"
-              class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm w-75"
-            >
+          <div class="col-md-4 align mt-1">
+            <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-50">
               <i class="fa fa-plus" aria-hidden="true"></i>
               Add
             </button>
@@ -116,35 +73,27 @@
 </div>
 
 <!-- DataTales Example -->
-<div class="card shadow mb-4">
-  <div class="card-header py-3">
-    <div class="row mb-4">
+<div class="card shadow mb-4 table-size">
+  <div class="progress progress-sm mb-2">
+    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+      aria-valuemax="100"></div>
+  </div>
+  <div class="card-header card-bg align-content-center">
+    <div class="row">
       <div class="col-md-3">
-        <h6 class="m-0 font-weight-bold table-title">Category Table</h6>
+        <h5 class="m-0 font-weight-bold cyber-title mt-2">Category Table</h5>
       </div>
-      <div class="col-md-6">
-        <input
-          id="search"
-          name="search"
-          type="text"
-          class="form-control"
-          placeholder="Search Category Name"
-          aria-label="search"
-          aria-describedby="basic-addon1"
-        />
+      <div class="col-md-8 mt-1">
+        <input id="search" name="search" type="text" class="form-control" placeholder="Search Category Name"
+          aria-label="search" aria-describedby="basic-addon1" />
       </div>
     </div>
   </div>
 
   <div class="card-body">
-    <div class="table-responsive">
-      <table
-        class="table table-bordered"
-        id="category-dataTable"
-        width="100%"
-        cellspacing="10"
-      >
-        <thead class="table-dark">
+    <div class="table-responsive scrollable-table-container">
+      <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+        <thead class="table-dark table-header">
           <tr>
             <th class="col-1 text-start">ID</th>
             <th class="col-3 text-center">Name</th>
@@ -155,7 +104,7 @@
           </tr>
         </thead>
 
-        <tbody class="table-light"></tbody>
+        <tbody class="no-border"></tbody>
       </table>
     </div>
   </div>
