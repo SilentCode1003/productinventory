@@ -1,0 +1,373 @@
+<script>
+    $(document).ready(function () {
+        //Functionality
+        var activePositions = [];
+        let employeeid = "";
+        let status = "";
+    
+        LoadTable();
+    
+        $('#data-table tbody').on('click', 'tr', function () {
+            var dataRow = [];
+            $(this).closest('tr').find('td').each(function () {
+                dataRow.push($(this).text());
+            });
+            console.log(dataRow);
+            employeeid = dataRow[0];
+            firstname = dataRow[1];
+            middlename = dataRow[2];
+            lastname = dataRow[3];
+            contactnumber = dataRow[6];
+            status = dataRow[8];
+        }) 
+    
+        $(document).on('click', '#editBtn', function(){
+            $('#employeeidmodal').val(employeeid);
+            $('#firstnamemodal').val(firstname);
+            $('#middlenamemodal').val(middlename);
+            $('#lastnamemodal').val(lastname);
+            $('#contactnomodal').val(contactnumber);
+            $('#employeesModal').modal('show');
+        })
+    
+        // $(document).on('click', '#closeBtn', function(){
+        //     $('#positionlist').val('');
+        //     $('#contactinfomodal').val('');
+        // })
+    
+        // $(document).on('click', '#deleteBtn', function(){
+        //     $('#employeeidmodal2').val(employeeid);
+        //     $('#deleteModal').modal('show');
+        // })
+        
+        // $('#confirm').on('input', function() {
+        //     const confirmValue = $(this).val().trim().toUpperCase();
+        //     const deleteBtnModal = $('#deleteBtnModal');
+    
+        //     // Enable the 'DELETE' button if the input value is 'CONFIRM', otherwise disable it
+        //     if (confirmValue === 'CONFIRM') {
+        //         deleteBtnModal.prop('disabled', false);
+        //     } else {
+        //         deleteBtnModal.prop('disabled', true);
+        //     }
+        // });
+    
+        $(document).on('click', '#addBtn', function () {
+            let fullname = $('#fullname').val();
+            let username = $('#username').val();
+            let password = $('#password').val();
+            let position = $('#position').val();
+            let department = $('#department').val();
+            let access = $('#access').val();
+
+            var message = "";
+            if (fullname == '') { message += 'Full Name, ' }
+            if (username == '') { message += 'User Name, ' }
+            if (password == '') { message += 'Password, ' }
+            if (position == '') { message += 'Position, ' }
+            if (department == '') { message += 'Department, ' }
+            if (access == '') { message += 'Access, ' }
+    
+            if (message != '') {
+                warning('Required', `Please fill up ${message}`);
+            }
+            else {
+                console.log(fullname, username, password, position, department, access)
+                $.ajax({
+                    type: 'POST',
+                    url: '/employee/save',
+                    data: {
+                        fullname: fullname,
+                        username: username,
+                        password: password,
+                        position: position,
+                        department: department,
+                        access: access
+                    },
+                    success: function (result) {
+                        if (result.msg == 'success') {
+                            LoadTable()
+                            success('Saved', 'Successfully')
+                            $('#fullname').val('');
+                            $('#username').val('');
+                            $('#password').val('');
+                            $('#position').val('');
+                            $('#department').val('');
+                            $('#access').val('');
+                        }
+    
+                        if (result.msg == 'exist') {
+                            warning('Exist', `${fullname} already exist!`);
+                        }
+    
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    }
+                })
+            }
+        })
+     
+        function populatetable(data) {
+            console.log(data);
+            const tableBody = $('#data-table tbody');
+            tableBody.empty();
+    
+            if (data.length === 0) {
+                const tr = $('<tr>').append($('<td>', {
+                    colspan: 12,
+                    class: 'text-center',
+                    text: 'No Data Matched'
+                }));
+                tableBody.append(tr);
+            } else {
+                data.forEach(item => {
+                    console.log("Access: "+item.accesstype)
+                    console.log("Position: "+item.position)
+
+                    let accessname = '';
+                    let positionname = '';
+                    $.ajax({
+                        type: 'POST',
+                        url: '/masteraccess/getname',
+                        data: {
+                            id: item.accesstype
+                        },
+                        success: function (result) {
+                            let data = result.data;
+                            accessname = data[0].name;
+
+                            $.ajax({
+                                type: 'POST',
+                                url: '/masterposition/getname',
+                                data: {
+                                    id: item.position
+                                },
+                                success: function (result) {
+                                    let data = result.data;
+                                    positionname = data[0].name;
+                                    let action = '';
+                                    if (item.status === 'ACTIVE') {
+                                        action = `<button id="editBtn" class="btn btn-outline-primary shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#employeesModal">EDIT</button>
+                                        <button id="inactiveBtn" class="btn btn-outline-danger shadow-sm w-100 mt-1" name="inactiveBtn">INACTIVE</button>`;
+                                    } else if (item.status === 'INACTIVE') {
+                                        action = `<button id="editBtn" class="btn btn-outline-primary shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#employeesModal">EDIT</button>
+                                        <button id="activeBtn" class="btn btn-outline-success shadow-sm w-100 mt-1" name="activeBtn">ACTIVE</button>`;
+                                    }
+
+                                    const tr = $('<tr>').append(
+                                        $('<td>', { text: item.id, 'data-label': 'Employee ID', class: 'custom-mobile-align' }),
+                                        $('<td>', { text: item.firstname, 'data-label': 'First Name', class: 'custom-mobile-align no-wrap' }),
+                                        $('<td>', { text: item.middlename, 'data-label': 'Middle Name', class: 'custom-mobile-align no-wrap' }),
+                                        $('<td>', { text: item.lastname, 'data-label': 'Last Name', class: 'custom-mobile-align no-wrap' }),
+                                        $('<td>', { text: positionname, 'data-label': 'Position', class: 'custom-mobile-align' }),
+                                        $('<td>', { text: accessname, 'data-label': 'Access Type', class: 'custom-mobile-align' }),
+                                        $('<td>', { text: item.contactno, 'data-label': 'Contact Number', class: 'custom-mobile-align' }),
+                                        $('<td>', { text: item.datehire, 'data-label': 'Date Hire', class: 'custom-mobile-align no-wrap' }),
+                                        $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
+                                        $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align no-wrap' }),
+                                        $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align no-wrap' }),
+                                        $('<td>', { html: action, 'data-label': 'Action', class: '' })
+                                    );
+
+                                    tableBody.append(tr);
+                                }
+                            });
+                    
+                        }
+                    });
+                });
+            }
+        }
+    
+        function LoadTable() {
+            $.ajax({
+                url: '/employee/load',
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.msg === 'success') {
+                        populatetable(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        function LoadList() {
+            $.ajax({
+                type: "GET",
+                url: "/category/load",
+                success: function (result) {
+                    let container = result.data;
+                    $.each(container, (key, item) => {
+                        let accessname = item.name;
+                        let accessid = item.id;
+                        console.log(accessname);
+
+                        var listItem = $("<li></li>")
+                        .text(accessname)
+                        .data("access", accessid);
+
+                        $(".accesslist").append(listItem);
+                    });
+
+                    $(".accesslist").on("click", "li", function () {
+                        var selectedOption = $(this).text();
+                        var selectedaccessid = $(this).data("access");
+
+                        $("#selectedaccess").text(selectedOption);
+                        $("#access").val(selectedaccessid).change();
+                    });
+                },
+                error: function (err) {
+                errormsg(err);
+                },
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "/category/load",
+                success: function (result) {
+                    let container = result.data;
+                    $.each(container, (key, item) => {
+                        let positionname = item.name;
+                        let positionid = item.id;
+                        console.log(positionname);
+
+                        var listItem = $("<li></li>")
+                        .text(positionname)
+                        .data("position", positionid);
+
+                        $(".positionlist").append(listItem);
+                    });
+
+                    $(".positionlist").on("click", "li", function () {
+                        var selectedOption = $(this).text();
+                        var selectedpositionid = $(this).data("position");
+
+                        $("#selectedposition").text(selectedOption);
+                        $("#position").val(selectedpositionid).change();
+                    });
+                },
+                error: function (err) {
+                errormsg(err);
+                },
+            });
+        }
+    
+        $(document).on('click', '#activeBtn', function(){
+            console.log(employeeid);
+            console.log(status);
+            $.ajax({
+                type: 'POST',
+                url: '/employee/status',
+                data: {
+                    status: status,
+                    employeeid: employeeid,
+                },
+                success: function (result) {
+                    if (result.msg == 'success') {
+                        LoadTable();
+                        success('Saved', 'Successfully')
+                    }
+    
+                    if (result.msg == 'notexist') {
+                        warning(`${employeeid} does not exist!`);
+                    }
+    
+                },
+                error: function (err) {
+                    errormsg(err);
+                }
+            })
+        });
+    
+        $(document).on('click', '#inactiveBtn', function(){
+            console.log(employeeid);
+            console.log(status);
+            $.ajax({
+                type: 'POST',
+                url: '/employee/status',
+                data: {
+                    status: status,
+                    employeeid: employeeid,
+                },
+                success: function (result) {
+                    if (result.msg == 'success') {
+                        LoadTable();
+                        success('Saved', 'Successfully')
+                    }
+    
+                    if (result.msg == 'notexist') {
+                        warning(`${employeeid} does not exist!`);
+                    }
+    
+                },
+                error: function (err) {
+                    errormsg(err);
+                }
+            })
+        });
+    
+        $(document).on('click', '#updateBtn', function () {
+            let employeeid = $('#employeeidmodal').val();
+            let firstname = $('#firstnamemodal').val();
+            let middlename = $('#middlenamemodal').val();
+            let lastname = $('#lastnamemodal').val();
+            let position = $('#positionlistmodal').val();
+            let accesstype = $('#accesslistmodal').val();
+            let contactno = $('#contactnomodal').val();
+    
+            var message = "";
+    
+            if (position == '' && contactno == '' &&  middlename == '0' && firstname == '' && lastname == '' &&  access == '0'){
+                    message += 'Fill up atleast 1 input field before updating'
+                }
+    
+            if (message != '') {
+                warning('Required', `${message}`);
+            }
+            else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/mastermeployee/edit',
+                    data: {
+                        employeeid: employeeid,
+                        firstname: firstname,
+                        middlename: middlename,
+                        lastname: lastname,
+                        position: position,
+                        accesstype: accesstype,
+                        contactno: contactno,
+                    },
+                    success: function (result) {
+                        if (result.msg == 'success') {
+                            LoadTable();
+                            $('#employeesModal').modal('hide');
+                            $('#employeeidmodal').val('');
+                            $('#firstnamemodal').val('');
+                            $('#middlenamemodal').val('');
+                            $('#lastnamemodal').val('');
+                            $('#positionlistmodal').val('');
+                            $('#accesslistmodal').val('');
+                            $('#contactnomodal').val('');
+                            success('Saved', 'Successfully')
+                        }
+    
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    }
+                })
+            }
+        })
+    
+        LoadList()
+    
+    })
+</script>
