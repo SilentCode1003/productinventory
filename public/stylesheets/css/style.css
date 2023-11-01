@@ -20,6 +20,10 @@
   --clr-inputfield: #555555;
 }
 
+.sidebar-dark .sidebar-heading {
+  color: var(--clr-glow) !important ;
+}
+
 /* Input Field */
 
 .input-group-text{
