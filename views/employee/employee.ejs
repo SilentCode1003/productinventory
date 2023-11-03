@@ -1,27 +1,53 @@
 <!-- Modal -->
-<div class="modal fade bd-example-modal-lg" id="categoryModal" tabindex="-1" role="dialog"
+<div class="modal fade bd-example-modal-lg" id="editModal" tabindex="-1" role="dialog"
   aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit Category</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Edit Employee</h5>
       </div>
       <div class="modal-body">
         <div class="row mb-2">
           <div class="col-lg-12">
             <div class="card-body">
-              <div class="row mb-2">
-                <div class="col-md-12">
-                  <label class="form-label" for="categorycodemodal">Category Code</label>
-                  <input id="categorycodemodal" name="categorycodemodal" type="text" class="form-control"
-                    placeholder="Enter new category" aria-label="fullname" aria-describedby="basic-addon1" disabled />
+              <div class="row mb-2 justify-content-center">
+                <div class="col-md-6">
+                  <label class="form-label" for="id">Employee ID</label>
+                  <input id="id" name="id" type="text" class="form-control"
+                    placeholder="" aria-label="employeeid" aria-describedby="basic-addon1" disabled />
                 </div>
               </div>
               <div class="row">
-                <div class="col-md-12">
-                  <label class="form-label" for="categorynamemodal">Category Name</label>
-                  <input id="categorynamemodal" name="categorynamemodal" type="text" class="form-control"
-                    placeholder="Enter new category" aria-label="fullname" aria-describedby="basic-addon1" />
+                <div class="col-md-6 mb-2">
+                  <div class="customdropdown">
+                    <div class="select selectpositionmodal">
+                      <span id="selectedpositionmodal">Select Position</span>
+                      <i class="fa fa-chevron-left"></i>
+                    </div>
+                    <input type="hidden" name="positionmodal" id="positionmodal">
+                    <ul class="customdropdown-menu positionlistmodal">
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-2">
+                  <div class="customdropdown">
+                    <div class="select selectaccessmodal">
+                      <span id="selectedaccessmodal">Select Access</span>
+                      <i class="fa fa-chevron-left"></i>
+                    </div>
+                    <input type="hidden" name="accessmodal" id="accessmodal">
+                    <ul class="customdropdown-menu accesslistmodal">
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-2 justify-content-center">
+                <div class="col-md-6">
+                  <label class="form-label" for="usernamemodal">User Name</label>
+                  <input id="usernamemodal" name="usernamemodal" type="text" class="form-control"
+                    placeholder="Enter New User Name" aria-label="usernamemodal" aria-describedby="basic-addon1" disabled />
                 </div>
               </div>
             </div>
@@ -52,70 +78,76 @@
       <div class="card-body">
 
         <div class="row d-flex justify-content-center">
-            <div class="col-md-6 mb-2">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon2">Full Name</span>
-                  </div>
-                  <input id="fullname" name="fullname" type="text" class="form-control"
-                    placeholder="Enter Full Name" aria-label="fullname" aria-describedby="basic-addon1" />
-                </div>
-            </div>
-        </div>
-
-        <div class="row d-flex">
-            <div class="col-md-6 mb-2">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon2">User Name</span>
-                  </div>
-                  <input id="username" name="username" type="text" class="form-control"
-                    placeholder="Enter User Name" aria-label="username" aria-describedby="basic-addon1" />
-                </div>
-            </div>
-            <div class="col-md-6 mb-2">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon2">Password</span>
-                  </div>
-                  <input id="password" name="password" type="password" class="form-control"
-                    placeholder="Enter Password" aria-label="password" aria-describedby="basic-addon1" />
-                </div>
-            </div>
-        </div>
-
-        <div class="row d-flex">
-            <div class="col-md-6 mb-2">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon2">Position</span>
-                  </div>
-                  <input id="fullname" name="fullname" type="text" class="form-control"
-                    placeholder="Enter Position Name" aria-label="fullname" aria-describedby="basic-addon1" />
-                </div>
-            </div>
-            <div class="col-md-6 mb-2">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon2">Department</span>
-                  </div>
-                  <input id="fullname" name="fullname" type="text" class="form-control"
-                    placeholder="Enter Department Name" aria-label="fullname" aria-describedby="basic-addon1" />
-                </div>
-            </div>
-        </div>
-
-        <div class="row d-flex justify-content-center mb-2">
-          <div class="col-md-6">
+          <div class="col-md-6 mb-2">
             <div class="input-group">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon2">Access</span>
+                <span class="input-group-text" id="basic-addon2">Full Name</span>
               </div>
-              <input id="fullname" name="fullname" type="text" class="form-control"
-                placeholder="Enter Access Type" aria-label="fullname" aria-describedby="basic-addon1" />
+              <input id="fullname" name="fullname" type="text" class="form-control" placeholder="Enter Full Name"
+                aria-label="fullname" aria-describedby="basic-addon1" />
             </div>
           </div>
         </div>
+
+        <div class="row d-flex">
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon2">User Name</span>
+              </div>
+              <input id="username" name="username" type="text" class="form-control" placeholder="Enter User Name"
+                aria-label="username" aria-describedby="basic-addon1" />
+            </div>
+          </div>
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon2">Password</span>
+              </div>
+              <input id="password" name="password" type="password" class="form-control" placeholder="Enter Password"
+                aria-label="password" aria-describedby="basic-addon1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row d-flex">
+          <div class="col-md-6 mb-2">
+            <div class="customdropdown">
+              <div class="select selectposition">
+                <span id="selectedposition">Select Position</span>
+                <i class="fa fa-chevron-left"></i>
+              </div>
+              <input type="hidden" name="position" id="position">
+              <ul class="customdropdown-menu positionlist">
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <div class="customdropdown">
+              <div class="select selectaccess">
+                <span id="selectedaccess">Select Access</span>
+                <i class="fa fa-chevron-left"></i>
+              </div>
+              <input type="hidden" name="access" id="access">
+              <ul class="customdropdown-menu accesslist">
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="row d-flex justify-content-center mb-2">
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon2">Department</span>
+              </div>
+              <input id="department" name="department" type="text" class="form-control" placeholder="Enter Department Name"
+                aria-label="department" aria-describedby="basic-addon1" />
+            </div>
+          </div>
+        </div>
+
         <div class="row justify-content-end">
           <div class="col-md-4 align mt-1">
             <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-100">

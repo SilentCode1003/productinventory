@@ -1,0 +1,221 @@
+<script>
+    $(document).ready(function () {
+        //Functionality
+        var activePositions = [];
+        let assetcontrol = "";
+        let status = "";
+
+        LoadTable();
+
+        $('#data-table tbody').on('click', 'tr', function () {
+            var dataRow = [];
+            $(this).closest('tr').find('td').each(function () {
+                dataRow.push($(this).text());
+            });
+            console.log(dataRow);
+            assetcontrol = dataRow[0];
+            status = dataRow[7];
+        })
+
+
+        $(document).on('click', '#addBtn', function () {
+            let serial = $('#serial').val();
+            let itemname = $('#itemname').val();
+            let category = $('#category').val();
+            let podate = $('#podate').val();
+            let ponumber = $('#ponumber').val();
+            let warrantydate = $('#warrantydate').val();
+
+            var message = "";
+            if (serial == '') { message += 'Serial, ' }
+            if (itemname == '') { message += 'Item Name, ' }
+            if (category == '') { message += 'Category, ' }
+            if (podate == '') { message += 'PO Date, ' }
+            if (ponumber == '') { message += 'PO Number, ' }
+            if (warrantydate == '') { message += 'Warranty Date, ' }
+
+            if (message != '') {
+                warning('Required', `Please fill up ${message}`);
+            }
+            else {
+                console.log(serial, itemname, category, podate, ponumber, warrantydate)
+                $.ajax({
+                    type: 'POST',
+                    url: '/products/save',
+                    data: {
+                        serial: serial,
+                        itemname: itemname,
+                        category: category,
+                        podate: podate,
+                        ponumber: ponumber,
+                        warrantydate: warrantydate
+                    },
+                    success: function (result) {
+                        if (result.msg == 'success') {
+                            LoadTable()
+                            success('Saved', 'Successfully')
+                            $('#serial').val('');
+                            $('#itemname').val('');
+                            $('#category').val('');
+                            $('#podate').val('');
+                            $('#ponumber').val('');
+                            $('#warrantydate').val('');
+                        }
+
+                        if (result.msg == 'exist') {
+                            warning('Exist', `${serial} already exist!`);
+                        }
+
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    }
+                })
+            }
+        })
+
+        function populatetable(data) {
+            console.log(data);
+            const tableBody = $('#data-table tbody');
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $('<tr>').append($('<td>', {
+                    colspan: 8,
+                    class: 'text-center',
+                    text: 'No Data Matched'
+                }));
+                tableBody.append(tr);
+            } else {
+                data.forEach(item => {
+                    if (item.status === 'ACTIVE') {
+                        action = `<button id="inactiveBtn" class="btn btn-outline-danger shadow-sm w-100 mt-1" name="inactiveBtn">INACTIVE</button>`;
+                    } else if (item.status === 'INACTIVE') {
+                        action = `<button id="activeBtn" class="btn btn-outline-success shadow-sm w-100 mt-1" name="activeBtn">ACTIVE</button>`;
+                    }
+
+                    const tr = $('<tr>').append(
+                        $('<td>', { text: item.assetcontrol, 'data-label': 'Asset Control', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.serial, 'data-label': 'Serial', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: item.itemname, 'data-label': 'Item Name', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: item.category, 'data-label': 'Category', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: ite.podate, 'data-label': 'PO Date', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.ponumber, 'data-label': 'PO Number', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align' }),
+                        $('<td>', { html: action, 'data-label': 'Action', class: '' })
+                    );
+                });
+            }
+        }
+
+        function LoadTable() {
+            $.ajax({
+                url: '/product/load',
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.msg === 'success') {
+                        populatetable(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        function LoadList() {
+            $.ajax({
+                type: "GET",
+                url: "/category/load",
+                success: function (result) {
+                    let container = result.data;
+                    $.each(container, (key, item) => {
+                        let categoryname = item.name;
+                        let categoryid = item.id;
+                        console.log(categoryname);
+
+                        var listItem = $("<li></li>")
+                            .text(categoryname)
+                            .data("categoryid", categoryid);
+
+                        $(".categorylist").append(listItem);
+                    });
+
+
+                    $(".categorylist").on("click", "li", function () {
+                        var selectedOption = $(this).text();
+                        var selectedcategoryId = $(this).data("categoryid");
+
+                        $("#selectedcategory").text(selectedOption);
+                        $("#categoryid").val(selectedcategoryId).change();
+                    });
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        }
+
+        $(document).on('click', '#activeBtn', function () {
+            console.log(assetcontrol);
+            console.log(status);
+            $.ajax({
+                type: 'POST',
+                url: '/product/status',
+                data: {
+                    status: status,
+                    assetcontrol: assetcontrol,
+                },
+                success: function (result) {
+                    if (result.msg == 'success') {
+                        LoadTable();
+                        success('Saved', 'Successfully')
+                    }
+
+                    if (result.msg == 'notexist') {
+                        warning(`${assetcontrol} does not exist!`);
+                    }
+
+                },
+                error: function (err) {
+                    errormsg(err);
+                }
+            })
+        });
+
+        $(document).on('click', '#inactiveBtn', function () {
+            console.log(assetcontrol);
+            console.log(status);
+            $.ajax({
+                type: 'POST',
+                url: '/product/status',
+                data: {
+                    status: status,
+                    assetcontrol: assetcontrol,
+                },
+                success: function (result) {
+                    if (result.msg == 'success') {
+                        LoadTable();
+                        success('Saved', 'Successfully')
+                    }
+
+                    if (result.msg == 'notexist') {
+                        warning(`${assetcontrol} does not exist!`);
+                    }
+
+                },
+                error: function (err) {
+                    errormsg(err);
+                }
+            })
+        });
+
+        LoadList()
+
+    })
+</script>

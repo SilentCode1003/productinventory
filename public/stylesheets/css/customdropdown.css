@@ -35,14 +35,14 @@
   .customdropdown {
     width: 100%;
     display: inline-block;
-    background-color: #fff;
+    background-color: transparent;
     border-radius: 0.275rem;
     box-shadow: 0 0 2px rgb(204, 204, 204);
     transition: all .5s ease;
     position: relative;
     height: calc(1.5em + 0.75rem + 2px);
     text-align: left;
-    border: 1px solid #d1d3e2;
+    border: 1px solid var(--clr-text);
   }
   .customdropdown:focus{
     outline: none !important;
@@ -50,7 +50,8 @@
   .customdropdown .select {
       cursor: pointer;
       display: block;
-      padding: 7px
+      padding: 7px;
+      color: var(--clr-glow);
   }
   .customdropdown .select > i {
       cursor: pointer;
@@ -59,21 +60,21 @@
       line-height: 20px
   }
   .customdropdown:hover {
-      box-shadow: 0 0 4px rgb(204, 204, 204)
+      box-shadow: 0 0 4px rgb(0, 255, 213)
   }
   .customdropdown:active {
-      background-color: #f8f8f8;
+      background-color: transparent;
   }
   .customdropdown.active:hover,
   .customdropdown.active {
-      background-color: #f8f8f8;
+      background-color: transparent;
   }
   .customdropdown.active .select > i {
       transform: rotate(-90deg)
   }
   .customdropdown .customdropdown-menu {
       position: absolute;
-      background-color: #ffffff;
+      background-color: var(--clr-card);
       width: 100%;
       left: 0;
       border-radius: 0.275rem;
@@ -82,7 +83,7 @@
       max-height: 144px;
       overflow-y: auto;
       z-index: 9;
-      border: 1px solid #d1d3e2;
+      border: 3px solid var(--clr-background);
   }
   .customdropdown .customdropdown-menu li {
       padding: 10px;
@@ -95,7 +96,7 @@
   }
   .customdropdown .customdropdown-menu li:hover {
       background-color: var(--clr-6);
-      color: white;
+      color: var(--clr-background);
   }
   .customdropdown .customdropdown-menu li:active {
       background-color: #f2f2f2
