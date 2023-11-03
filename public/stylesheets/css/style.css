@@ -239,6 +239,10 @@ td {
   height: 50px;
 }
 
+.input-group-prepend .input-group-text::after {
+  color: #ffffff !important; /* Change this to the desired color */
+}
+
 .modal-header {
   background-color: var(--clr-card) !important;
   color: var(--clr-text);
@@ -489,3 +493,10 @@ body {
 button.ani-btn{
   border-radius: 0.275rem;
 }
+
+
+/*
+CALENDAR
+*/
+
+
