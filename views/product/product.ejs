@@ -1,0 +1,122 @@
+<!-- PCreated by Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-3">
+    <h1 class="cyber-title">Register</h1>
+</div>
+<!-- Content Row -->
+<div class="row mb-2">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-6">
+                        <div class="customdropdown">
+                            <div class="select selectcategory">
+                                <span id="selectedcategory">Select Category</span>
+                                <i class="fa fa-chevron-left"></i>
+                            </div>
+                            <input type="hidden" name="categoryid" id="categoryid">
+                            <ul class="customdropdown-menu categorylist">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row d-flex">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Serial</span>
+                            </div>
+                            <input id="serial" name="serial" type="text" class="form-control" placeholder="Enter Serial"
+                                aria-label="serial" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Item Name</span>
+                            </div>
+                            <input id="itemname" name="itemname" type="text" class="form-control"
+                                placeholder="Enter Item Name" aria-label="itemname" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row d-flex mb-2">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Purchase Order Date</span>
+                            </div>
+                            <input id="podate" name="podate" type="text" class="form-control"
+                                placeholder="Enter Purchase Order Date" aria-label="podate"
+                                aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Purchase Order Number</span>
+                            </div>
+                            <input id="ponumber" name="ponumber" type="text" class="form-control"
+                                placeholder="Enter Purchase Order Number" aria-label="ponumber"
+                                aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row justify-content-end">
+                    <div class="col-md-4 align mt-1">
+                        <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-100">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4 table-size">
+    <div class="progress progress-sm mb-2">
+        <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+            aria-valuemax="100"></div>
+    </div>
+    <div class="card-header card-bg align-content-center">
+        <div class="row">
+            <div class="col-md-3">
+                <h5 class="m-0 font-weight-bold cyber-title mt-2">Employee Table</h5>
+            </div>
+            <div class="col-md-8 mt-1">
+                <input id="search" name="search" type="text" class="form-control" placeholder="Search Category Name"
+                    aria-label="search" aria-describedby="basic-addon1" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive scrollable-table-container">
+            <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+                <thead class="table-dark table-header">
+                    <tr>
+                        <th>Asset Control</th>
+                        <th>Serial</th>
+                        <th>Item Name</th>
+                        <th>Category</th>
+                        <th>PO Date</th>
+                        <th>PO Number</th>
+                        <th>Warranty Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody class="no-border"></tbody>
+            </table>
+        </div>
+    </div>
+</div>

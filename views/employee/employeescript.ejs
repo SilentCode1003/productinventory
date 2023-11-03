@@ -122,60 +122,26 @@
                 tableBody.append(tr);
             } else {
                 data.forEach(item => {
-                    console.log("Access: "+item.accesstype)
-                    console.log("Position: "+item.position)
+                    if (item.status === 'ACTIVE') {
+                        action = `<button id="editBtn" class="btn btn-outline-primary shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#employeesModal">EDIT</button>
+                        <button id="inactiveBtn" class="btn btn-outline-danger shadow-sm w-100 mt-1" name="inactiveBtn">INACTIVE</button>`;
+                    } else if (item.status === 'INACTIVE') {
+                        action = `<button id="editBtn" class="btn btn-outline-primary shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#employeesModal">EDIT</button>
+                        <button id="activeBtn" class="btn btn-outline-success shadow-sm w-100 mt-1" name="activeBtn">ACTIVE</button>`;
+                    }
 
-                    let accessname = '';
-                    let positionname = '';
-                    $.ajax({
-                        type: 'POST',
-                        url: '/masteraccess/getname',
-                        data: {
-                            id: item.accesstype
-                        },
-                        success: function (result) {
-                            let data = result.data;
-                            accessname = data[0].name;
-
-                            $.ajax({
-                                type: 'POST',
-                                url: '/masterposition/getname',
-                                data: {
-                                    id: item.position
-                                },
-                                success: function (result) {
-                                    let data = result.data;
-                                    positionname = data[0].name;
-                                    let action = '';
-                                    if (item.status === 'ACTIVE') {
-                                        action = `<button id="editBtn" class="btn btn-outline-primary shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#employeesModal">EDIT</button>
-                                        <button id="inactiveBtn" class="btn btn-outline-danger shadow-sm w-100 mt-1" name="inactiveBtn">INACTIVE</button>`;
-                                    } else if (item.status === 'INACTIVE') {
-                                        action = `<button id="editBtn" class="btn btn-outline-primary shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#employeesModal">EDIT</button>
-                                        <button id="activeBtn" class="btn btn-outline-success shadow-sm w-100 mt-1" name="activeBtn">ACTIVE</button>`;
-                                    }
-
-                                    const tr = $('<tr>').append(
-                                        $('<td>', { text: item.id, 'data-label': 'Employee ID', class: 'custom-mobile-align' }),
-                                        $('<td>', { text: item.firstname, 'data-label': 'First Name', class: 'custom-mobile-align no-wrap' }),
-                                        $('<td>', { text: item.middlename, 'data-label': 'Middle Name', class: 'custom-mobile-align no-wrap' }),
-                                        $('<td>', { text: item.lastname, 'data-label': 'Last Name', class: 'custom-mobile-align no-wrap' }),
-                                        $('<td>', { text: positionname, 'data-label': 'Position', class: 'custom-mobile-align' }),
-                                        $('<td>', { text: accessname, 'data-label': 'Access Type', class: 'custom-mobile-align' }),
-                                        $('<td>', { text: item.contactno, 'data-label': 'Contact Number', class: 'custom-mobile-align' }),
-                                        $('<td>', { text: item.datehire, 'data-label': 'Date Hire', class: 'custom-mobile-align no-wrap' }),
-                                        $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
-                                        $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align no-wrap' }),
-                                        $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align no-wrap' }),
-                                        $('<td>', { html: action, 'data-label': 'Action', class: '' })
-                                    );
-
-                                    tableBody.append(tr);
-                                }
-                            });
-                    
-                        }
-                    });
+                    const tr = $('<tr>').append(
+                        $('<td>', { text: item.id, 'data-label': 'Employee ID', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.fullname, 'data-label': 'First Name', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: item.position, 'data-label': 'oposition', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: item.departmentby, 'data-label': 'Department', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: ite.username, 'data-label': 'username', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.access, 'data-label': 'Access Type', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align' }),
+                        $('<td>', { html: action, 'data-label': 'Action', class: '' })
+                    );
                 });
             }
         }
@@ -253,6 +219,7 @@
                         $("#selectedposition").text(selectedOption);
                         $("#position").val(selectedpositionid).change();
                     });
+                    
                 },
                 error: function (err) {
                 errormsg(err);
