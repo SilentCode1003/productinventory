@@ -1,0 +1,143 @@
+<script>
+    $(document).ready(function () {
+        //Functionality
+        let assetcontrol = "";
+
+        LoadTable();
+
+        $('#data-table tbody').on('click', 'tr', function () {
+            var dataRow = [];
+            $(this).closest('tr').find('td').each(function () {
+                dataRow.push($(this).text());
+            });
+            console.log(dataRow);
+            assetcontrol = dataRow[0];
+        })
+
+
+        $(document).on('click', '#addBtn', function () {
+            let serial = $('#serial').val();
+            let returnto = $('#returnto').val();
+            let referenceno = $('#referenceno').val();
+
+            var message = "";
+            if (serial == '') { message += 'Serial, ' }
+            if (returnto == '') { message += 'Item Name, ' }
+            if (referenceno == '') { message += 'referenceno, ' }
+
+            if (message != '') {
+                warning('Required', `Please fill up ${message}`);
+            }
+            else {
+                console.log(serial, returnto, referenceno)
+                $.ajax({
+                    type: 'POST',
+                    url: '/return/save',
+                    data: {
+                        serial: serial,
+                        returnto: returnto,
+                        referenceno: referenceno
+                    },
+                    success: function (result) {
+                        if (result.msg == 'success') {
+                            LoadTable()
+                            success('Saved', 'Successfully')
+                            $('#serial').val('');
+                            $('#returnto').val('');
+                            $('#referenceno').val('');
+                        }
+
+                        if (result.msg == 'exist') {
+                            warning('Exist', `${serial} already exist!`);
+                        }
+
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    }
+                })
+            }
+        })
+
+        function populatetable(data) {
+            console.log(data);
+            const tableBody = $('#data-table tbody');
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $('<tr>').append($('<td>', {
+                    colspan: 7,
+                    class: 'text-center',
+                    text: 'No Data Matched'
+                }));
+                tableBody.append(tr);
+            } else {
+                data.forEach(item => {
+                    const tr = $('<tr>').append(
+                        $('<td>', { text: item.id, 'data-label': 'ID', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.assetcontrol, 'data-label': 'Asset Control', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.serial, 'data-label': 'Serial', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.date, 'data-label': 'Date', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: item.returnby, 'data-label': 'Returned By', class: 'custom-mobile-align no-wrap' }),
+                        $('<td>', { text: ite.returnto, 'data-label': 'Returned To', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.referenceno, 'data-label': 'Reference No.', class: 'custom-mobile-align' }),
+                    );
+                });
+            }
+        }
+
+        function LoadTable() {
+            $.ajax({
+                url: '/deploy/load',
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.msg === 'success') {
+                        populatetable(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        function LoadList() {
+            $.ajax({
+                type: "GET",
+                url: "/category/load",
+                success: function (result) {
+                    let container = result.data;
+                    $.each(container, (key, item) => {
+                        let categoryname = item.name;
+                        let categoryid = item.id;
+                        console.log(categoryname);
+
+                        var listItem = $("<li></li>")
+                            .text(categoryname)
+                            .data("categoryid", categoryid);
+
+                        $(".seriallist").append(listItem);
+                    });
+
+
+                    $(".seriallist").on("click", "li", function () {
+                        var selectedOption = $(this).text();
+                        var selectedserialId = $(this).data("serial");
+
+                        $("#selectedserial").text(selectedOption);
+                        $("#serial").val(selectedserialId).change();
+                    });
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        }
+
+        LoadList()
+
+    })
+</script>

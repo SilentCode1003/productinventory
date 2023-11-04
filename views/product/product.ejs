@@ -22,7 +22,7 @@
                     </div>
                 </div>
 
-                <div class="row d-flex">
+                <div class="row d-flex mt-2">
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
                             <div class="input-group-prepend">
@@ -47,18 +47,16 @@
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">Purchase Order Date</span>
+                                <span class="input-group-text" id="basic-addon2">PO Date</span>
                             </div>
-                            <input id="podate" name="podate" type="text" class="form-control"
-                                placeholder="Enter Purchase Order Date" aria-label="podate"
-                                aria-describedby="basic-addon1" />
+                            <input type="date" class="form-control" id="podate" name="podate">
                         </div>
                     </div>
 
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">Purchase Order Number</span>
+                                <span class="input-group-text" id="basic-addon2">PO Number</span>
                             </div>
                             <input id="ponumber" name="ponumber" type="text" class="form-control"
                                 placeholder="Enter Purchase Order Number" aria-label="ponumber"
@@ -90,10 +88,10 @@
     <div class="card-header card-bg align-content-center">
         <div class="row">
             <div class="col-md-3">
-                <h5 class="m-0 font-weight-bold cyber-title mt-2">Employee Table</h5>
+                <h5 class="m-0 font-weight-bold cyber-title mt-2">Product Table</h5>
             </div>
             <div class="col-md-8 mt-1">
-                <input id="search" name="search" type="text" class="form-control" placeholder="Search Category Name"
+                <input id="search" name="search" type="text" class="form-control" placeholder="Search Serial"
                     aria-label="search" aria-describedby="basic-addon1" />
             </div>
         </div>
@@ -112,6 +110,7 @@
                         <th>PO Number</th>
                         <th>Warranty Date</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
 
