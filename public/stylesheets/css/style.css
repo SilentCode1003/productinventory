@@ -20,6 +20,10 @@
   --clr-inputfield: #555555;
 }
 
+.editbutton:hover{
+  cursor: pointer;
+}
+
 .sidebar-dark .sidebar-heading {
   color: var(--clr-glow) !important ;
 }
@@ -46,6 +50,10 @@
 }
 
 /* TABLE */
+
+.table td{
+  padding: 2rem !important;
+}
 
 .scrollable-table-container-lg{
   max-height: 670px !important; 
