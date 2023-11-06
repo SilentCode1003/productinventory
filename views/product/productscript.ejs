@@ -41,7 +41,7 @@
                 console.log(serial, itemname, category, podate, ponumber, warrantydate)
                 $.ajax({
                     type: 'POST',
-                    url: '/products/save',
+                    url: '/product/save',
                     data: {
                         serial: serial,
                         itemname: itemname,
