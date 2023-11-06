@@ -108,14 +108,14 @@
             }
         })
      
-        function populatetable(data) {
+        function populatedatatable(data) {
             console.log(data);
-            const tableBody = $('#data-table tbody');
+            const tableBody = $('#datatable tbody');
             tableBody.empty();
     
             if (data.length === 0) {
                 const tr = $('<tr>').append($('<td>', {
-                    colspan: 12,
+                    colspan: 10,
                     class: 'text-center',
                     text: 'No Data Matched'
                 }));
@@ -124,13 +124,11 @@
                 data.forEach(item => {
                     let action = "";
                     if (item.status === 'ACTIVE') {
-                        action = `
-                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                            <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                        action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+                                <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
                     } else if (item.status === 'INACTIVE') {
-                        action = `
-                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                            <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                        action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+                                <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
                     }
 
                     const tr = $('<tr>').append(
@@ -145,21 +143,37 @@
                         $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align' }),
                         $('<td>', { html: action, 'data-label': 'Action', class: '' })
                     );
+                    tableBody.append(tr);
                 });
             }
         }
     
         function LoadTable() {
+            $(".progress").hide();
+            $(".progress").slideDown();
+
             $.ajax({
                 url: '/employee/load',
                 method: 'GET',
                 dataType: 'json',
-                success: function (data) {
-                    if (data.msg === 'success') {
-                        populatetable(data.data);
-                    } else {
-                        console.error(data.msg);
+                xhrFields: {
+                    onprogress: function (e) {
+                        if (e.lengthComputable) {
+                            var percentComplete = (e.loaded / e.total) * 100;
+                            $(".progress-bar").css("width", percentComplete + "%");
+                        }
                     }
+                },
+                success: function (data) {
+                    setTimeout(function () {
+                        $(".progress").slideUp(function () {
+                            if (data.msg === 'success') {
+                                populatedatatable(data.data);
+                            } else {
+                                console.error(data.msg);
+                            }
+                        });
+                    }, 1000);
                 },
                 error: function (error) {
                     console.error(error);
