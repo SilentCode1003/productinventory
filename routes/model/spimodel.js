@@ -5,6 +5,8 @@ const {
   ProductModel,
   DeployModel,
   ReturnModel,
+  TransferModel,
+  SoldModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -62,8 +64,7 @@ exports.MasterCategory = (data) => {
 exports.Employee = (data) => {
   let dataResult = [];
 
-  data.forEach((key, item) => {
-    dataResult.push({
+  data.forEach((key, item) => {dataResult.push({
       id: key.e_id,
       fullname: key.e_fullname,
       position: key.e_position,
@@ -74,6 +75,7 @@ exports.Employee = (data) => {
       status: key.e_status,
       createdby: key.e_createdby,
       createddate: key.e_createddate,
+    
     });
   });
 
@@ -86,6 +88,7 @@ exports.Employee = (data) => {
         key["department"],
         key["username"],
         key["password"],
+        key["access"],
         key["status"],
         key["createdby"],
         key["createddate"]
@@ -132,6 +135,7 @@ exports.Deploy = (data) => {
       date: key.d_date,
       deployby: key.d_deployby,
       deployto: key.d_deployto,
+      referenceno: key.d_referenceno,
     });
   });
 
@@ -142,7 +146,8 @@ exports.Deploy = (data) => {
         key["serial"],
         key["date"],
         key["deployby"],
-        key["deployto"]
+        key["deployto"],
+        key["referenceno"]
       )
   );
 };
@@ -158,6 +163,7 @@ exports.Return = (data) => {
       date: key.r_date,
       returnby: key.r_returnby,
       returnfrom: key.r_returnfrom,
+      referenceno: key.r_referenceno,
     });
   });
 
@@ -168,7 +174,8 @@ exports.Return = (data) => {
         key["serial"],
         key["date"],
         key["returnby"],
-        key["returnfrom"]
+        key["returnfrom"],
+        key["referenceno"]
       )
   );
 };
@@ -183,11 +190,73 @@ exports.Return = (data) => {
       serial: key.r_serial,
       date: key.r_date,
       repairby: key.r_repairby,
+      referenceno: key.r_referenceno,
     });
   });
 
   return dataResult.map(
     (key) =>
-      new ReturnModel(key["id"], key["serial"], key["date"], key["r_repairby"])
+      new ReturnModel(
+        key["id"],
+        key["serial"],
+        key["date"],
+        key["r_repairby"],
+        key["referenceno"]
+      )
+  );
+};
+
+exports.Sold = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.s_id,
+      assetcontrol: key.s_assetcontrol,
+      serial: key.s_serial,
+      date: key.s_date,
+      soldby: key.s_soldby,
+      soldto: key.s_soldto,
+      referenceno: key.s_referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new SoldModel(
+        key["id"],
+        key["assetcontrol"],
+        key["serial"],
+        key["date"],
+        key["soldby"],
+        key["soldto"],
+        key["referenceno"]
+      )
+  );
+};
+
+exports.Transfer = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.r_id,
+      assetcontrol: key.r_assetcontrol,
+      serial: key.r_serial,
+      date: key.r_date,
+      repairby: key.r_repairby,
+      referenceno: key.referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new TransferModel(
+        key["id"],
+        key["serial"],
+        key["date"],
+        key["r_repairby"],
+        key["referenceno"]
+      )
   );
 };

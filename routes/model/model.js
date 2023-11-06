@@ -66,34 +66,81 @@ class ProductModel {
 }
 
 class DeployModel {
-  constructor(id, assetcontrol, serial, date, deployby, deployto) {
+  constructor(id, assetcontrol, serial, date, deployby, deployto, referenceno) {
     this.id = id;
     this.assetcontrol = assetcontrol;
     this.serial = serial;
     this.date = date;
     this.deployby = deployby;
     this.deployto = deployto;
+    this.referenceno = referenceno;
   }
 }
 
 class ReturnModel {
-  constructor(id, assetcontrol, serial, date, returnby, returnfrom) {
+  constructor(
+    id,
+    assetcontrol,
+    serial,
+    date,
+    returnby,
+    returnfrom,
+    referenceno
+  ) {
     this.id = id;
     this.assetcontrol = assetcontrol;
     this.serial = serial;
     this.date = date;
     this.returnby = returnby;
     this.returnfrom = returnfrom;
+    this.referenceno = referenceno;
   }
 }
 
 class RepairModel {
-  constructor(id, assetcontrol, serial, date, repairby) {
+  constructor(id, assetcontrol, serial, date, repairby, referenceno) {
     this.id = id;
     this.assetcontrol = assetcontrol;
     this.serial = serial;
     this.date = date;
     this.repairby = repairby;
+    this.referenceno = referenceno;
+  }
+}
+
+class SoldModel {
+  constructor(id, assetcontrol, serial, date, soldby, soldto, referenceno) {
+    this.id = id;
+    this.assetcontrol = assetcontrol;
+    this.serial = serial;
+    this.date = date;
+    this.soldby = soldby;
+    this.soldto = soldto;
+    this.referenceno = referenceno;
+  }
+}
+
+class TransferModel {
+  constructor(
+    id,
+    assetcontrol,
+    serial,
+    date,
+    transferby,
+    from,
+    receivedby,
+    to,
+    referenceno
+  ) {
+    this.id = id;
+    this.assetcontrol = assetcontrol;
+    this.serial = serial;
+    this.date = date;
+    this.transferby = transferby;
+    this.from = from;
+    this.receivedby = receivedby;
+    this.to = to;
+    this.referenceno = referenceno;
   }
 }
 
@@ -105,4 +152,6 @@ module.exports = {
   DeployModel,
   ReturnModel,
   RepairModel,
+  SoldModel,
+  TransferModel,
 };
