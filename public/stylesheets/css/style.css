@@ -180,10 +180,7 @@ td{
   width: 60px;
   margin-left: 8px;
 }
-.fa,
-.fas {
-  margin-right: 10px !important;
-}
+
 .form-label {
   font-size: 1.2rem;
   font-weight: bold;
