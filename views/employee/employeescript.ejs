@@ -122,12 +122,15 @@
                 tableBody.append(tr);
             } else {
                 data.forEach(item => {
+                    let action = "";
                     if (item.status === 'ACTIVE') {
-                        action = `<button id="editBtn" class="btn btn-outline-primary shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#employeesModal">EDIT</button>
-                        <button id="inactiveBtn" class="btn btn-outline-danger shadow-sm w-100 mt-1" name="inactiveBtn">INACTIVE</button>`;
+                        action = `
+                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+                            <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
                     } else if (item.status === 'INACTIVE') {
-                        action = `<button id="editBtn" class="btn btn-outline-primary shadow-sm w-100" name="editBtn" data-toggle="modal" data-target="#employeesModal">EDIT</button>
-                        <button id="activeBtn" class="btn btn-outline-success shadow-sm w-100 mt-1" name="activeBtn">ACTIVE</button>`;
+                        action = `
+                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+                            <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
                     }
 
                     const tr = $('<tr>').append(
