@@ -397,7 +397,14 @@
               $(".sidebar").toggleClass("toggled", isSidebarOpen);
   
               if (isSidebarOpen) {
-                  $('.sidebar .collapse').collapse('hide');
+                $('.sidebar .collapse').collapse('hide');
+                $('#content').toggleClass('content-toggled');
+                $('.navbar').toggleClass('navbar-toggled');
+                $('.sticky-footer').toggleClass('footer-toggled');
+              } else{
+                $('#content').removeClass('content-toggled');
+                $('.navbar').removeClass('navbar-toggled');
+                $('.sticky-footer').removeClass('footer-toggled');
               }
           }
   
@@ -405,7 +412,7 @@
   
           $("#sidebarToggle, #sidebarToggleTop").on('click', function (e) {
               isSidebarOpen = !isSidebarOpen;
-  
+
               localStorage.setItem('isSidebarOpen', isSidebarOpen);
   
               updateSidebarState();
