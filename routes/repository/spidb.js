@@ -293,4 +293,49 @@ exports.InsertTable = (tablename, data, callback) => {
       callback(null, result);
     });
   }
+
+  if (tablename == "master_department") {
+    let sql = `INSERT INTO master_department(
+      md_name,
+      md_status,
+      md_createdby,
+      md_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "master_position") {
+    let sql = `INSERT INTO master_position(
+      mp_name,
+      mp_status,
+      mp_createdby,
+      mp_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "master_access") {
+    let sql = `INSERT INTO master_access(
+      ma_name,
+      ma_status,
+      ma_createdby,
+      ma_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
 };

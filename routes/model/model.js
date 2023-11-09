@@ -144,6 +144,36 @@ class TransferModel {
   }
 }
 
+class MasterDepartmentModel {
+  constructor(id, name, status, createdby, createddate) {
+    this.id = id;
+    this.name = name;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
+
+class MasterAccessModel {
+  constructor(id, name, status, createdby, createddate) {
+    this.id = id;
+    this.name = name;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
+
+class MasterPositionModel {
+  constructor(id, name, status, createdby, createddate) {
+    this.id = id;
+    this.name = name;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
+
 module.exports = {
   MasterItemModel,
   MasterCategoryModel,
@@ -154,4 +184,7 @@ module.exports = {
   RepairModel,
   SoldModel,
   TransferModel,
+  MasterDepartmentModel,
+  MasterAccessModel,
+  MasterPositionModel,
 };
