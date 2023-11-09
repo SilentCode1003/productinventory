@@ -443,3 +443,11 @@ exports.ConvertToJson = (data) => {
   return result;
 };
 //#endregion
+
+//#region Custom Asset Tag - UPS-000000000
+exports.GenerateAssetTag = (type, sequence) => {
+  const padded = sequence.toString().padStart(8, "0");
+  const assettag = `${type}-${padded}`;
+  return assettag;
+};
+//#endregion

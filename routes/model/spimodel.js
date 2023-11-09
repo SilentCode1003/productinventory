@@ -106,6 +106,7 @@ exports.Product = (data) => {
     dataResult.push({
       assetcontrol: key.p_assetcontrol,
       serial: key.p_serial,
+      itemname: key.p_itemname,
       category: key.p_category,
       podate: key.p_podate,
       ponumber: key.p_ponumber,
@@ -117,7 +118,9 @@ exports.Product = (data) => {
   return dataResult.map(
     (key) =>
       new ProductModel(
+        key["assetcontrol"],
         key["serial"],
+        key["itemname"],
         key["category"],
         key["podate"],
         key["ponumber"],

@@ -232,7 +232,9 @@ exports.InsertTable = (tablename, data, callback) => {
 
   if (tablename == "product") {
     let sql = `INSERT INTO product(
+      p_assetcontrol,
       p_serial,
+      p_itemname,
       p_category,
       p_podate,
       p_ponumber,

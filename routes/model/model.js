@@ -49,6 +49,7 @@ class ProductModel {
   constructor(
     assetcontrol,
     serial,
+    itemname,
     category,
     podate,
     ponumber,
@@ -57,6 +58,7 @@ class ProductModel {
   ) {
     this.assetcontrol = assetcontrol;
     this.serial = serial;
+    this.itemname = itemname;
     this.category = category;
     this.podate = podate;
     this.ponumber = ponumber;
