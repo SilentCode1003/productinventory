@@ -7,6 +7,9 @@ const {
   ReturnModel,
   TransferModel,
   SoldModel,
+  MasterDepartmentModel,
+  MasterAccessModel,
+  MasterPositionModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -64,7 +67,8 @@ exports.MasterCategory = (data) => {
 exports.Employee = (data) => {
   let dataResult = [];
 
-  data.forEach((key, item) => {dataResult.push({
+  data.forEach((key, item) => {
+    dataResult.push({
       id: key.e_id,
       fullname: key.e_fullname,
       position: key.e_position,
@@ -75,7 +79,6 @@ exports.Employee = (data) => {
       status: key.e_status,
       createdby: key.e_createdby,
       createddate: key.e_createddate,
-    
     });
   });
 
@@ -257,6 +260,81 @@ exports.Transfer = (data) => {
         key["date"],
         key["r_repairby"],
         key["referenceno"]
+      )
+  );
+};
+
+exports.MasterDepartment = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.ma_id,
+      name: key.ma_name,
+      status: key.ma_status,
+      createdby: key.ma_createdby,
+      createddate: key.ma_createddate,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new MasterDepartmentModel(
+        key["id"],
+        key["name"],
+        key["status"],
+        key["createdby"],
+        key["createddate"]
+      )
+  );
+};
+
+exports.MasterAccess = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.md_id,
+      name: key.md_name,
+      status: key.md_status,
+      createdby: key.md_createdby,
+      createddate: key.md_createddate,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new MasterAccessModel(
+        key["id"],
+        key["name"],
+        key["status"],
+        key["createdby"],
+        key["createddate"]
+      )
+  );
+};
+
+exports.MasterPosition = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.mp_id,
+      name: key.mp_name,
+      status: key.mp_status,
+      createdby: key.mp_createdby,
+      createddate: key.mp_createddate,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new MasterPositionModel(
+        key["id"],
+        key["name"],
+        key["status"],
+        key["createdby"],
+        key["createddate"]
       )
   );
 };
