@@ -1,6 +1,8 @@
 var express = require("express");
 const { Select, InsertTable } = require("./repository/spidb");
 const { Product } = require("./model/spimodel");
+const { GenerateAssetTag } = require("./repository/customhelper");
+const { GetValue, WH } = require("./repository/dictionary");
 var router = express.Router();
 
 /* GET home page. */
@@ -43,21 +45,57 @@ router.post("/save", (req, res) => {
   try {
     const { serial, itemname, category, podate, ponumber, warrantydate } =
       req.body;
-    let product = [
-      [serial, itemname, category, podate, ponumber, warrantydate],
-    ];
+    let sequence = 1;
+    let status = GetValue(WH());
 
-    InsertTable("product", product, (err, result) => {
-      if (err) console.error("Error: ", err);
+    Product_Count()
+      .then((result) => {
+        sequence = parseInt(result[0].total == 0 ? sequence : result[0].total);
+        let product = [
+          [
+            GenerateAssetTag(category, sequence),
+            serial,
+            itemname,
+            category,
+            podate,
+            ponumber,
+            warrantydate,
+            status
+          ],
+        ];
 
-      console.log(result);
-      res.json({
-        msg: "success",
+        InsertTable("product", product, (err, result) => {
+          if (err) console.error("Error: ", err);
+
+          console.log(result);
+          res.json({
+            msg: "success",
+          });
+        });
+      })
+      .catch((error) => {
+        return res.json({
+          msg: error,
+        });
       });
-    });
   } catch (error) {
     res.json({
       msg: error,
     });
   }
 });
+
+//#region Functions
+function Product_Count() {
+  return new Promise((resolve, reject) => {
+    let sql = "select count(*) as total from product";
+    Select(sql, (err, result) => {
+      if (err) reject(err);
+
+      console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+//#endregion
