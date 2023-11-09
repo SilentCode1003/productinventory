@@ -76,7 +76,7 @@
 
         function populatetable(data) {
             console.log(data);
-            const tableBody = $('#data-table tbody');
+            const tableBody = $('#datatable tbody');
             tableBody.empty();
 
             if (data.length === 0) {
@@ -88,6 +88,7 @@
                 tableBody.append(tr);
             } else {
                 data.forEach(item => {
+                    let action = "";
                     if (item.status === 'ACTIVE') {
                         action = `
                             <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
@@ -96,33 +97,47 @@
                             <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
                     }
 
-
                     const tr = $('<tr>').append(
                         $('<td>', { text: item.assetcontrol, 'data-label': 'Asset Control', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.serial, 'data-label': 'Serial', class: 'custom-mobile-align no-wrap' }),
                         $('<td>', { text: item.itemname, 'data-label': 'Item Name', class: 'custom-mobile-align no-wrap' }),
                         $('<td>', { text: item.category, 'data-label': 'Category', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: ite.podate, 'data-label': 'PO Date', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.podate, 'data-label': 'PO Date', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.ponumber, 'data-label': 'PO Number', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.warrantydate, 'data-label': 'Warranty Date', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
                         $('<td>', { html: action, 'data-label': 'Action', class: '' })
                     );
+                    tableBody.append(tr);
                 });
             }
         }
 
         function LoadTable() {
+            $(".progress").hide();
+            $(".progress").slideDown();
             $.ajax({
                 url: '/product/load',
                 method: 'GET',
                 dataType: 'json',
-                success: function (data) {
-                    if (data.msg === 'success') {
-                        populatetable(data.data);
-                    } else {
-                        console.error(data.msg);
+                xhrFields: {
+                    onprogress: function (e) {
+                        if (e.lengthComputable) {
+                            var percentComplete = (e.loaded / e.total) * 100;
+                            $(".progress-bar").css("width", percentComplete + "%");
+                        }
                     }
+                },
+                success: function (data) {
+                    setTimeout(function () {
+                        $(".progress").slideUp(function () {
+                            if (data.msg === 'success') {
+                                populatetable(data.data);
+                            } else {
+                                console.error(data.msg);
+                            }
+                        });
+                    }, 1000);
                 },
                 error: function (error) {
                     console.error(error);
