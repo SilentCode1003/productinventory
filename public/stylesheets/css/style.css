@@ -27,13 +27,13 @@
   background-color: var(--clr-background) !important;
   margin-left: 14rem;
   width: var(--minus-14rem);
-  z-index: 1;
+  z-index: 2;
 }
 
 .sidebar{
   position: fixed !important;
   background-color: var(--clr-background) !important;
-  z-index: 1;
+  z-index: 3;
 }
 
 #content{
@@ -482,6 +482,9 @@ body {
 
 @media (max-width: 767px){
 
+  .table td {
+    padding: 1rem !important;
+  }
   
   #content{
     margin-left: 6rem;
@@ -494,6 +497,7 @@ body {
   .navbar{
     margin-left: 6rem;
     width: var(--minus-6rem);
+    border-bottom: solid 4px var(--clr-gradient-sidebar);
   }
 
   .content-toggled {
@@ -519,7 +523,7 @@ body {
     margin-bottom:15px;
   }
   .custom-mobile-table .custom-mobile-align{
-    padding-left: 50%;
+    padding-left: 50% !important;
     position: relative;
   }
   .custom-mobile-table .custom-mobile-align::before{
