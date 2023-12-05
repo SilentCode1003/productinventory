@@ -184,7 +184,7 @@
         function LoadList() {
             $.ajax({
                 type: "GET",
-                url: "/category/load",
+                url: "/access/load",
                 success: function (result) {
                     let container = result.data;
                     $.each(container, (key, item) => {
@@ -214,7 +214,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "/category/load",
+                url: "/position/load",
                 success: function (result) {
                     let container = result.data;
                     $.each(container, (key, item) => {
