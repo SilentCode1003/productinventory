@@ -1,9 +1,11 @@
 var express = require("express");
-const { Select, InsertTable } = require("./repository/spidb");
+var router = express.Router();
+
+
+const { Select, InsertTable, SelectParameter } = require("./repository/spidb");
 const { Product } = require("./model/spimodel");
 const { GenerateAssetTag } = require("./repository/customhelper");
 const { GetValue, WH } = require("./repository/dictionary");
-var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -48,30 +50,48 @@ router.post("/save", (req, res) => {
     let sequence = 1;
     let status = GetValue(WH());
 
-    Product_Count()
+    // console.log(serial);
+
+
+
+    Product_Check(serial)
       .then((result) => {
-        sequence = parseInt(result[0].total == 0 ? sequence : result[0].total);
-        let product = [
-          [
-            GenerateAssetTag(category, sequence),
-            serial,
-            itemname,
-            category,
-            podate,
-            ponumber,
-            warrantydate,
-            status
-          ],
-        ];
-
-        InsertTable("product", product, (err, result) => {
-          if (err) console.error("Error: ", err);
-
-          console.log(result);
+        if (result[0].total != 0) {
           res.json({
-            msg: "success",
+            msg: "exist",
           });
-        });
+        } else {
+          Product_Count()
+            .then((result) => {
+              sequence = parseInt(
+                result[0].total == 0 ? sequence : result[0].total++
+              );
+              let product = [
+                [
+                  GenerateAssetTag(category, sequence),
+                  serial,
+                  itemname,
+                  category,
+                  podate,
+                  ponumber,
+                  warrantydate,
+                  status,
+                ],
+              ];
+              InsertTable("product", product, (err, result) => {
+                if (err) console.error("Error: ", err);
+                console.log(result);
+                res.json({
+                  msg: "success",
+                });
+              });
+            })
+            .catch((error) => {
+              return res.json({
+                msg: error,
+              });
+            });
+        }
       })
       .catch((error) => {
         return res.json({
@@ -79,7 +99,7 @@ router.post("/save", (req, res) => {
         });
       });
   } catch (error) {
-    res.json({
+    return res.json({
       msg: error,
     });
   }
@@ -92,8 +112,21 @@ function Product_Count() {
     Select(sql, (err, result) => {
       if (err) reject(err);
 
-      console.log(result);
+      // console.log(result);
 
+      resolve(result);
+    });
+  });
+}
+
+function Product_Check(serial) {
+  return new Promise((resolve, reject) => {
+    let sql = "select count(*) as total from product where p_serial=?";
+
+    SelectParameter(sql, [serial], (err, result) => {
+      if (err) reject(err);
+
+      // console.log(result);
       resolve(result);
     });
   });

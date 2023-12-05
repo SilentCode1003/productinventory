@@ -51,6 +51,7 @@
                         warrantydate: warrantydate
                     },
                     success: function (result) {
+                        console.log(result.msg);
                         if (result.msg == 'success') {
                             LoadTable()
                             success('Saved', 'Successfully')

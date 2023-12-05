@@ -272,11 +272,11 @@ exports.MasterDepartment = (data) => {
 
   data.forEach((key, item) => {
     dataResult.push({
-      id: key.ma_id,
-      name: key.ma_name,
-      status: key.ma_status,
-      createdby: key.ma_createdby,
-      createddate: key.ma_createddate,
+      id: key.md_id,
+      name: key.md_name,
+      status: key.md_status,
+      createdby: key.md_createdby,
+      createddate: key.md_createddate,
     });
   });
 
