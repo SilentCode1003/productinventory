@@ -54,6 +54,43 @@ router.get("/load", (req, res) => {
   }
 });
 
+router.post("/getitemsbycategory", (req, res) => {
+  try {
+    const id = req.body.id;
+    let sql = `select
+    mi_id as mi_id,
+    mi_name as mi_name,
+    mc_name as mi_category,
+    mi_createdby as mi_createdby,
+    mi_createddate as mi_createddate,
+    mi_status as mi_status
+    from master_item
+    inner join master_category on mi_category = mc_id where mi_category = ${id}`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      console.log(result);
+
+      if (result.length != 0) {
+        let data = MasterItem(result);
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 router.post("/save", (req, res) => {
   try {
     const { itemsname, categoryid } = req.body;
