@@ -14,7 +14,12 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let sql = "select * from employee";
+    let sql = `SELECT e_id as e_id, e_fullname as e_fullname, mp_name as e_position, md_name as e_department, e_username as e_username, 
+    e_password as e_password, ma_name as e_access, e_status as e_status, e_createdby as e_createdby, e_createddate as e_createddate
+    FROM employee 
+    INNER JOIN master_access on ma_id = e_access
+    INNER JOIN master_department on md_id = e_department
+    INNER JOIN master_position on mp_id = e_position`;
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
       console.log(result);
@@ -50,10 +55,10 @@ router.post("/save", (req, res) => {
     let employee = [
       [
         fullname,
-        username,
-        password,
         position,
         department,
+        username,
+        password,
         access,
         status,
         createdby,
