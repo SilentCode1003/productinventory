@@ -17,7 +17,7 @@ router.get("/", function (req, res, next) {
 });
 
 module.exports = router;
-m
+
 router.get("/load", (req, res) => {
   try {
     let sql = `select * from master_client`;
