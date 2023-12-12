@@ -63,7 +63,7 @@
     });
 
     //Edit Update
-    $(document).on("click", "#saveBtn", function () {
+    $(document).on("click", "#updateBtn", function () {
       let categorynamemodal = $("#categorynamemodal").val();
 
       var message = "";
@@ -86,6 +86,7 @@
             if (result.msg == "success") {
               LoadTable();
               success("Saved", "Successfully");
+              $("#categoryModal").modal("hide");
             }
 
             if (result.msg == "exist") {

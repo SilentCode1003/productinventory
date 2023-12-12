@@ -85,6 +85,7 @@
           success: function (result) {
             if (result.msg == "success") {
               LoadTable();
+              $("#editModal").modal("hide");
               success("Saved", "Successfully");
             }
 
