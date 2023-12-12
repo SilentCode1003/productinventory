@@ -451,3 +451,19 @@ exports.GenerateAssetTag = (type, sequence) => {
   return assettag;
 };
 //#endregion
+
+//#region Select Parameter Query data=[1,2,3]
+exports.SelectStatement = (str, data) => {
+  let statement = "";
+  let found = 0;
+  for (let i = 0; i < str.length; i++) {
+    if (str[i] === "?") {
+      statement += `'${data[found]}'`;
+      found += 1;
+    } else {
+      statement += str[i];
+    }
+  }
+  return statement;
+};
+//#endregion

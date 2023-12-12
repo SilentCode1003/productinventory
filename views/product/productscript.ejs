@@ -17,10 +17,52 @@
             status = dataRow[7];
         })
 
+        $(document).on('change', '#categoryid', function() {    
+            let id = $(this).val();
+            console.log(id)
+
+            $(".productlist").empty();
+            $("#selectedproduct").text('Select Product');
+            $("#productid").val('')
+            $.ajax({
+                type: "POST",
+                url: "/items/getitemsbycategory",
+                data: {
+                    id:id
+                },
+                success: function (result) {
+                    let container = result.data;
+                    console.log(container)
+                    $.each(container, (key, item) => {
+                        let productname = item.name;
+                        let productid = item.id;
+
+                        let listItem = $("<li></li>")
+                        .text(productname)
+                        .data("productid", productid);
+
+                        $(".productlist").append(listItem);
+                        
+                    });
+
+                    $(".productlist").on("click", "li", function () {
+                        let selectedOption = $(this).text();
+                        let selectedproductId = $(this).data("productid");
+
+                        $("#selectedproduct").text(selectedOption);
+                        $("#productid").val(selectedproductId).change();
+                    });
+
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        });
 
         $(document).on('click', '#addBtn', function () {
             let serial = $('#serial').val();
-            let itemname = $('#itemname').val();
+            let itemname = $('#productid').val();
             let category = $('#categoryid').val();
             let podate = $('#podate').val();
             let ponumber = $('#ponumber').val();
@@ -51,7 +93,7 @@
                         warrantydate: warrantydate
                     },
                     success: function (result) {
-                        console.log(result.msg);
+                        console.log(result);
                         if (result.msg == 'success') {
                             LoadTable()
                             success('Saved', 'Successfully')

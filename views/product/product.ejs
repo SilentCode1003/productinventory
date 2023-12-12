@@ -33,12 +33,14 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">Item Name</span>
+                        <div class="customdropdown">
+                            <div class="select selectproduct">
+                                <span id="selectedproduct">Select Product</span>
+                                <i class="fa fa-chevron-left"></i>
                             </div>
-                            <input id="itemname" name="itemname" type="text" class="form-control"
-                                placeholder="Enter Item Name" aria-label="itemname" aria-describedby="basic-addon1" />
+                            <input type="hidden" name="productid" id="productid">
+                            <ul class="customdropdown-menu productlist">
+                            </ul>
                         </div>
                     </div>
                 </div>

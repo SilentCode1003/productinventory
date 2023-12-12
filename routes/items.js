@@ -54,6 +54,43 @@ router.get("/load", (req, res) => {
   }
 });
 
+router.post("/getitemsbycategory", (req, res) => {
+  try {
+    const id = req.body.id;
+    let sql = `select
+    mi_id as mi_id,
+    mi_name as mi_name,
+    mc_name as mi_category,
+    mi_createdby as mi_createdby,
+    mi_createddate as mi_createddate,
+    mi_status as mi_status
+    from master_item
+    inner join master_category on mi_category = mc_id where mi_category = ${id}`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      console.log(result);
+
+      if (result.length != 0) {
+        let data = MasterItem(result);
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 router.post("/save", (req, res) => {
   try {
     const { itemsname, categoryid } = req.body;
@@ -61,28 +98,47 @@ router.post("/save", (req, res) => {
     let createdby =
       req.session.fullname == null ? "dev42" : req.session.fullname;
     let createddate = helper.GetCurrentDatetime();
-    let master_item = [[itemsname, categoryid, status, createdby, createddate]];
-    let sql = `select * from master_item where mi_name = ?`;
-    SelectParameter(sql, [itemsname], (err, result) => {
-      if (err) console.error("Error: ", err);
 
-      console.log(result);
+    Check_Item(itemsname)
+      .then((result) => {
+        let data = MasterItem(result);
 
-      if (result.length != 0) {
-        return res.json({
-          msg: "exist",
-        });
-      } else {
-        InsertTable("master_item", master_item, (err, result) => {
-          if (err) console.error("Error: ", err);
-
-          console.log(result);
-          res.json({
-            msg: "success",
+        if (data.length != 0) {
+          return res.json({
+            msg: "exist",
           });
+        } else {
+          let master_item = [
+            [itemsname, categoryid, status, createdby, createddate],
+          ];
+          let sql = `select * from master_item where mi_name = ?`;
+          SelectParameter(sql, [itemsname], (err, result) => {
+            if (err) console.error("Error: ", err);
+
+            console.log(result);
+
+            if (result.length != 0) {
+              return res.json({
+                msg: "exist",
+              });
+            } else {
+              InsertTable("master_item", master_item, (err, result) => {
+                if (err) console.error("Error: ", err);
+
+                console.log(result);
+                res.json({
+                  msg: "success",
+                });
+              });
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        res.json({
+          msg: error,
         });
-      }
-    });
+      });
   } catch (error) {
     res.json({
       msg: error,
@@ -159,3 +215,18 @@ router.post("/status", (req, res) => {
     });
   }
 });
+
+//#region Function
+function Check_Item(name) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_item where mi_name=?";
+
+    SelectParameter(sql, [name], (err, result) => {
+      if (err) reject(err);
+
+      console.log(result);
+      resolve(result);
+    });
+  });
+}
+//#endregion

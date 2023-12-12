@@ -176,6 +176,17 @@ class MasterPositionModel {
   }
 }
 
+class MasterClientModel {
+  constructor(id, branch, company, status, createdby, createddate) {
+    this.id = id;
+    this.branch = branch;
+    this.company = company;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
+
 module.exports = {
   MasterItemModel,
   MasterCategoryModel,
@@ -189,4 +200,5 @@ module.exports = {
   MasterDepartmentModel,
   MasterAccessModel,
   MasterPositionModel,
+  MasterClientModel
 };
