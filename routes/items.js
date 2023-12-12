@@ -98,28 +98,47 @@ router.post("/save", (req, res) => {
     let createdby =
       req.session.fullname == null ? "dev42" : req.session.fullname;
     let createddate = helper.GetCurrentDatetime();
-    let master_item = [[itemsname, categoryid, status, createdby, createddate]];
-    let sql = `select * from master_item where mi_name = ?`;
-    SelectParameter(sql, [itemsname], (err, result) => {
-      if (err) console.error("Error: ", err);
 
-      console.log(result);
+    Check_Item(itemsname)
+      .then((result) => {
+        let data = MasterItem(result);
 
-      if (result.length != 0) {
-        return res.json({
-          msg: "exist",
-        });
-      } else {
-        InsertTable("master_item", master_item, (err, result) => {
-          if (err) console.error("Error: ", err);
-
-          console.log(result);
-          res.json({
-            msg: "success",
+        if (data.length != 0) {
+          return res.json({
+            msg: "exist",
           });
+        } else {
+          let master_item = [
+            [itemsname, categoryid, status, createdby, createddate],
+          ];
+          let sql = `select * from master_item where mi_name = ?`;
+          SelectParameter(sql, [itemsname], (err, result) => {
+            if (err) console.error("Error: ", err);
+
+            console.log(result);
+
+            if (result.length != 0) {
+              return res.json({
+                msg: "exist",
+              });
+            } else {
+              InsertTable("master_item", master_item, (err, result) => {
+                if (err) console.error("Error: ", err);
+
+                console.log(result);
+                res.json({
+                  msg: "success",
+                });
+              });
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        res.json({
+          msg: error,
         });
-      }
-    });
+      });
   } catch (error) {
     res.json({
       msg: error,
@@ -196,3 +215,18 @@ router.post("/status", (req, res) => {
     });
   }
 });
+
+//#region Function
+function Check_Item(name) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_item where mi_name=?";
+
+    SelectParameter(sql, [name], (err, result) => {
+      if (err) reject(err);
+
+      console.log(result);
+      resolve(result);
+    });
+  });
+}
+//#endregion
