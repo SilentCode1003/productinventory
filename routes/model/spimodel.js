@@ -10,6 +10,7 @@ const {
   MasterDepartmentModel,
   MasterAccessModel,
   MasterPositionModel,
+  MasterClientModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -335,6 +336,33 @@ exports.MasterPosition = (data) => {
       new MasterPositionModel(
         key["id"],
         key["name"],
+        key["status"],
+        key["createdby"],
+        key["createddate"]
+      )
+  );
+};
+
+exports.MasterClient = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.mc_id,
+      branch: key.mc_branch,
+      company: key.mc_company,
+      status: key.mc_status,
+      createdby: key.mc_createdby,
+      createddate: key.mc_createddate,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new MasterClientModel(
+        key["id"],
+        key["branch"],
+        key["company"],
         key["status"],
         key["createdby"],
         key["createddate"]
