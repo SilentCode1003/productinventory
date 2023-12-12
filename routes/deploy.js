@@ -1,7 +1,8 @@
 var express = require("express");
-const { Select, InsertTable } = require("./repository/spidb");
+const { Select, InsertTable, Update } = require("./repository/spidb");
 const { Deploy, Return } = require("./model/spimodel");
 const { SelectStatement } = require("./repository/customhelper");
+const { GetValue, DLV } = require("./repository/dictionary");
 var router = express.Router();
 
 /* GET home page. */
@@ -44,17 +45,29 @@ router.post("/save", (req, res) => {
             msg: "exist",
           });
         } else {
-          InsertTable("deploy", deploy, (err, result) => {
-            if (err) console.error("Error: ", err);
-            console.log(result);
+          Deploy_Product(assetcontrol)
+            .then((result) => {
+              InsertTable("deploy", deploy, (err, result) => {
+                if (err) console.error("Error: ", err);
+                console.log(result);
 
-            res.json({
-              msg: "success",
+                res.json({
+                  msg: "success",
+                });
+              });
+            })
+            .catch((error) => {
+              res.json({
+                msg: error,
+              });
             });
-          });
         }
       })
-      .catch((error) => {});
+      .catch((error) => {
+        res.json({
+          msg: error,
+        });
+      });
   } catch (error) {
     res.json({
       msg: error,
@@ -73,6 +86,21 @@ function Check_Deploy(assetcontrol, date, deployto) {
       if (err) reject(err);
 
       console.log(result);
+      resolve(result);
+    });
+  });
+}
+
+function Deploy_Product(assetcontrol) {
+  return new Promise((resolve, reject) => {
+    let data = [GetValue(DLV()), assetcontrol];
+    let sql = "update product set p_status=? p_assetcontrol=?";
+
+    Update(sql, data, (err, result) => {
+      if (err) reject(err);
+
+      console.log(result);
+
       resolve(result);
     });
   });
