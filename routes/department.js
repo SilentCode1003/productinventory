@@ -1,7 +1,12 @@
 var express = require("express");
 var router = express.Router();
 
-const { Update, Select, InsertTable } = require("./repository/spidb");
+const {
+  Update,
+  Select,
+  InsertTable,
+  SelectParameter,
+} = require("./repository/spidb");
 const dictionary = require("./repository/dictionary");
 const helper = require("./repository/customhelper");
 const { MasterDepartment } = require("./model/spimodel");
@@ -53,15 +58,31 @@ router.post("/save", (req, res) => {
     let createddate = helper.GetCurrentDatetime();
     let master_department = [];
 
-    master_department.push([name, status, createdby, createddate]);
-    InsertTable("master_department", master_department, (err, result) => {
-      if (err) console.error("Error: ", err);
+    Check_Department(name)
+      .then((result) => {
+        let data = MasterDepartment(result);
 
-      console.log(result);
-      res.json({
-        msg: "success",
+        if (data.length != 0) {
+          return res.json({
+            msg: "exist",
+          });
+        } else {
+          master_department.push([name, status, createdby, createddate]);
+          InsertTable("master_department", master_department, (err, result) => {
+            if (err) console.error("Error: ", err);
+
+            console.log(result);
+            res.json({
+              msg: "success",
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        res.json({
+          msg: error,
+        });
       });
-    });
   } catch (error) {
     res.json({
       msg: error,
@@ -138,3 +159,18 @@ router.post("/status", (req, res) => {
     });
   }
 });
+
+//#region Function
+function Check_Department(name) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_department where md_name=?";
+
+    SelectParameter(sql, [name], (err, result) => {
+      if (err) reject(err);
+
+      console.log(result);
+      resolve(result);
+    });
+  });
+}
+//#endregion
