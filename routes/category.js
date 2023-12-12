@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 
-const { Update, Select, InsertTable } = require("./repository/spidb");
+const { Update, Select, InsertTable, SelectParameter } = require("./repository/spidb");
 const dictionary = require("./repository/dictionary");
 const helper = require("./repository/customhelper");
 const { MasterCategory } = require("./model/spimodel");
@@ -51,15 +51,30 @@ router.post("/save", (req, res) => {
     let createddate = helper.GetCurrentDatetime();
     let master_category = [];
 
-    master_category.push([categoryname, status, createdby, createddate]);
-    InsertTable("master_category", master_category, (err, result) => {
-      if (err) console.error("Error: ", err);
+    Check_Category(categoryname)
+      .then((result) => {
+        let data = MasterCategory(result);
+        if (data.length != 0) {
+          return res.json({
+            msg: "exist",
+          });
+        } else {
+          master_category.push([categoryname, status, createdby, createddate]);
+          InsertTable("master_category", master_category, (err, result) => {
+            if (err) console.error("Error: ", err);
 
-      console.log(result);
-      res.json({
-        msg: "success",
+            console.log(result);
+            res.json({
+              msg: "success",
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        res.json({
+          msg: error,
+        });
       });
-    });
   } catch (error) {
     res.json({
       msg: error,
@@ -136,3 +151,18 @@ router.post("/status", (req, res) => {
     });
   }
 });
+
+//#region Function
+function Check_Category(name) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_category where mc_name=?";
+
+    SelectParameter(sql, [name], (err, result) => {
+      if (err) reject(err);
+
+      console.log(result);
+      resolve(result);
+    });
+  });
+}
+//#endregion
