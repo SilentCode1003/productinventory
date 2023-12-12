@@ -340,4 +340,20 @@ exports.InsertTable = (tablename, data, callback) => {
       callback(null, result);
     });
   }
+
+  if (tablename == "master_client") {
+    let sql = `INSERT INTO master_client(
+      mc_branch,
+      mc_company,
+      mc_status,
+      mc_createdby,
+      mc_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
 };

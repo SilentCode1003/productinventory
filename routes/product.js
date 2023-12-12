@@ -1,7 +1,6 @@
 var express = require("express");
 var router = express.Router();
 
-
 const { Select, InsertTable, SelectParameter } = require("./repository/spidb");
 const { Product } = require("./model/spimodel");
 const { GenerateAssetTag } = require("./repository/customhelper");
@@ -16,7 +15,21 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let sql = "select * from product";
+    let sql = `SELECT 
+    p.p_assetcontrol as p_assetcontrol,
+    p.p_serial as p_serial,
+    mi.mi_name as p_itemname,
+    mc.mc_name as p_category,
+    p.p_podate as p_podate,
+    p.p_ponumber as p_ponumber,
+    p.p_warrantydate as p_warrantydate,
+    p.p_status as p_status
+    FROM 
+        product p
+    INNER JOIN 
+        master_item mi ON p.p_itemname = mi.mi_id
+    INNER JOIN 
+        master_category mc ON p.p_category = mc.mc_id`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -51,8 +64,6 @@ router.post("/save", (req, res) => {
     let status = GetValue(WH());
 
     // console.log(serial);
-
-
 
     Product_Check(serial)
       .then((result) => {
@@ -100,6 +111,54 @@ router.post("/save", (req, res) => {
       });
   } catch (error) {
     return res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/getserial", (req, res) => {
+  try {
+    const { assetcontrol } = req.body;
+    let sql = "select * from product where p_assetcontrol=?";
+
+    SelectParameter(sql, [assetcontrol], (err, result) => {
+      if (err) console.error("Error: ", err);
+      let data = Product(result);
+      console.log(result);
+
+      res.json({
+        msg: "success",
+        data: {
+          serial: data[0].serial,
+        },
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/getassetcontrol", (req, res) => {
+  try {
+    const { serial } = req.body;
+    let sql = "select * from product where p_serial=?";
+
+    SelectParameter(sql, [serial], (err, result) => {
+      if (err) console.error("Error: ", err);
+      let data = Product(result);
+      console.log(result);
+
+      res.json({
+        msg: "success",
+        data: {
+          assetcontrol: data[0].assetcontrol,
+        },
+      });
+    });
+  } catch (error) {
+    res.json({
       msg: error,
     });
   }

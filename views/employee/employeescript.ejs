@@ -3,11 +3,15 @@
         //Functionality
         var activePositions = [];
         let employeeid = "";
+        let firstname;
+        let middlename;
+        let lastname;
+        let contactnumber;
         let status = "";
     
         LoadTable();
     
-        $('#data-table tbody').on('click', 'tr', function () {
+        $('#datatable tbody').on('click', 'tr', function () {
             var dataRow = [];
             $(this).closest('tr').find('td').each(function () {
                 dataRow.push($(this).text());
@@ -30,10 +34,9 @@
             $('#employeesModal').modal('show');
         })
     
-        // $(document).on('click', '#closeBtn', function(){
-        //     $('#positionlist').val('');
-        //     $('#contactinfomodal').val('');
-        // })
+        $(document).on('click', '#editBtn', function(){
+            $('#editModal').modal('show');
+        })
     
         // $(document).on('click', '#deleteBtn', function(){
         //     $('#employeeidmodal2').val(employeeid);
@@ -51,6 +54,11 @@
         //         deleteBtnModal.prop('disabled', true);
         //     }
         // });
+
+        $(document).on('change', '#department', function() {    
+            let id = $(this).val();
+            console.log(id)
+        });
     
         $(document).on('click', '#addBtn', function () {
             let fullname = $('#fullname').val();
@@ -137,6 +145,7 @@
                         $('<td>', { text: item.position, 'data-label': 'oposition', class: 'custom-mobile-align no-wrap' }),
                         $('<td>', { text: item.department, 'data-label': 'Department', class: 'custom-mobile-align no-wrap' }),
                         $('<td>', { text: item.username, 'data-label': 'username', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.password, 'data-label': 'password', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.access, 'data-label': 'Access Type', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align no-wrap' }),
@@ -237,6 +246,36 @@
                         $("#position").val(selectedpositionid).change();
                     });
                     
+                },
+                error: function (err) {
+                errormsg(err);
+                },
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "/department/load",
+                success: function (result) {
+                    let container = result.data;
+                    $.each(container, (key, item) => {
+                        let departmentname = item.name;
+                        let departmentid = item.id;
+                        // console.log(departmentname);
+
+                        var listItem = $("<li></li>")
+                        .text(departmentname)
+                        .data("department", departmentid);
+
+                        $(".departmentlist").append(listItem);
+                    });
+
+                    $(".departmentlist").on("click", "li", function () {
+                        var selectedOption = $(this).text();
+                        var selecteddepartmentid = $(this).data("department");
+
+                        $("#selecteddepartment").text(selectedOption);
+                        $("#department").val(selecteddepartmentid).change();
+                    });
                 },
                 error: function (err) {
                 errormsg(err);

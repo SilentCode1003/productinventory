@@ -1,27 +1,34 @@
 var express = require("express");
 var router = express.Router();
 
-const { Update, Select, InsertTable, SelectParameter } = require("./repository/spidb");
+const {
+  Update,
+  Select,
+  InsertTable,
+  SelectParameter,
+} = require("./repository/spidb");
 const dictionary = require("./repository/dictionary");
 const helper = require("./repository/customhelper");
-const { MasterCategory } = require("./model/spimodel");
+const { MasterClient } = require("./model/spimodel");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("category", { title: "Express" });
+  res.render("client", { title: "Express" });
 });
 
 module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let sql = `select * from master_category`;
+    let sql = `select * from master_client`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
+      console.log(result);
+
       if (result.length != 0) {
-        let data = MasterCategory(result);
+        let data = MasterClient(result);
 
         console.log(data);
         res.json({
@@ -44,23 +51,25 @@ router.get("/load", (req, res) => {
 
 router.post("/save", (req, res) => {
   try {
-    let categoryname = req.body.categoryname;
+    let branch = req.body.branch;
+    let company = req.body.company;
     let status = dictionary.GetValue(dictionary.ACT());
     let createdby =
       req.session.fullname == null ? "dev42" : req.session.fullname;
     let createddate = helper.GetCurrentDatetime();
-    let master_category = [];
+    let master_client = [];
 
-    Check_Category(categoryname)
+    Check_Client(branch, company)
       .then((result) => {
-        let data = MasterCategory(result);
+        let data = MasterClient(result);
+
         if (data.length != 0) {
           return res.json({
             msg: "exist",
           });
         } else {
-          master_category.push([categoryname, status, createdby, createddate]);
-          InsertTable("master_category", master_category, (err, result) => {
+          master_client.push([branch, company, status, createdby, createddate]);
+          InsertTable("master_client", master_client, (err, result) => {
             if (err) console.error("Error: ", err);
 
             console.log(result);
@@ -84,19 +93,24 @@ router.post("/save", (req, res) => {
 
 router.post("/edit", (req, res) => {
   try {
-    let categorynamemodal = req.body.categorynamemodal;
-    let categorycode = req.body.categorycode;
+    const { branch, company, id } = req.body;
+    let data = [];
+    let sql_update = "UPDATE master_client SET";
 
-    let data = [categorynamemodal, categorycode];
+    if (branch != "") {
+      sql_update += " mc_branch=?,";
+      data.push(branch);
+    }
+    if (company != "") {
+      sql_update += " mc_company=?,";
+      data.push(company);
+    }
 
-    let sql_Update = `UPDATE master_category 
-                     SET mc_name = ?
-                     WHERE mc_id = ?`;
+    sql_update = sql_update.slice(0, -1);
+    sql_update += " WHERE mc_id=?";
+    data.push(id);
 
-    let sql_check = `SELECT * FROM master_category WHERE mc_id='${categorycode}'`;
-
-    console.log(data);
-
+    let sql_check = `SELECT * FROM master_client WHERE mc_id='${id}'`;
     Select(sql_check, (err, result) => {
       if (err) console.error("Error: ", err);
 
@@ -105,7 +119,7 @@ router.post("/edit", (req, res) => {
           msg: "notexist",
         });
       } else {
-        Update(sql_Update, data, (err, result) => {
+        Update(sql_update, data, (err, result) => {
           if (err) console.error("Error: ", err);
 
           console.log(result);
@@ -125,16 +139,16 @@ router.post("/edit", (req, res) => {
 
 router.post("/status", (req, res) => {
   try {
-    let categorycode = req.body.categorycode;
+    let id = req.body.id;
     let status =
       req.body.status == dictionary.GetValue(dictionary.ACT())
         ? dictionary.GetValue(dictionary.INACT())
         : dictionary.GetValue(dictionary.ACT());
-    let data = [status, categorycode];
+    let data = [status, id];
 
-    let sql_Update = `UPDATE master_category 
-                     SET mc_status = ?
-                     WHERE mc_id = ?`;
+    let sql_Update = `UPDATE master_client 
+                     SET ma_status = ?
+                     WHERE ma_id = ?`;
 
     console.log(data);
 
@@ -153,14 +167,17 @@ router.post("/status", (req, res) => {
 });
 
 //#region Function
-function Check_Category(name) {
+function Check_Client(branch, company) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from master_category where mc_name=?";
+    let sql = "select * from master_client where mc_brach=? and mc_company";
 
-    SelectParameter(sql, [name], (err, result) => {
+    let command = helper.SelectStatement(sql, [branch, company]);
+
+    Select(command, (err, result) => {
       if (err) reject(err);
 
       console.log(result);
+
       resolve(result);
     });
   });
