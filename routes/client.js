@@ -166,6 +166,49 @@ router.post("/status", (req, res) => {
   }
 });
 
+router.get("/getcompany", (req, res) => {
+  try {
+    let sql = "select * from master_client";
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      let data = MasterClient(result);
+
+      console.log(data);
+      res.json({
+        msg: "success",
+        data: data,
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/getbranch", (req, res) => {
+  try {
+    const { company } = req.body;
+    let sql = "select * from master_client where mc_company=?";
+
+    SelectParameter(sql, [company], (err, result) => {
+      if (err) console.error("Error: ", err);
+      let data = MasterClient(result);
+
+      console.log(data);
+      res.json({
+        msg: "success",
+        data: data,
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 //#region Function
 function Check_Client(branch, company) {
   return new Promise((resolve, reject) => {
