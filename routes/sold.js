@@ -80,6 +80,15 @@ function Check_Sold(assetcontrol, date, soldto) {
   return new Promise((resolve, reject) => {
     let sql =
       "select * from sold where s_assetcontrol-? and s_date=? and s_soldto=?";
+    let command = SelectStatement(sql, [assetcontrol, date, soldto]);
+
+    Select(command, (err, result) => {
+      if (err) reject(err);
+
+      console.log(result);
+
+      resolve(result);
+    });
   });
 }
 
