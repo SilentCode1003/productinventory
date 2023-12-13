@@ -28,6 +28,7 @@ exports.GetValue = (abr) => {
   if (abr == "OSR") return "ONSITE SERVICE REQUEST";
   if (abr == "DND") return "DONE";
   if (abr == "ASGN") return "ASSIGNED";
+  if (abr == "RPRD") return "REPAIRED";
 };
 
 //#region STATUS CODE
@@ -144,5 +145,9 @@ exports.DND = () => {
 
 exports.ASGN = () => {
   return "ASGN";
+};
+
+exports.RPRD = () => {
+  return "RPRD";
 };
 //#endregion

@@ -11,6 +11,7 @@ const {
   MasterAccessModel,
   MasterPositionModel,
   MasterClientModel,
+  RepairModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -366,6 +367,33 @@ exports.MasterClient = (data) => {
         key["status"],
         key["createdby"],
         key["createddate"]
+      )
+  );
+};
+
+exports.Repair = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.r_id,
+      assetcontrol: key.r_assetcontrol,
+      serial: key.r_serial,
+      date: key.r_date,
+      repairby: key.r_repairby,
+      referenceno: key.r_referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new RepairModel(
+        key["id"],
+        key["assetcontrol"],
+        key["serial"],
+        key["date"],
+        key["repairby"],
+        key["referenceno"]
       )
   );
 };

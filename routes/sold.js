@@ -32,8 +32,9 @@ router.get("/load", (req, res) => {
 
 router.post("/save", (req, res) => {
   try {
-    const { assetcontrol, serial, date, soldby, soldto } = req.body;
-    let sold = [[assetcontrol, serial, date, soldby, soldto]];
+    const { assetcontrol, serial, date, soldby, soldto, referenceno } =
+      req.body;
+    let sold = [[assetcontrol, serial, date, soldby, soldto, referenceno]];
 
     Check_Sold(assetcontrol, date, soldto)
       .then((result) => {
