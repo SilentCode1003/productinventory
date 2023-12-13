@@ -115,7 +115,7 @@ function Check_Transfer(assetcontrol, date, from, to) {
 function Transfer_Product(assetcontrol) {
   return new Promise((resolve, reject) => {
     let data = [GetValue(TRFR()), assetcontrol];
-    let sql = "update product set p_status=? p_assetcontrol=?";
+    let sql = "update product set p_status=? where p_assetcontrol=?";
 
     Update(sql, data, (err, result) => {
       if (err) reject(err);
