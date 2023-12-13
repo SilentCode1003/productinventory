@@ -2,7 +2,7 @@ var express = require("express");
 const { Select, InsertTable, Update } = require("./repository/spidb");
 const { Deploy, Return } = require("./model/spimodel");
 const { SelectStatement } = require("./repository/customhelper");
-const { GetValue, DLV } = require("./repository/dictionary");
+const { GetValue, DLV, DLY } = require("./repository/dictionary");
 var router = express.Router();
 
 /* GET home page. */
@@ -38,7 +38,7 @@ router.post("/save", (req, res) => {
     let deploy = [
       [assetcontrol, serial, date, deployby, deployto, referenceno],
     ];
-    console.log(deploy)
+    console.log(deploy);
 
     Check_Deploy(assetcontrol, date, deployto)
       .then((result) => {
@@ -51,6 +51,7 @@ router.post("/save", (req, res) => {
         } else {
           Deploy_Product(assetcontrol)
             .then((result) => {
+              console.log(result);
               InsertTable("deploy", deploy, (err, result) => {
                 if (err) console.error("Error: ", err);
                 console.log(result);
@@ -97,11 +98,15 @@ function Check_Deploy(assetcontrol, date, deployto) {
 
 function Deploy_Product(assetcontrol) {
   return new Promise((resolve, reject) => {
-    let data = [GetValue(DLV()), assetcontrol];
+    let data = [GetValue(DLY()), assetcontrol];
     let sql = "update product set p_status=? where p_assetcontrol=?";
 
+    console.log(data);
     Update(sql, data, (err, result) => {
-      if (err) reject(err);
+      if (err) {
+        console.error(err);
+        reject(err);
+      }
 
       console.log(result);
 

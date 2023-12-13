@@ -95,7 +95,7 @@ function Check_Sold(assetcontrol, date, soldto) {
 function Sold_Product(assetcontrol) {
   return new Promise((resolve, reject) => {
     let data = [GetValue(SLD()), assetcontrol];
-    let sql = "update product set p_status=? p_assetcontrol=?";
+    let sql = "update product set p_status=? where p_assetcontrol=?";
 
     Update(sql, data, (err, result) => {
       if (err) reject(err);
