@@ -93,7 +93,7 @@ function Check_Repair(assetcontrol, date) {
 function Repair_Product(assetcontrol) {
   return new Promise((resolve, reject) => {
     let data = [GetValue(RPRD()), assetcontrol];
-    let sql = "update product set p_status=? p_assetcontrol=?";
+    let sql = "update product set p_status=? where p_assetcontrol=?";
 
     Update(sql, data, (err, result) => {
       if (err) reject(err);

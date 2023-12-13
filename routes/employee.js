@@ -3,6 +3,7 @@ const { SelectParameter, Select, InsertTable } = require("./repository/spidb");
 const { Employee } = require("./model/spimodel");
 const { GetValue, ACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
+const { Encrypter } = require("./repository/cryptography");
 var router = express.Router();
 
 /* GET home page. */
@@ -52,26 +53,45 @@ router.post("/save", (req, res) => {
     let createdby =
       req.session.fullname == null ? "creator" : req.session.fullname;
     let createddate = GetCurrentDatetime();
-    let employee = [
-      [
-        fullname,
-        position,
-        department,
-        username,
-        password,
-        access,
-        status,
-        createdby,
-        createddate,
-      ],
-    ];
-    InsertTable("employee", employee, (err, result) => {
+
+    Encrypter(password, (err, encrypted) => {
       if (err) console.error("Error: ", err);
 
-      console.log(result);
-      res.json({
-        msg: "success",
-      });
+      console.log(encrypted);
+
+      Check_Employee(fullname)
+        .then((result) => {
+          let data = Employee(result);
+
+          if (data.length != 0) {
+            return res.json({
+              msg: "exist",
+            });
+          } else {
+            let employee = [
+              [
+                fullname,
+                position,
+                department,
+                username,
+                encrypted,
+                access,
+                status,
+                createdby,
+                createddate,
+              ],
+            ];
+            InsertTable("employee", employee, (err, result) => {
+              if (err) console.error("Error: ", err);
+
+              console.log(result);
+              res.json({
+                msg: "success",
+              });
+            });
+          }
+        })
+        .catch(() => {});
     });
   } catch (error) {
     res.json({
@@ -79,3 +99,17 @@ router.post("/save", (req, res) => {
     });
   }
 });
+
+//#region Function
+function Check_Employee(fullname) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from employee where e_fullname=?";
+    SelectParameter(sql, [fullname], (err, result) => {
+      if (err) reject(err);
+      console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+//#endregion
