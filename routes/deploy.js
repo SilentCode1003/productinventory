@@ -33,8 +33,11 @@ router.get("/load", (req, res) => {
 
 router.post("/save", (req, res) => {
   try {
-    const { assetcontrol, serial, date, deployby, deployto } = req.body;
-    let deploy = [[assetcontrol, serial, date, deployby, deployto]];
+    const { assetcontrol, serial, date, deployby, deployto, referenceno } =
+      req.body;
+    let deploy = [
+      [assetcontrol, serial, date, deployby, deployto, referenceno],
+    ];
 
     Check_Deploy(assetcontrol, date, deployto)
       .then((result) => {

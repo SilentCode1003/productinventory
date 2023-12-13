@@ -212,7 +212,7 @@ router.post("/getbranch", (req, res) => {
 //#region Function
 function Check_Client(branch, company) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from master_client where mc_brach=? and mc_company";
+    let sql = "select * from master_client where mc_branch=? and mc_company=?";
 
     let command = helper.SelectStatement(sql, [branch, company]);
 
