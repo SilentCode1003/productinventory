@@ -151,6 +151,7 @@ exports.Deploy = (data) => {
     (key) =>
       new DeployModel(
         key["id"],
+        key["assetcontrol"],
         key["serial"],
         key["date"],
         key["deployby"],
@@ -179,6 +180,7 @@ exports.Return = (data) => {
     (key) =>
       new ReturnModel(
         key["id"],
+        key["assetcontrol"],
         key["serial"],
         key["date"],
         key["returnby"],
@@ -206,6 +208,7 @@ exports.Return = (data) => {
     (key) =>
       new ReturnModel(
         key["id"],
+        key["assetcontrol"],
         key["serial"],
         key["date"],
         key["r_repairby"],
@@ -261,6 +264,7 @@ exports.Transfer = (data) => {
     (key) =>
       new TransferModel(
         key["id"],
+        key["assetcontrol"],
         key["serial"],
         key["date"],
         key["r_repairby"],
