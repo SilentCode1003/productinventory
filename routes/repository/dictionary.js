@@ -29,6 +29,7 @@ exports.GetValue = (abr) => {
   if (abr == "DND") return "DONE";
   if (abr == "ASGN") return "ASSIGNED";
   if (abr == "RPRD") return "REPAIRED";
+  if (abr == "TRFR") return "TRANSFER";
 };
 
 //#region STATUS CODE
@@ -149,5 +150,9 @@ exports.ASGN = () => {
 
 exports.RPRD = () => {
   return "RPRD";
+};
+
+exports.TRFR = () => {
+  return "TRFR";
 };
 //#endregion
