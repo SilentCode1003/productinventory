@@ -38,6 +38,7 @@ router.post("/save", (req, res) => {
     let deploy = [
       [assetcontrol, serial, date, deployby, deployto, referenceno],
     ];
+    console.log(deploy)
 
     Check_Deploy(assetcontrol, date, deployto)
       .then((result) => {
@@ -97,7 +98,7 @@ function Check_Deploy(assetcontrol, date, deployto) {
 function Deploy_Product(assetcontrol) {
   return new Promise((resolve, reject) => {
     let data = [GetValue(DLV()), assetcontrol];
-    let sql = "update product set p_status=? p_assetcontrol=?";
+    let sql = "update product set p_status=? where p_assetcontrol=?";
 
     Update(sql, data, (err, result) => {
       if (err) reject(err);
