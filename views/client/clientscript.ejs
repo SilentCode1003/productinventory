@@ -28,27 +28,34 @@
       });
   
       $(document).on("click", "#addBtn", function () {
-        let name = $("#name").val();
+        let companyname = $("#companyname").val();
+        let branchname = $("#branchname").val();
   
-        var message = "";
+        let message = "";
   
-        if (name == "") {
-          message += "Add Access";
+        if (branchname == "") {
+          message += "Branch Name, ";
         }
-  
+        if(branchname == "") {
+          message += "Company Name";
+        }
         if (message != "") {
           warning("Required", `Please fill up ${message}`);
-        } else {
+        } 
+        else {
           $.ajax({
             type: "POST",
             url: "/client/save",
             data: {
-              name: name,
+              company: companyname,
+              branch: branchname,
             },
             success: function (result) {
               if (result.msg == "success") {
                 LoadTable();
                 success("Saved", "Successfully");
+                $("#idmodal").val('');
+                $("#namemodal").val('');
               }
   
               if (result.msg == "exist") {
@@ -198,8 +205,8 @@
   
                 const tr = $('<tr>').append(
                     $('<td>', { text: item.id, 'data-label': 'ID', class: 'custom-mobile-align' }),
-                    $('<td>', { text: item.branch, 'data-label': 'Branch', class: 'custom-mobile-align' }),
                     $('<td>', { text: item.company, 'data-label': 'Company', class: 'custom-mobile-align' }),
+                    $('<td>', { text: item.branch, 'data-label': 'Branch', class: 'custom-mobile-align' }),
                     $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
                     $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align' }),
                     $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align' }),
@@ -245,51 +252,81 @@
       }
     });
 
+    $(document).on('click', '#companyDropdown .dropdown-option', function() {
+      let companyname = $(this).text();
+      $('#companyname').val(companyname).trigger('change');
+      activeBranch.length = 0;
+      $('#branchDropdown .dropdown-option').remove();
+      $("#branchname").val('');
+
+      $.ajax({
+        type: "POST",
+        url: "/client/getbranch",
+        data: {
+          company: companyname,
+        },
+        success: function (result) {
+          let container = result.data;
+
+          $.each(container, (key, item) => {
+            activeBranch.push(item.branch); 
+          });
+
+          console.log("branches: ", activeBranch)
+          populateCustomDropdown();
+          
+          function populateCustomDropdown() {
+              for (const branch of activeBranch) {
+                  addOption("branchDropdown", branch);
+              }
+          }
+
+          function addOption(dropdownId, optionText) {
+              const dropdownElement = document.getElementById(dropdownId);
+              const newOption = document.createElement("div");
+              newOption.className = "dropdown-option";
+              newOption.textContent = optionText;
+
+              newOption.addEventListener("click", function () {
+                  const inputElement = document.getElementById("branchname");
+                  inputElement.value = optionText;
+                  dropdownElement.style.display = "none";
+              });
+              
+              dropdownElement.appendChild(newOption);
+          }
+          
+          setupCustomDropdown("branchname", "branchDropdown", "dropdown-option");
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    });
+
     let activeBranch = [];
     let activeCompany = [];
+
     function LoadList() {
       $.ajax({
-          type: "GET",
-          url: "/access/load",
-          success: function (result) {
-              let container = result.data;
-              $.each(container, (key, item) => {
-                  let accessname = item.name;
-                  let accessid = item.id;
-                  console.log("access names:", item.name);
-                  activeBranch.push(item.name); 
-              });
-              populateCustomDropdown();
-          },
-          error: function (err) {
-          errormsg(err);
-          },
-      });
-
-      $.ajax({
-          type: "GET",
-          url: "/access/load",
-          success: function (result) {
-              let container = result.data;
-              $.each(container, (key, item) => {
-                  let accessname = item.name;
-                  let accessid = item.id;
-                  console.log("access names:", item.name);
-                  activeCompany.push(item.name); 
-              });
-              populateCustomDropdown1();
-          },
-          error: function (err) {
-          errormsg(err);
-          },
+        type: "GET",
+        url: "/client/getcompany",
+        success: function (result) {
+            let container = result.data;
+            console.log(container);
+            $.each(container, (key, item) => {
+                if (activeCompany.indexOf(item.company) === -1) {
+                    activeCompany.push(item.company); 
+                }
+            });
+            populateCustomDropdown1();
+        },
+        error: function (err) {
+            errormsg(err);
+        },
       });
     }
 
-    function populateCustomDropdown() {
-        for (const branch of activeBranch) {
-            addOption("branchDropdown", branch);
-        }
-    }
 
     function populateCustomDropdown1() {
         for (const company of activeCompany) {
@@ -333,22 +370,6 @@
         });
     }
 
-    function addOption(dropdownId, optionText) {
-        const dropdownElement = document.getElementById(dropdownId);
-        const newOption = document.createElement("div");
-        newOption.className = "dropdown-option";
-        newOption.textContent = optionText;
-
-        newOption.addEventListener("click", function () {
-            const inputElement = document.getElementById("branchname");
-            inputElement.value = optionText;
-            dropdownElement.style.display = "none";
-        });
-        
-        dropdownElement.appendChild(newOption);
-    }
-
-    
     function addOption2(dropdownId, optionText) {
         const dropdownElement = document.getElementById(dropdownId);
         const newOption = document.createElement("div");
@@ -364,7 +385,6 @@
         dropdownElement.appendChild(newOption);
     }
 
-    setupCustomDropdown("branchname", "branchDropdown", "dropdown-option");
     setupCustomDropdown("companyname", "companyDropdown", "dropdown-option");
     LoadList()
   </script>
