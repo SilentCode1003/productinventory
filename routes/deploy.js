@@ -14,7 +14,16 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let sql = "select * from deploy";
+    let sql = `select 
+    d_id,
+    d_assetcontrol,
+    d_serial,
+    d_date,
+    e_fullname as d_deployby,
+    d_deployto,
+    d_referenceno
+    from deploy
+    inner join employee on e_id = d_deployby`;
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
