@@ -135,6 +135,10 @@
   height: 625px !important;
 }
 
+.no-wrap{
+  white-space: nowrap;
+}
+
 .table-size-sm{
   height: 475px !important;
 }

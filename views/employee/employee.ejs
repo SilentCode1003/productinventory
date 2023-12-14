@@ -10,13 +10,20 @@
         <div class="row mb-2">
           <div class="col-lg-12">
             <div class="card-body">
+              
               <div class="row mb-2 justify-content-center">
                 <div class="col-md-6">
                   <label class="form-label" for="id">Employee ID</label>
                   <input id="employeeidmodal" name="employeeidmodal" type="text" class="form-control"
                     placeholder="" aria-label="employeeid" aria-describedby="basic-addon1" disabled />
                 </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="fullnamemodal">Full Name</label>
+                  <input id="fullnamemodal" name="fullnamemodal" type="text" class="form-control"
+                    placeholder="Enter New full Name" aria-label="fullnamemodal" aria-describedby="basic-addon1"/>
+                </div>
               </div>
+
               <div class="row">
                 <div class="col-md-6 mb-2">
                   <div class="customdropdown">
@@ -44,12 +51,19 @@
               </div>
 
               <div class="row mb-2 justify-content-center">
-                <div class="col-md-6">
-                  <label class="form-label" for="usernamemodal">User Name</label>
-                  <input id="usernamemodal" name="usernamemodal" type="text" class="form-control"
-                    placeholder="Enter New User Name" aria-label="usernamemodal" aria-describedby="basic-addon1" disabled />
+                <div class="col-md-6 mb-2">
+                  <div class="customdropdown">
+                    <div class="select selectdepartmentmodal">
+                      <span id="selecteddepartmentmodal">Select Department</span>
+                      <i class="fa fa-chevron-left"></i>
+                    </div>
+                    <input type="hidden" name="departmentmodal" id="departmentmodal">
+                    <ul class="customdropdown-menu departmentlistmodal">
+                    </ul>
+                  </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
