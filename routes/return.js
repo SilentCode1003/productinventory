@@ -16,13 +16,13 @@ router.get("/load", (req, res) => {
   try {
     let sql = `select 
     r_id,
-    r_assetcontroll,
+    r_assetcontrol,
     r_serial,
     r_date,
     e_fullname as r_returnby,
     r_returnfrom,
     r_referenceno
-    from return
+    from returnitem
     inner join employee on e_id = r_returnby;`;
 
     Select(sql, (err, result) => {
@@ -48,8 +48,9 @@ router.post("/save", (req, res) => {
     let returnitem = [
       [assetcontrol, serial, date, returnby, returnfrom, referenceno],
     ];
+    console.log(returnitem)
 
-    Check_Return(assetcontrol, date, from, to)
+    Check_Return(assetcontrol, date)
       .then((result) => {
         let data = Return(result);
         if (data.length != 0) {
@@ -59,7 +60,7 @@ router.post("/save", (req, res) => {
         } else {
           Return_Product()
             .then((result) => {
-              InsertTable("return", returnitem, (err, result) => {
+              InsertTable("returnitem", returnitem, (err, result) => {
                 if (err) console.error("Error: ", err);
                 console.log(result);
 
@@ -91,9 +92,8 @@ router.post("/save", (req, res) => {
 
 function Check_Return(assetcontrol, date, from, to) {
   return new Promise((resolve, reject) => {
-    let sql =
-      "select * from transfer where t_assetcontrol-? and t_date=? and t_from=? and t_to=?";
-    let command = SelectStatement(sql, [assetcontrol, date, from, to]);
+    let sql = "select * from returnitem where r_assetcontrol-? and r_date=?";
+    let command = SelectStatement(sql, [assetcontrol, date]);
 
     Select(command, (err, result) => {
       if (err) reject(err);
@@ -108,7 +108,7 @@ function Check_Return(assetcontrol, date, from, to) {
 function Return_Product(assetcontrol) {
   return new Promise((resolve, reject) => {
     let data = [GetValue(RET()), assetcontrol];
-    let sql = "update product set p_status=? p_assetcontrol=?";
+    let sql = "update product set p_status=? where p_assetcontrol=?";
 
     Update(sql, data, (err, result) => {
       if (err) reject(err);

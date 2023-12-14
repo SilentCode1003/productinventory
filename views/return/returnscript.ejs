@@ -14,28 +14,40 @@
             assetcontrol = dataRow[0];
         })
 
-
         $(document).on('click', '#addBtn', function () {
-            let serial = $('#serial').val();
-            let returnto = $('#returnto').val();
+            // const actualValue = $('#hiddenSerialValue').val();
+            
+            let data = $('#serialname').val();
+            let returnfrom = $('#returnfromid').val();
+            let returnby = $('#returnbyid').val();
             let referenceno = $('#referenceno').val();
+            let date = $('#date').val();
+            let splitData = data.split(' ');
+
+            let serial = splitData[0];
+            let assetControl = splitData[1].replace('(', '').replace(')', '');
 
             var message = "";
-            if (serial == '') { message += 'Serial, ' }
-            if (returnto == '') { message += 'Item Name, ' }
+            if (data == '') { message += 'Serial and Asset Control, ' }
+            if (returnfrom == '') { message += 'Deploy To, ' }
+            if (returnby == '') { message += 'Deploy By, ' }
             if (referenceno == '') { message += 'referenceno, ' }
+            if (date == '') { message += 'Date, ' }
 
             if (message != '') {
                 warning('Required', `Please fill up ${message}`);
             }
             else {
-                console.log(serial, returnto, referenceno)
+                console.log(assetControl, serial, date, returnby, returnfrom, referenceno, )
                 $.ajax({
                     type: 'POST',
                     url: '/return/save',
                     data: {
+                        assetcontrol: assetControl,
                         serial: serial,
-                        returnto: returnto,
+                        date: date,
+                        returnby: returnby,
+                        returnfrom: returnfrom,
                         referenceno: referenceno
                     },
                     success: function (result) {
@@ -43,8 +55,10 @@
                             LoadTable()
                             success('Saved', 'Successfully')
                             $('#serial').val('');
-                            $('#returnto').val('');
+                            $('#deployto').val('');
                             $('#referenceno').val('');
+                            $("#serialname").val('');
+                            $("#hiddenSerialValue").val('');
                         }
 
                         if (result.msg == 'exist') {
@@ -79,7 +93,7 @@
                         $('<td>', { text: item.serial, 'data-label': 'Serial', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.date, 'data-label': 'Date', class: 'custom-mobile-align no-wrap' }),
                         $('<td>', { text: item.returnby, 'data-label': 'Returned By', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: ite.returnto, 'data-label': 'Returned To', class: 'custom-mobile-align' }),
+                        $('<td>', { text: ite.returnfrom, 'data-label': 'Returned To', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.referenceno, 'data-label': 'Reference No.', class: 'custom-mobile-align' }),
                     );
                     tableBody.append(tr);
@@ -119,40 +133,156 @@
             });
         }
 
+        //#region CUSTOM DROPDOWN INPUT
+        let activeSerial = [];
+
         function LoadList() {
+            // console.log("triggered");
             $.ajax({
                 type: "GET",
-                url: "/category/load",
+                url: "/product/load",
+                success: function (result) {
+                    let container = result.data;
+                    // console.log(container);
+                    $.each(container, (key, item) => {
+                        let newname = item.serial + " (" + item.assetcontrol + ")";
+                        activeSerial.push({ display: newname, value: item.serial });
+                    });
+                    populateCustomDropdown1();
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "/client/load",
                 success: function (result) {
                     let container = result.data;
                     $.each(container, (key, item) => {
-                        let categoryname = item.name;
-                        let categoryid = item.id;
-                        console.log(categoryname);
+                        let displayname = item.company + " - " + item.branch;
+                        let dataid = item.company + " - " + item.branch;
+                        // console.log(displayname);
 
                         var listItem = $("<li></li>")
-                            .text(categoryname)
-                            .data("categoryid", categoryid);
+                            .text(displayname)
+                            .data("dataid", dataid);
 
-                        $(".seriallist").append(listItem);
+                        $(".returnfromlist").append(listItem);
                     });
 
-
-                    $(".seriallist").on("click", "li", function () {
+                    $(".returnfromlist").on("click", "li", function () {
                         var selectedOption = $(this).text();
-                        var selectedserialId = $(this).data("serial");
+                        var selectedreturnfromId = $(this).data("dataid");
 
-                        $("#selectedserial").text(selectedOption);
-                        $("#serial").val(selectedserialId).change();
+                        $("#selectedreturnfrom").text(selectedOption);
+                        $("#returnfromid").val(selectedreturnfromId).change();
                     });
                 },
                 error: function (err) {
                     errormsg(err);
                 },
             });
+
+            $.ajax({
+                type: "GET",
+                url: "/employee/load",
+                success: function (result) {
+                    let container = result.data;
+                    $.each(container, (key, item) => {
+                        let displayname = item.fullname;
+                        let dataid = item.id;
+                        // console.log(displayname);
+
+                        var listItem = $("<li></li>")
+                            .text(displayname)
+                            .data("dataid", dataid);
+
+                        $(".returnbylist").append(listItem);
+                    });
+
+                    $(".returnbylist").on("click", "li", function () {
+                        var selectedOption = $(this).text();
+                        var selectedreturnbyId = $(this).data("dataid");
+
+                        $("#selectedreturnby").text(selectedOption);
+                        $("#returnbyid").val(selectedreturnbyId).change();
+                    });
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        
         }
 
+        function populateCustomDropdown1() {
+            for (const serial of activeSerial) {
+                addOption2("serialDropdown", serial.display, serial.value);
+            }
+        }
+
+        function setupCustomDropdown(inputId, dropdownId, optionClass) {
+            const inputElement = document.getElementById(inputId);
+            const dropdownElement = document.getElementById(dropdownId);
+            const options = dropdownElement.getElementsByClassName(optionClass);
+
+            inputElement.addEventListener("click", function () {
+                dropdownElement.style.display = "block";
+            });
+
+            for (const option of options) {
+                option.addEventListener("click", function () {
+                    inputElement.value = option.textContent;
+                    const actualValue = option.getAttribute("data-value");
+                    inputElement.setAttribute("data-actual-value", actualValue);
+                    dropdownElement.style.display = "none";
+                });
+            }
+
+            inputElement.addEventListener("input", function () {
+                const value = inputElement.value.toUpperCase();
+                for (const option of options) {
+                    if (option.textContent.toUpperCase().includes(value)) {
+                        option.style.display = "block";
+                    } else {
+                        option.style.display = "none";
+                    }
+                }
+                dropdownElement.style.display = "block";
+            });
+
+            document.addEventListener("click", function (event) {
+                const target = event.target;
+                if (!dropdownElement.contains(target) && target !== inputElement) {
+                    dropdownElement.style.display = "none";
+                }
+            });
+        }
+
+        function addOption2(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenSerialValue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue); // Store the actual value in a data attribute
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("serialname");
+                inputElement.value = displayText; // Display the text in the input field
+                hiddenInput.value = actualValue; // Update the hidden input field with the actual value
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
         LoadList()
+        //#endregion
 
     })
 </script>
