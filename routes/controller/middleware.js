@@ -53,6 +53,9 @@ var roleacess = [
     role: "User",
     routes: [
       {
+        layout: "index",
+      },
+      {
         layout: "category",
       },
       {
@@ -85,7 +88,7 @@ exports.Validator = function (req, res, layout) {
   console.log(roleacess.length);
 
   if (req.session.access == "User" && layout == "index") {
-    return res.redirect("/index");
+    return res.redirect("/access");
   } else {
     roleacess.forEach((key, item) => {
       var routes = key.routes;
