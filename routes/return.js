@@ -48,6 +48,7 @@ router.post("/save", (req, res) => {
     let returnitem = [
       [assetcontrol, serial, date, returnby, returnfrom, referenceno],
     ];
+    console.log(returnitem)
 
     Check_Return(assetcontrol, date)
       .then((result) => {
@@ -107,7 +108,7 @@ function Check_Return(assetcontrol, date, from, to) {
 function Return_Product(assetcontrol) {
   return new Promise((resolve, reject) => {
     let data = [GetValue(RET()), assetcontrol];
-    let sql = "update product set p_status=? p_assetcontrol=?";
+    let sql = "update product set p_status=? where p_assetcontrol=?";
 
     Update(sql, data, (err, result) => {
       if (err) reject(err);

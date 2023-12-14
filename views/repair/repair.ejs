@@ -9,24 +9,46 @@
             <div class="card-body">
 
                 <div class="row d-flex justify-content-center">
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select/Input Asset Control or Serial" name="serialname" id="serialname"/>
+                          <input type="hidden" id="hiddenSerialValue" name="hiddenSerialValue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Asset Control/Serial</span>
+                          </div>
+                        </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="serialDropdown"></div>
+                    </div>
+                      
+                    <div class="col-md-6 mb-2">
                         <div class="customdropdown">
-                            <div class="select selectserial">
-                                <span id="selectedserial">Select Serial</span>
-                                <i class="fa fa-chevron-left"></i>
+                            <div class="select selectrepairby">
+                              <span id="selectedrepairby">Repair By</span>
+                              <i class="fa fa-chevron-left"></i>
                             </div>
-                            <input type="hidden" name="serial" id="serial">
-                            <ul class="customdropdown-menu seriallist">
-                            </ul>
+                            <input type="hidden" name="repairbyid" id="repairbyid">
+                            <ul class="customdropdown-menu repairbylist"></ul>
                         </div>
                     </div>
+                </div>
+
+                <div class="row d-flex mt-2">
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon2">Reference Number</span>
                             </div>
-                            <input id="refenceno" name="refenceno" type="text" class="form-control"
-                                placeholder="Enter Reference Number" aria-label="refenceno" aria-describedby="basic-addon1" />
+                            <input id="referenceno" name="referenceno" type="text" class="form-control"
+                                placeholder="Enter Reference Number" aria-label="referenceno" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Date</span>
+                            </div>
+                            <input id="date" name="date" type="date" class="form-control"
+                                placeholder="Enter Date" aria-label="date" aria-describedby="basic-addon1" />
                         </div>
                     </div>
                 </div>
@@ -43,6 +65,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- DataTales Example -->
 <div class="card shadow mb-4 table-size">
