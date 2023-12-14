@@ -190,33 +190,6 @@ exports.Return = (data) => {
   );
 };
 
-exports.Return = (data) => {
-  let dataResult = [];
-
-  data.forEach((key, item) => {
-    dataResult.push({
-      id: key.r_id,
-      assetcontrol: key.r_assetcontrol,
-      serial: key.r_serial,
-      date: key.r_date,
-      repairby: key.r_repairby,
-      referenceno: key.r_referenceno,
-    });
-  });
-
-  return dataResult.map(
-    (key) =>
-      new ReturnModel(
-        key["id"],
-        key["assetcontrol"],
-        key["serial"],
-        key["date"],
-        key["r_repairby"],
-        key["referenceno"]
-      )
-  );
-};
-
 exports.Sold = (data) => {
   let dataResult = [];
 
