@@ -1,9 +1,51 @@
 var roleacess = [
   {
-    role: "Administrator",
+    role: "Admin",
     routes: [
       {
-        layout: "dashboard",
+        layout: "index",
+      },
+      {
+        layout: "access",
+      },
+      {
+        layout: "category",
+      },
+      {
+        layout: "client",
+      },
+      {
+        layout: "department",
+      },
+      {
+        layout: "deploy",
+      },
+      {
+        layout: "employee",
+      },
+      {
+        layout: "items",
+      },
+      {
+        layout: "position",
+      },
+      {
+        layout: "product",
+      },
+      {
+        layout: "repair",
+      },
+      {
+        layout: "return",
+      },
+      {
+        layout: "sold",
+      },
+      {
+        layout: "transfer",
+      },
+      {
+        layout: "users",
       },
     ],
   },
@@ -11,7 +53,28 @@ var roleacess = [
     role: "User",
     routes: [
       {
-        layout: "dashboard",
+        layout: "category",
+      },
+      {
+        layout: "items",
+      },
+      {
+        layout: "product",
+      },
+      {
+        layout: "deploy",
+      },
+      {
+        layout: "repair",
+      },
+      {
+        layout: "return",
+      },
+      {
+        layout: "sold",
+      },
+      {
+        layout: "transfer",
       },
     ],
   },
@@ -21,8 +84,8 @@ exports.Validator = function (req, res, layout) {
   console.log(layout);
   console.log(roleacess.length);
 
-  if (req.session.accesstype == "User" && layout == "index") {
-    return res.redirect("/dashboard");
+  if (req.session.access == "User" && layout == "index") {
+    return res.redirect("/index");
   } else {
     roleacess.forEach((key, item) => {
       var routes = key.routes;
@@ -30,10 +93,10 @@ exports.Validator = function (req, res, layout) {
       routes.forEach((value, index) => {
         console.log(`${key.role} - ${value.layout}`);
 
-        if (key.role == req.session.accesstype && value.layout == layout) {
+        if (key.role == req.session.access && value.layout == layout) {
           return res.render(`${layout}`, {
-            employeeid: req.session.employeeid,
             fullname: req.session.fullname,
+            access: req.session.access,
             department: req.session.department,
             position: req.session.position,
           });

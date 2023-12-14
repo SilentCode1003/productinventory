@@ -74,9 +74,8 @@ router.post("/save", (req, res) => {
         } else {
           Product_Count()
             .then((result) => {
-              sequence = parseInt(
-                result[0].total == 0 ? sequence : result[0].total++
-              );
+              sequence = parseInt((result[0].total += 1));
+
               let product = [
                 [
                   GenerateAssetTag(category, sequence),

@@ -1,0 +1,131 @@
+<!-- Modal -->
+<div class="modal fade bd-example-modal-lg" id="editModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Client</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-2">
+          <div class="col-lg-12">
+            <div class="card-body">
+              <div class="row mb-2">
+                <div class="col-md-12">
+                  <label class="form-label" for="idmodal">Client ID</label>
+                  <input id="idmodal" name="idmodal" type="text" class="form-control" placeholder="Enter new access"
+                    aria-label="fullname" aria-describedby="basic-addon1" disabled />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label" for="branchmodal">Branch</label>
+                  <input id="branchmodal" name="branchmodal" type="text" class="form-control" placeholder="Enter new access"
+                    aria-label="fullname" aria-describedby="basic-addon1" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="companymodal">Company</label>
+                    <input id="companymodal" name="companymodal" type="text" class="form-control" placeholder="Enter new access"
+                      aria-label="fullname" aria-describedby="basic-addon1" />
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-cyberpower" data-dismiss="modal">
+          <i class="fa fa-times" aria-hidden="true"></i>Close
+        </button>
+        <button type="button" id="updateBtn" class="btn btn-outline-cyberpower">
+          <i class="fa fa-check" aria-hidden="true"></i>Update
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PCreated by Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-3">
+  <h1 class="cyber-title">Client</h1>
+</div>
+<!-- Content Row -->
+<div class="row mb-2">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+
+        <div class="row d-flex">
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <input class="form-control text-center custom-input" placeholder="Select/Input Company" name="companyname" id="companyname"/>
+              <div class="input-group-append">
+                <span class="input-group-text">Company</span>
+              </div>
+            </div>
+            <div class="custom-dropdown custom-dropdown-margin-left" id="companyDropdown"></div>
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <input class="form-control text-center custom-input" placeholder="Select/Input Branch" name="branchname" id="branchname"/>
+              <div class="input-group-append">
+                  <span class="input-group-text">Branch</span>
+              </div>
+            </div>
+            <div class="custom-dropdown custom-dropdown-margin-left" id="branchDropdown"></div>
+          </div>
+        </div>
+
+        <div class="row justify-content-end">
+          <div class="col-md-4 align mt-1">
+            <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-100">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              Add
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4 table-size">
+  <div class="progress progress-sm mb-2">
+    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+      aria-valuemax="100"></div>
+  </div>
+  <div class="card-header card-bg align-content-center">
+    <div class="row">
+      <div class="col-md-3">
+        <h5 class="m-0 font-weight-bold cyber-title mt-2">Client Table</h5>
+      </div>
+      <div class="col-md-8 mt-1">
+        <input id="search" name="search" type="text" class="form-control" placeholder="Search Client Name"
+          aria-label="search" aria-describedby="basic-addon1" />
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="table-responsive scrollable-table-container">
+      <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+        <thead class="table-dark table-header">
+          <tr>
+            <th class="col-1 text-start">ID</th>
+            <th class="col-3 text-center">Company</th>
+            <th class="col-3 text-center">Branch</th>
+            <th class="col-1 text-center">Status</th>
+            <th class="col-2 text-center">Created by</th>
+            <th class="col-2 text-center">Created date</th>
+            <th class=""></th>
+          </tr>
+        </thead>
+
+        <tbody class="no-border"></tbody>
+      </table>
+    </div>
+  </div>
+</div>

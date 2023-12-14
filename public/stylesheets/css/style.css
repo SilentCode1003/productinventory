@@ -15,6 +15,7 @@
   --clr-background: #1f232c;
   --clr-background-content: #3e4046;
   --clr-text: #45edf2;
+  --clr-6: #77d1cd;
   --clr-glow: #c72ba5;
   --clr-card: #273441;
   --clr-inputfield: #555555;
@@ -39,6 +40,11 @@
 #content{
   margin-top: 4.375rem;
   margin-left: 14rem;
+}
+
+#content1{
+  background-color: var(--clr-background);
+  height: 100vh;
 }
 
 .sticky-footer{
@@ -437,11 +443,11 @@ body {
 .custom-dropdown {
   display: none;
   width: 100%;
-  border: 1px solid #ccc;
+  border: 1px solid var(--clr-card);
   max-height: 250px;
   overflow-y: auto;
   position: absolute;
-  background-color: white;
+  background-color: var(--clr-card);
   width: 36.7vw;
   z-index: 1000;
   border-radius: 0.275rem;
@@ -462,11 +468,15 @@ body {
 
 .dropdown-option {
   padding: 5px 10px;
+  background-color: var(--clr-card) !important;
+  border: 1px solid var(--clr-card) !important;
   cursor: pointer;
+  border-radius: 0.275rem;
 }
 
 .dropdown-option:hover {
-  background-color: #f0f0f0;
+  background-color: var(--clr-6) !important;
+  color: var(--clr-background) !important;
 }
 
 .daterangepicker th.month{
