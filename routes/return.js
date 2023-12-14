@@ -3,11 +3,13 @@ const { Select, InsertTable } = require("./repository/spidb");
 const { Return } = require("./model/spimodel");
 const { SelectStatement } = require("./repository/customhelper");
 const { GetValue, RET } = require("./repository/dictionary");
+const { Validator } = require("./controller/middleware");
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("return", { title: "Express" });
+  // res.render("return", { title: "Express" });
+  Validator(req, res, "return");
 });
 
 module.exports = router;

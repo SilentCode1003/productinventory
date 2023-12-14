@@ -5,10 +5,12 @@ const { Update, Select, InsertTable, SelectParameter } = require("./repository/s
 const dictionary = require("./repository/dictionary");
 const helper = require("./repository/customhelper");
 const { MasterCategory } = require("./model/spimodel");
+const { Validator } = require("./controller/middleware");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("category", { title: "Express" });
+  // res.render("category", { title: "Express" });
+  Validator(req, res, "category");
 });
 
 module.exports = router;

@@ -2,11 +2,13 @@ var express = require("express");
 const { Sold } = require("./model/spimodel");
 const { InsertTable } = require("./repository/spidb");
 const { SLD, GetValue } = require("./repository/dictionary");
+const { Validator } = require("./controller/middleware");
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("sold", { title: "Express" });
+  // res.render("sold", { title: "Express" });
+  Validator(req, res, "sold")
 });
 
 module.exports = router;
