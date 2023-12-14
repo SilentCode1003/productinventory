@@ -80,7 +80,7 @@
       border-radius: 0.275rem;
       overflow: hidden;
       display: none;
-      max-height: 144px;
+      max-height: 178px;
       overflow-y: auto;
       z-index: 9;
       border: 3px solid var(--clr-background);
