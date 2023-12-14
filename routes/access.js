@@ -14,8 +14,8 @@ const { Validator } = require("./controller/middleware");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("access", { title: "Express" });
-  
+  // res.render("access", { title: "Express" });
+  Validator(req, res, "access");
 });
 
 module.exports = router;

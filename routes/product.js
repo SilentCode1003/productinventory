@@ -5,10 +5,12 @@ const { Select, InsertTable, SelectParameter } = require("./repository/spidb");
 const { Product } = require("./model/spimodel");
 const { GenerateAssetTag } = require("./repository/customhelper");
 const { GetValue, WH } = require("./repository/dictionary");
+const { Validator } = require("./controller/middleware");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("product", { title: "Express" });
+  // res.render("product", { title: "Express" });
+  Validator(req, res, "product");
 });
 
 module.exports = router;

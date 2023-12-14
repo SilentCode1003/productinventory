@@ -3,11 +3,13 @@ const { Select } = require("./repository/spidb");
 const { Transfer } = require("./model/spimodel");
 const { GetValue, TRFR } = require("./repository/dictionary");
 const { SelectStatement } = require("./repository/customhelper");
+const { Validator } = require("./controller/middleware");
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("transfer", { title: "Express" });
+  // res.render("transfer", { title: "Express" });
+  Validator(req, res, "transfer");
 });
 
 module.exports = router;

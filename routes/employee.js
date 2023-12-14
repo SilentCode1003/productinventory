@@ -4,11 +4,13 @@ const { Employee } = require("./model/spimodel");
 const { GetValue, ACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
 const { Encrypter } = require("./repository/cryptography");
+const { Validator } = require("./controller/middleware");
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("employee", { title: "Express" });
+  // res.render("employee", { title: "Express" });
+  Validator(req, res, "employee");
 });
 
 module.exports = router;
