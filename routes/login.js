@@ -19,7 +19,7 @@ router.post("/login", (req, res) => {
 
     Encrypter(password, (err, encrypted) => {
       if (err) console.error("Error: ", err);
-      let data = [username, password];
+      let data = [username, encrypted];
       let command = SelectStatement(sql, data);
 
       Select(command, (err, result) => {
