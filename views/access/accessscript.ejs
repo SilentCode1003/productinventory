@@ -48,6 +48,7 @@
             success: function (result) {
               if (result.msg == "success") {
                 LoadTable();
+                $("#name").val('');
                 success("Saved", "Successfully");
               }
   

@@ -14,18 +14,19 @@
             assetcontrol = dataRow[0];
         })
 
+        $(document).on('input', '#location', function () {
+            $('#hiddenValue').val('');
+        });
+
         $(document).on('click', '#addBtn', function () {
             // const actualValue = $('#hiddenSerialValue').val();
-            
+            let location = $('#hiddenValue').val();
             let data = $('#serialname').val();
             let deployto = $('#location').val();
             let deployby = $('#employeeid').val();
             let referenceno = $('#referenceno').val();
             let date = $('#date').val();
             let splitData = data.split(' ');
-
-            let serial = splitData[0];
-            let assetControl = splitData[1].replace('(', '').replace(')', '');
 
             var message = "";
             if (data == '') { message += 'Serial and Asset Control, ' }
@@ -38,39 +39,76 @@
                 warning('Required', `Please fill up ${message}`);
             }
             else {
-                console.log(assetControl, serial, date, deployby, deployto, referenceno, )
-                $.ajax({
-                    type: 'POST',
-                    url: '/deploy/save',
-                    data: {
-                        assetcontrol: assetControl,
-                        serial: serial,
-                        date: date,
-                        deployby: deployby,
-                        deployto: deployto,
-                        referenceno: referenceno
-                    },
-                    success: function (result) {
-                        if (result.msg == 'success') {
-                            LoadTable()
-                            success('Saved', 'Successfully')
-                            $('#serial').val('');
-                            $('#deployto').val('');
-                            $('#referenceno').val('');
-                            $("#serialname").val('');
-                            $("#hiddenSerialValue").val('');
-                            $("#date").val('');
-                        }
+                
+                let serial = splitData[0];
+                let assetControl = splitData[1].replace('(', '').replace(')', '');
+                // console.log("Save Data: ", assetControl, serial, date, deployby, deployto, referenceno, )
+                // console.log("location check: ", location);
 
-                        if (result.msg == 'exist') {
-                            warning('Exist', `${serial} already exist!`);
-                        }
+                if (location != ''){
+                    let match = location.match(/\((.*?)\)\s*\((.*?)\)/);
 
-                    },
-                    error: function (err) {
-                        errormsg(err);
-                    }
-                })
+                    let branch = match[1].trim();
+                    let company = match[2].trim();
+
+                    console.log("Branch: ", branch);
+                    console.log("Company: ", company);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/client/checklocation',
+                        data: {
+                            company: company,
+                            branch: branch,
+                        },
+                        success: function (result) {
+                            if (result.msg == 'notexist'){
+                                warning('Not Exist', `${location} does not exist!`);
+                            } else{
+                                success('Exist', `${location} exist!` )
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/deploy/save',
+                                    data: {
+                                        assetcontrol: assetControl,
+                                        serial: serial,
+                                        date: date,
+                                        deployby: deployby,
+                                        deployto: deployto,
+                                        referenceno: referenceno
+                                    },
+                                    success: function (result) {
+                                        if (result.msg == 'success') {
+                                            LoadTable()
+                                            success('Saved', 'Successfully')
+                                            $('#location').val('');
+                                            $('#employeeid').val('');
+                                            $("#selectedemployee").text('Deploy By');
+                                            $('#referenceno').val('');
+                                            $("#serialname").val('');
+                                            $("#hiddenSerialValue").val('');
+                                            $("#date").val('');
+                                            $('#hiddenValue').val('');
+                                            
+                                        }
+
+                                        if (result.msg == 'exist') {
+                                            warning('Exist', `${serial} already exist!`);
+                                        }
+
+                                    },
+                                    error: function (err) {
+                                        errormsg(err);
+                                    }
+                                })
+                            }
+                        },
+                        error: function (err) {
+                            errormsg(err);
+                        }
+                    });
+                } else{
+                    warning('Not Exist', `Location does not exist!`);
+                }
             }
         })
 
@@ -164,7 +202,8 @@
                     let container = result.data;
                     $.each(container, (key, item) => {
                         let displayname = item.company + " - " + item.branch;
-                        activeDeployLocation.push({ display: displayname, value: displayname });
+                        let hiddenData = "("+ item.branch +") (" + item.company +")" 
+                        activeDeployLocation.push({ display: displayname, value: hiddenData });
                         // let dataid = item.company + " - " + item.branch;
                         // console.log(displayname);
 
