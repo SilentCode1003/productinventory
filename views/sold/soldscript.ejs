@@ -14,27 +14,39 @@
             assetcontrol = dataRow[0];
         })
 
-
         $(document).on('click', '#addBtn', function () {
-            let serial = $('#serial').val();
-            let soldto = $('#soldto').val();
+            // const actualValue = $('#hiddenSerialValue').val();
+            
+            let data = $('#serialname').val();
+            let soldto = $('#location').val();
+            let soldby = $('#employeeid').val();
             let referenceno = $('#referenceno').val();
+            let date = $('#date').val();
+            let splitData = data.split(' ');
+
+            let serial = splitData[0];
+            let assetControl = splitData[1].replace('(', '').replace(')', '');
 
             var message = "";
-            if (serial == '') { message += 'Serial, ' }
-            if (soldto == '') { message += 'Item Name, ' }
+            if (data == '') { message += 'Serial and Asset Control, ' }
+            if (soldto == '') { message += 'Deploy To, ' }
+            if (soldby == '') { message += 'Deploy By, ' }
             if (referenceno == '') { message += 'referenceno, ' }
+            if (date == '') { message += 'Date, ' }
 
             if (message != '') {
                 warning('Required', `Please fill up ${message}`);
             }
             else {
-                console.log(serial, soldto, referenceno)
+                console.log(assetControl, serial, date, soldby, soldto, referenceno, )
                 $.ajax({
                     type: 'POST',
-                    url: '/deploy/save',
+                    url: '/sold/save',
                     data: {
+                        assetcontrol: assetControl,
                         serial: serial,
+                        date: date,
+                        soldby: soldby,
                         soldto: soldto,
                         referenceno: referenceno
                     },
@@ -45,6 +57,9 @@
                             $('#serial').val('');
                             $('#soldto').val('');
                             $('#referenceno').val('');
+                            $("#serialname").val('');
+                            $("#hiddenSerialValue").val('');
+                            $("#date").val('');
                         }
 
                         if (result.msg == 'exist') {
@@ -119,40 +134,185 @@
             });
         }
 
+        //#region CUSTOM DROPDOWN INPUT
+        let activeSerial = [];
+        let activeDeployLocation = [];
+
         function LoadList() {
+            // console.log("triggered");
             $.ajax({
                 type: "GET",
-                url: "/category/load",
+                url: "/product/load",
+                success: function (result) {
+                    let container = result.data;
+                    // console.log(container);
+                    $.each(container, (key, item) => {
+                        let newname = item.serial + " (" + item.assetcontrol + ")";
+                        activeSerial.push({ display: newname, value: item.serial });
+                    });
+                    populateCustomDropdown1();
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "/client/load",
                 success: function (result) {
                     let container = result.data;
                     $.each(container, (key, item) => {
-                        let categoryname = item.name;
-                        let categoryid = item.id;
-                        console.log(categoryname);
+                        let displayname = item.company + " - " + item.branch;
+                        activeDeployLocation.push({ display: displayname, value: displayname });
+                        // let dataid = item.company + " - " + item.branch;
+                        // console.log(displayname);
+
+                        // var listItem = $("<li></li>")
+                        //     .text(displayname)
+                        //     .data("dataid", dataid);
+
+                        // $(".deploylist").append(listItem);
+                    });
+                    populateCustomDropdown();
+
+                    // $(".deploylist").on("click", "li", function () {
+                    //     var selectedOption = $(this).text();
+                    //     var selecteddeployId = $(this).data("dataid");
+
+                    //     $("#selecteddeploy").text(selectedOption);
+                    //     $("#deployid").val(selecteddeployId).change();
+                    // });
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "/employee/load",
+                success: function (result) {
+                    let container = result.data;
+                    $.each(container, (key, item) => {
+                        let displayname = item.fullname;
+                        let dataid = item.id;
+                        // console.log(displayname);
 
                         var listItem = $("<li></li>")
-                            .text(categoryname)
-                            .data("categoryid", categoryid);
+                            .text(displayname)
+                            .data("dataid", dataid);
 
-                        $(".seriallist").append(listItem);
+                        $(".employeelist").append(listItem);
                     });
 
-
-                    $(".seriallist").on("click", "li", function () {
+                    $(".employeelist").on("click", "li", function () {
                         var selectedOption = $(this).text();
-                        var selectedserialId = $(this).data("serial");
+                        var selectedemployeeId = $(this).data("dataid");
 
-                        $("#selectedserial").text(selectedOption);
-                        $("#serial").val(selectedserialId).change();
+                        $("#selectedemployee").text(selectedOption);
+                        $("#employeeid").val(selectedemployeeId).change();
                     });
                 },
                 error: function (err) {
                     errormsg(err);
                 },
             });
+        
         }
 
+        function populateCustomDropdown1() {
+            for (const serial of activeSerial) {
+                addOption2("serialDropdown", serial.display, serial.value);
+            }
+        }
+
+        function populateCustomDropdown() {
+            for (const deploy of activeDeployLocation) {
+                addOption1("locationDropdown", deploy.display, deploy.value);
+            }
+        }
+
+        function setupCustomDropdown(inputId, dropdownId, optionClass) {
+            const inputElement = document.getElementById(inputId);
+            const dropdownElement = document.getElementById(dropdownId);
+            const options = dropdownElement.getElementsByClassName(optionClass);
+
+            inputElement.addEventListener("click", function () {
+                dropdownElement.style.display = "block";
+            });
+
+            for (const option of options) {
+                option.addEventListener("click", function () {
+                    inputElement.value = option.textContent;
+                    const actualValue = option.getAttribute("data-value");
+                    inputElement.setAttribute("data-actual-value", actualValue);
+                    dropdownElement.style.display = "none";
+                });
+            }
+
+            inputElement.addEventListener("input", function () {
+                const value = inputElement.value.toUpperCase();
+                for (const option of options) {
+                    if (option.textContent.toUpperCase().includes(value)) {
+                        option.style.display = "block";
+                    } else {
+                        option.style.display = "none";
+                    }
+                }
+                dropdownElement.style.display = "block";
+            });
+
+            document.addEventListener("click", function (event) {
+                const target = event.target;
+                if (!dropdownElement.contains(target) && target !== inputElement) {
+                    dropdownElement.style.display = "none";
+                }
+            });
+        }
+
+        function addOption2(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenSerialValue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue); 
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("serialname");
+                inputElement.value = displayText; 
+                hiddenInput.value = actualValue; 
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        function addOption1(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenValue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue); 
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("location");
+                inputElement.value = displayText; 
+                hiddenInput.value = actualValue; 
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
+        setupCustomDropdown("location", "locationDropdown", "dropdown-option");
         LoadList()
+        //#endregion
 
     })
 </script>

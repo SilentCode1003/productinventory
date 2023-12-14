@@ -18,29 +18,29 @@
                           </div>
                         </div>
                         <div class="custom-dropdown custom-dropdown-margin-left" id="serialDropdown"></div>
-                      </div>
+                    </div>
                 </div>
 
                 <div class="row d-flex mt-2">
                     <div class="col-md-6 mb-2">
-                        <div class="customdropdown">
-                            <div class="select selectdeploy">
-                              <span id="selecteddeploy">Deploy To</span>
-                              <i class="fa fa-chevron-left"></i>
-                            </div>
-                            <input type="hidden" name="deployid" id="deployid">
-                            <ul class="customdropdown-menu deploylist"></ul>
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select Deploy To" name="location" id="location"/>
+                          <input type="hidden" id="hiddenValue" name="hiddenValue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Deploy To</span>
+                          </div>
                         </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="locationDropdown"></div>
                     </div>
 
                     <div class="col-md-6 mb-2">
                         <div class="customdropdown">
-                            <div class="select selectdeployby">
-                              <span id="selecteddeployby">Deploy By</span>
+                            <div class="select selectemployee">
+                              <span id="selectedemployee">Deploy By</span>
                               <i class="fa fa-chevron-left"></i>
                             </div>
-                            <input type="hidden" name="deploybyid" id="deploybyid">
-                            <ul class="customdropdown-menu deploybylist"></ul>
+                            <input type="hidden" name="employeeid" id="employeeid">
+                            <ul class="customdropdown-menu employeelist"></ul>
                         </div>
                     </div>
                 </div>

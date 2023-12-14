@@ -9,71 +9,59 @@
             <div class="card-body">
 
                 <div class="row d-flex justify-content-center">
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select/Input Asset Control or Serial" name="serialname" id="serialname"/>
+                          <input type="hidden" id="hiddenSerialValue" name="hiddenSerialValue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Asset Control/Serial</span>
+                          </div>
+                        </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="serialDropdown"></div>
+                    </div>
+                </div>
+
+                <div class="row d-flex mt-2">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select/Input Transfer From" name="location" id="location"/>
+                          <input type="hidden" id="hiddenValue" name="hiddenValue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">From</span>
+                          </div>
+                        </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="locationDropdown"></div>
+                    </div>
+
+                    <div class="col-md-6 mb-2">
                         <div class="customdropdown">
-                            <div class="select selectserial">
-                                <span id="selectedserial">Select Serial</span>
-                                <i class="fa fa-chevron-left"></i>
+                            <div class="select selectemployee">
+                              <span id="selectedemployee">Transfer By</span>
+                              <i class="fa fa-chevron-left"></i>
                             </div>
-                            <input type="hidden" name="serial" id="serial">
-                            <ul class="customdropdown-menu seriallist">
-                            </ul>
+                            <input type="hidden" name="employeeid" id="employeeid">
+                            <ul class="customdropdown-menu employeelist"></ul>
                         </div>
                     </div>
                 </div>
 
                 <div class="row d-flex mt-2">
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">Transfer By</span>
-                            </div>
-                            <input id="transferby" name="transferby" type="text" class="form-control"
-                                placeholder="Enter Transfer By" aria-label="transferby" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">Receive By</span>
-                            </div>
-                            <input id="receiveby" name="receiveby" type="text" class="form-control"
-                                placeholder="Enter Receive By" aria-label="receiveby" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row d-flex mt-2">
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">From</span>
-                            </div>
-                            <input id="from" name="from" type="text" class="form-control" placeholder="Enter From(?)"
-                                aria-label="from" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">To</span>
-                            </div>
-                            <input id="to" name="to" type="text" class="form-control" placeholder="Enter To(?)"
-                                aria-label="to" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row d-flex justify-content-center mt-2">
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon2">Reference Number</span>
                             </div>
-                            <input id="refenceno" name="refenceno" type="text" class="form-control"
-                                placeholder="Enter Reference Number" aria-label="refenceno" aria-describedby="basic-addon1" />
+                            <input id="referenceno" name="referenceno" type="text" class="form-control"
+                                placeholder="Enter Reference Number" aria-label="referenceno" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Date</span>
+                            </div>
+                            <input id="date" name="date" type="date" class="form-control"
+                                placeholder="Enter Date" aria-label="date" aria-describedby="basic-addon1" />
                         </div>
                     </div>
                 </div>

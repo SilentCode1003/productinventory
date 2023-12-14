@@ -48,6 +48,8 @@
           success: function (result) {
             if (result.msg == "success") {
               LoadTable();
+              $("#categoryname").val('');
+
               success("Saved", "Successfully");
             }
 

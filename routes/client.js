@@ -111,7 +111,7 @@ router.post("/edit", (req, res) => {
     sql_update = sql_update.slice(0, -1);
     sql_update += " WHERE mc_id=?";
     data.push(id);
-
+    console.log("Update Data: ", data)
     let sql_check = `SELECT * FROM master_client WHERE mc_id='${id}'`;
     Select(sql_check, (err, result) => {
       if (err) console.error("Error: ", err);
