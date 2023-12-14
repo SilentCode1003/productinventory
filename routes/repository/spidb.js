@@ -255,7 +255,8 @@ exports.InsertTable = (tablename, data, callback) => {
       d_serial,
       d_date,
       d_deployby,
-      d_deployto) VALUES ?`;
+      d_deployto,
+      d_referenceno) VALUES ?`;
 
     this.Insert(sql, data, (err, result) => {
       if (err) {
@@ -271,7 +272,8 @@ exports.InsertTable = (tablename, data, callback) => {
       r_serial,
       r_date,
       r_returnby,
-      r_returnfrom) VALUES ?`;
+      r_returnfrom,
+      r_referenceno) VALUES ?`;
 
     this.Insert(sql, data, (err, result) => {
       if (err) {
@@ -286,7 +288,44 @@ exports.InsertTable = (tablename, data, callback) => {
       r_assetcontrol,
       r_serial,
       r_date,
-      r_repairby) VALUES ?`;
+      r_repairby,
+      r_referenceno) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "sold") {
+    let sql = `INSERT INTO sold(
+      s_assetcontrol,
+      s_serial,
+      s_date,
+      s_soldby,
+      s_soldto,
+      s_referenceno) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "transfer") {
+    let sql = `INSERT INTO transfer(
+      t_assetcontrol,
+      t_serial,
+      t_date,
+      t_transferby,
+      t_from,
+      t_receiveby,
+      t_to,
+      t_referenceno) VALUES ?`;
 
     this.Insert(sql, data, (err, result) => {
       if (err) {
