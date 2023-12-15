@@ -94,7 +94,7 @@
                         $('<td>', { text: item.serial, 'data-label': 'Serial', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.date, 'data-label': 'Date', class: 'custom-mobile-align no-wrap' }),
                         $('<td>', { text: item.soldby, 'data-label': 'Sold By', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: ite.soldto, 'data-label': 'Sold To', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.soldto, 'data-label': 'Sold To', class: 'custom-mobile-align' }),
                         $('<td>', { text: item.referenceno, 'data-label': 'Reference No.', class: 'custom-mobile-align' }),
                     );
                     tableBody.append(tr);
@@ -147,8 +147,10 @@
                     let container = result.data;
                     // console.log(container);
                     $.each(container, (key, item) => {
-                        let newname = item.serial + " (" + item.assetcontrol + ")";
-                        activeSerial.push({ display: newname, value: item.serial });
+                        if(item.status != "DEPLOYED" && item.status != "SOLD"){
+                            let newname = item.serial + " (" + item.assetcontrol + ")";
+                            activeSerial.push({ display: newname, value: item.serial });
+                        }
                     });
                     populateCustomDropdown1();
                 },
