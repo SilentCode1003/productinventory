@@ -183,10 +183,12 @@
                 url: "/product/load",
                 success: function (result) {
                     let container = result.data;
-                    // console.log(container);
+                    console.log("data: ", container);
                     $.each(container, (key, item) => {
-                        let newname = item.serial + " (" + item.assetcontrol + ")";
-                        activeSerial.push({ display: newname, value: item.serial });
+                        if(item.status != "DEPLOYED" && item.status != "SOLD"){
+                            let newname = item.serial + " (" + item.assetcontrol + ")";
+                            activeSerial.push({ display: newname, value: item.serial });
+                        }
                     });
                     populateCustomDropdown1();
                 },

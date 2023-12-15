@@ -1,0 +1,101 @@
+<!-- Begin PCreated by Content -->
+<div class="container-fluid">
+    <!-- Content Row -->
+    <div class="row">
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-6 col-md-6 mb-3">
+            <div class="card border-left-teal h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="font-weight-bold text-primary text-uppercase mb-1">
+                                Total Stocks</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="monthlyearning"></span></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Earnings (Monthly) Card Example -->
+        <div class="col-xl-6 col-md-6 mb-3">
+            <div class="card border-left-teal h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="font-weight-bold text-success text-uppercase mb-1">
+                                Total Sold</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="annualearning"></span></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="row mb-2 ml-1">
+        <div class="responsive-col">
+            <div class="input-group">
+                <button id="adjustDateBackward" class="btn btn-outline-cyberpower custom-br-left"><i class="fas fa-caret-left"></i></button>
+                <input id="dateRange" name="dateRange" type="text" class="form-control text-center" placeholder="Select Date Range" aria-describedby="basic-addon1" readonly>
+                <button id="adjustDateForward" class="btn btn-outline-cyberpower custom-br-right"><i class="fas fa-caret-right"></i></button>
+            </div> 
+        </div>
+        <div class="col-2">
+            <div class="customdropdown">
+                <div class="select selectcategory">
+                    <span id="selectedcategory">Select Category</span>
+                    <i class="fa fa-chevron-left"></i>
+                </div>
+                <input type="hidden" name="categoryid" id="categoryid">
+                <ul class="customdropdown-menu categorylist">
+                </ul>
+            </div>
+        </div>   
+    </div>
+    <div class="row mb-2">
+        <div class="col padding-fix">
+            <div class="asvesti-border">
+                <div class="card dashboard-size">
+                    <div class="card-header card-bg align-content-center">
+                        <h4 class="m-0 card-title">Sold Items Analytics</h4>
+                    </div>
+                    <div class="card-body">
+                        <div style="width: 100%; margin: auto; height: 300px;" id="chartContainer" class="chartContainer">
+                            <canvas class="chartbox" id="myChart"></canvas>
+                        </div>
+                        <div class="text-center w-100" id="noDataMessage" style="display: none;">
+                            <p>No Current Sales.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col padding-fix">
+            <div class="asvesti-border">
+                <div class="card dashboard-size">
+                    <div class="card-header card-bg align-content-center">
+                        <h4 class="m-0 card-title">Best Sellers</h4>
+                    </div>
+                    <div class="card-body">
+                        <div style="width: 100%; margin: auto; height: 300px;" id="chartContainer" class="chartContainer">
+                            <canvas class="chartbox" id="myChart"></canvas>
+                        </div>
+                        <div class="text-center w-100" id="noDataMessage" style="display: none;">
+                            <p>No Current Sales.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
