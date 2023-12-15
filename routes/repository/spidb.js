@@ -268,7 +268,7 @@ exports.InsertTable = (tablename, data, callback) => {
 
   if (tablename == "returnitem") {
     let sql = `INSERT INTO returnitem(
-      r_assetcontroll,
+      r_assetcontrol,
       r_serial,
       r_date,
       r_returnby,
