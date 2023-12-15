@@ -32,6 +32,7 @@ router.get("/load", (req, res) => {
       if (err) console.error("Error: ", err);
 
       let data = Transfer(result);
+      console.log("transfer Data: ", data)
       res.json({
         msg: "success",
         data: data,
@@ -68,9 +69,7 @@ router.post("/save", (req, res) => {
         referenceno,
       ],
     ];
-
-    console.log("Transfer: ",transfer);
-
+    console.log(transfer)
     Check_Transfer(assetcontrol, date, from, to)
       .then((result) => {
         let data = Transfer(result);
