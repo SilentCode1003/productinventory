@@ -77,7 +77,7 @@ router.post("/save", (req, res) => {
             msg: "exist",
           });
         } else {
-          Transfer_Product()
+          Transfer_Product(assetcontrol)
             .then((result) => {
               InsertTable("transfer", transfer, (err, result) => {
                 if (err) console.error("Error: ", err);
