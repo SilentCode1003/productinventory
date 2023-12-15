@@ -2,6 +2,8 @@
     $(document).ready(function () {
         //Functionality
         let assetcontrol = "";
+        let activeSerial = [];
+        let activeDeployLocation = [];
 
         LoadTable();
 
@@ -14,23 +16,24 @@
             assetcontrol = dataRow[0];
         })
 
+        $(document).on('input', '#location', function () {
+            $('#hiddenValue').val('');
+        });
+
         $(document).on('click', '#addBtn', function () {
             // const actualValue = $('#hiddenSerialValue').val();
-            
+            let location = $('#hiddenValue').val();
             let data = $('#serialname').val();
             let soldto = $('#location').val();
             let soldby = $('#employeeid').val();
             let referenceno = $('#referenceno').val();
             let date = $('#date').val();
-            let splitData = data.split(' ');
-
-            let serial = splitData[0];
-            let assetControl = splitData[1].replace('(', '').replace(')', '');
+  
 
             var message = "";
             if (data == '') { message += 'Serial and Asset Control, ' }
-            if (soldto == '') { message += 'Deploy To, ' }
-            if (soldby == '') { message += 'Deploy By, ' }
+            if (soldto == '') { message += 'Sold To, ' }
+            if (soldby == '') { message += 'Sold By, ' }
             if (referenceno == '') { message += 'referenceno, ' }
             if (date == '') { message += 'Date, ' }
 
@@ -38,40 +41,73 @@
                 warning('Required', `Please fill up ${message}`);
             }
             else {
+                let splitData = data.split(' ');
+                let serial = splitData[0];
+                let assetControl = splitData[1].replace('(', '').replace(')', '');
                 console.log(assetControl, serial, date, soldby, soldto, referenceno, )
-                $.ajax({
-                    type: 'POST',
-                    url: '/sold/save',
-                    data: {
-                        assetcontrol: assetControl,
-                        serial: serial,
-                        date: date,
-                        soldby: soldby,
-                        soldto: soldto,
-                        referenceno: referenceno
-                    },
-                    success: function (result) {
-                        if (result.msg == 'success') {
-                            LoadTable();
-                            LoadList();
-                            success('Saved', 'Successfully')
-                            $('#serial').val('');
-                            $('#soldto').val('');
-                            $('#referenceno').val('');
-                            $("#serialname").val('');
-                            $("#hiddenSerialValue").val('');
-                            $("#date").val('');
-                        }
+                console.log("locationdata: ",location)
+                if(location !=''){
+                    let match = location.match(/\((.*?)\)\s*\((.*?)\)/);
+                    let branch = match[1].trim();
+                    let company = match[2].trim();
 
-                        if (result.msg == 'exist') {
-                            warning('Exist', `${serial} already exist!`);
-                        }
+                    console.log("Branch: ", branch);
+                    console.log("Company: ", company);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/client/checklocation',
+                        data: {
+                            company: company,
+                            branch: branch,
+                        },
+                        success: function (result) {
+                            if (result.msg == 'notexist'){
+                                warning('Not Exist', `${location} does not exist!`);
+                            } else{
+                                success('Exist', `${location} exist!` )
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/sold/save',
+                                    data: {
+                                        assetcontrol: assetControl,
+                                        serial: serial,
+                                        date: date,
+                                        soldby: soldby,
+                                        soldto: soldto,
+                                        referenceno: referenceno
+                                    },
+                                    success: function (result) {
+                                        if (result.msg == 'success') {
+                                            success('Saved', 'Successfully');
+                                            LoadTable()
+                                            $('#location').val('');
+                                            $('#employeeid').val('');
+                                            $("#selectedemployee").text('Sold By');
+                                            $('#referenceno').val('');
+                                            $("#serialname").val('');
+                                            $("#hiddenSerialValue").val('');
+                                            $("#date").val('');
+                                            $('#hiddenValue').val('');
+                                        }
 
-                    },
-                    error: function (err) {
-                        errormsg(err);
-                    }
-                })
+                                        if (result.msg == 'exist') {
+                                            warning('Exist', `${serial} already exist!`);
+                                        }
+
+                                    },
+                                    error: function (err) {
+                                        errormsg(err);
+                                    }
+                                })
+                            }
+                        },
+                        error: function (err) {
+                            errormsg(err);
+                        }
+                    });
+                } else{
+                    warning('Not Exist', `Location does not exist!`);
+                }
             }
         })
 
@@ -136,8 +172,6 @@
         }
 
         //#region CUSTOM DROPDOWN INPUT
-        let activeSerial = [];
-        let activeDeployLocation = [];
 
         function LoadList() {
             // console.log("triggered");
@@ -167,25 +201,10 @@
                     let container = result.data;
                     $.each(container, (key, item) => {
                         let displayname = item.company + " - " + item.branch;
-                        activeDeployLocation.push({ display: displayname, value: displayname });
-                        // let dataid = item.company + " - " + item.branch;
-                        // console.log(displayname);
-
-                        // var listItem = $("<li></li>")
-                        //     .text(displayname)
-                        //     .data("dataid", dataid);
-
-                        // $(".deploylist").append(listItem);
+                        let hiddenData = "("+ item.branch +") (" + item.company +")" 
+                        activeDeployLocation.push({ display: displayname, value: hiddenData });
                     });
                     populateCustomDropdown();
-
-                    // $(".deploylist").on("click", "li", function () {
-                    //     var selectedOption = $(this).text();
-                    //     var selecteddeployId = $(this).data("dataid");
-
-                    //     $("#selecteddeploy").text(selectedOption);
-                    //     $("#deployid").val(selecteddeployId).change();
-                    // });
                 },
                 error: function (err) {
                     errormsg(err);
@@ -316,6 +335,37 @@
         setupCustomDropdown("location", "locationDropdown", "dropdown-option");
         LoadList()
         //#endregion
+
+        function filterTableRows() {
+            const searchQuery = $('#search').val().trim().toLowerCase();
+            let foundMatches = false;
+
+            $('#no-match-row').remove();
+
+            $('#datatable tbody tr').each(function () {
+                const rowData = $(this).text().toLowerCase();
+                if (rowData.includes(searchQuery)) {
+                    $(this).show();
+                    foundMatches = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (!foundMatches) {
+                const noMatchRow = $('<tr>').append(
+                    $('<td>', {
+                        colspan: 9,
+                        class: 'text-center',
+                        text: 'No Data Matched'
+                    })
+                );
+                $('#datatable tbody').append(noMatchRow);
+                noMatchRow.attr('id', 'no-match-row');
+            }
+        }
+
+        $('#search').on('input', filterTableRows);
 
     })
 </script>

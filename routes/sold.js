@@ -96,6 +96,50 @@ router.post("/save", (req, res) => {
   }
 });
 
+router.post("/getsold", (req, res) => {
+  try {
+    let daterange = req.body.daterange;
+    let category = req.body.category;
+    let [startDate, endDate] = daterange.split(' - ');
+
+    let formattedStartDate = startDate.split('/').reverse().join('-');
+    let formattedEndDate = endDate.split('/').reverse().join('-');
+
+    formattedStartDate = formattedStartDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1-$3-$2');
+    formattedEndDate = formattedEndDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1-$3-$2');
+    
+
+    let sql = `SELECT s_id as id, s_assetcontrol as assetcontrol, s_serial as serial, mi_name as productname, 
+              mc_name as category, p_status as status, e_fullname as soldby, s_date as date
+              FROM sold 
+              INNER JOIN product on p_assetcontrol = s_assetcontrol and p_serial = s_serial 
+              INNER JOIN master_item on mi_id = p_itemname
+              INNER JOIN master_category on mc_id = p_category
+              INNER JOIN employee on e_id = s_soldby
+              WHERE mc_name = '${category}' AND s_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      if (result.length != 0) {
+        console.log(result);
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }          
+});
+
 //#region Function
 
 function Check_Sold(assetcontrol, date, soldto) {
