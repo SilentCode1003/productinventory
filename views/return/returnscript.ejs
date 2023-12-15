@@ -18,14 +18,11 @@
             // const actualValue = $('#hiddenSerialValue').val();
             
             let data = $('#serialname').val();
-            let returnfrom = $('#returnfromid').val();
+            let returnfrom = $('#returnfrom').val();
             let returnby = $('#returnbyid').val();
             let referenceno = $('#referenceno').val();
             let date = $('#date').val();
             let splitData = data.split(' ');
-
-            let serial = splitData[0];
-            let assetControl = splitData[1].replace('(', '').replace(')', '');
 
             var message = "";
             if (data == '') { message += 'Serial and Asset Control, ' }
@@ -38,7 +35,9 @@
                 warning('Required', `Please fill up ${message}`);
             }
             else {
-                console.log(assetControl, serial, date, returnby, returnfrom, referenceno, )
+                let serial = splitData[0];
+                let assetControl = splitData[1].replace('(', '').replace(')', '');
+                console.log(assetControl, serial, date, returnby, returnfrom, referenceno )
                 $.ajax({
                     type: 'POST',
                     url: '/return/save',
@@ -58,7 +57,8 @@
                             $('#deployto').val('');
                             $('#referenceno').val('');
                             $("#serialname").val('');
-                            $("#hiddenSerialValue").val('');
+                            $("#hiddenReturnFromValue").val('');
+                            $("#date").val('');
                         }
 
                         if (result.msg == 'exist') {
@@ -135,7 +135,7 @@
 
         //#region CUSTOM DROPDOWN INPUT
         let activeSerial = [];
-
+        let activeDeployLocation = [];
         function LoadList() {
             // console.log("triggered");
             $.ajax({
@@ -162,23 +162,9 @@
                     let container = result.data;
                     $.each(container, (key, item) => {
                         let displayname = item.company + " - " + item.branch;
-                        let dataid = item.company + " - " + item.branch;
-                        // console.log(displayname);
-
-                        var listItem = $("<li></li>")
-                            .text(displayname)
-                            .data("dataid", dataid);
-
-                        $(".returnfromlist").append(listItem);
+                        activeDeployLocation.push({ display: displayname, value: displayname });
                     });
-
-                    $(".returnfromlist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selectedreturnfromId = $(this).data("dataid");
-
-                        $("#selectedreturnfrom").text(selectedOption);
-                        $("#returnfromid").val(selectedreturnfromId).change();
-                    });
+                    populateCustomDropdown();
                 },
                 error: function (err) {
                     errormsg(err);
@@ -219,7 +205,13 @@
 
         function populateCustomDropdown1() {
             for (const serial of activeSerial) {
-                addOption2("serialDropdown", serial.display, serial.value);
+                addOption1("serialDropdown", serial.display, serial.value);
+            }
+        }
+
+        function populateCustomDropdown() {
+            for (const returnfrom of activeDeployLocation) {
+                addOption2("returnfromDropdown", returnfrom.display, returnfrom.value);
             }
         }
 
@@ -261,7 +253,7 @@
             });
         }
 
-        function addOption2(dropdownId, displayText, actualValue) {
+        function addOption1(dropdownId, displayText, actualValue) {
             const dropdownElement = document.getElementById(dropdownId);
             const hiddenInput = document.getElementById("hiddenSerialValue");
 
@@ -280,7 +272,27 @@
             dropdownElement.appendChild(newOption);
         }
 
+        function addOption2(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenReturnFromValue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue); // Store the actual value in a data attribute
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("returnfrom");
+                inputElement.value = displayText; // Display the text in the input field
+                hiddenInput.value = actualValue; // Update the hidden input field with the actual value
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
         setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
+        setupCustomDropdown("returnfrom", "returnfromDropdown", "dropdown-option");
         LoadList()
         //#endregion
 

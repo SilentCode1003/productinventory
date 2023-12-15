@@ -54,8 +54,8 @@
               if (result.msg == "success") {
                 LoadTable();
                 success("Saved", "Successfully");
-                $("#idmodal").val('');
-                $("#namemodal").val('');
+                $("#companyname").val('');
+                $("#branchname").val('');
               }
   
               if (result.msg == "exist") {
@@ -71,12 +71,14 @@
   
       //Edit Update
       $(document).on("click", "#updateBtn", function () {
-        let namemodal = $("#namemodal").val();
+        let idmodal = $("#idmodal").val();
+        let branchmodal = $("#branchmodal").val();
+        let companymodal = $("#companymodal").val();
   
         var message = "";
   
-        if (namemodal == "") {
-          message += "Access Type Name ";
+        if (branchmodal == "" && companymodal == "") {
+          message += "Fill up atleast 1 input field before updating!";
         }
   
         if (message != "") {
@@ -86,8 +88,9 @@
             type: "POST",
             url: "/client/edit",
             data: {
-              namemodal: namemodal,
-              id: id,
+              company: companymodal,
+              branch: branchmodal,
+              id: idmodal,
             },
             success: function (result) {
               if (result.msg == "success") {
@@ -95,8 +98,8 @@
                 success("Saved", "Successfully");
               }
   
-              if (result.msg == "exist") {
-                warning("Exist", `${namemodal} already exist!`);
+              if (result.msg == "notexist") {
+                warning("Not Exist", `${companymodal} Does not exist!`);
               }
             },
             error: function (err) {

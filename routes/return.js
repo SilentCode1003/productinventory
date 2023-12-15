@@ -50,7 +50,7 @@ router.post("/save", (req, res) => {
     let returnitem = [
       [assetcontrol, serial, date, returnby, returnfrom, referenceno],
     ];
-    console.log(returnitem)
+    console.log("return data", returnitem)
 
     Check_Return(assetcontrol, date)
       .then((result) => {

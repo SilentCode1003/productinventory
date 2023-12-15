@@ -46,7 +46,7 @@ router.post("/save", (req, res) => {
   try {
     const { assetcontrol, serial, date, repairby, referenceno } = req.body;
     let repair = [[assetcontrol, serial, date, repairby, referenceno]];
-
+    console.log("repair data: ", repair)
     Check_Repair(assetcontrol, date)
       .then((result) => {
         let data = Repair(result);

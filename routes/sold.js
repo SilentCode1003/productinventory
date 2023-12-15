@@ -47,7 +47,7 @@ router.post("/save", (req, res) => {
     const { assetcontrol, serial, date, soldby, soldto, referenceno } =
       req.body;
     let sold = [[assetcontrol, serial, date, soldby, soldto, referenceno]];
-
+    console.log("Sold data: ", sold)
     Check_Sold(assetcontrol, date, soldto)
       .then((result) => {
         let data = Sold(result);
