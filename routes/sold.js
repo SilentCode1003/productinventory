@@ -66,7 +66,7 @@ router.post("/save", (req, res) => {
             msg: "exist",
           });
         } else {
-          Sold_Product()
+          Sold_Product(assetcontrol)
             .then((result) => {
               InsertTable("sold", sold, (err, result) => {
                 if (err) console.error("Error: ", err);
