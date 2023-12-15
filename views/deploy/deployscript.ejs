@@ -14,18 +14,19 @@
             assetcontrol = dataRow[0];
         })
 
+        $(document).on('input', '#location', function () {
+            $('#hiddenValue').val('');
+        });
+
         $(document).on('click', '#addBtn', function () {
             // const actualValue = $('#hiddenSerialValue').val();
-            
+            let location = $('#hiddenValue').val();
             let data = $('#serialname').val();
-            let deployto = $('#deployid').val();
-            let deployby = $('#deploybyid').val();
+            let deployto = $('#location').val();
+            let deployby = $('#employeeid').val();
             let referenceno = $('#referenceno').val();
             let date = $('#date').val();
             let splitData = data.split(' ');
-
-            let serial = splitData[0];
-            let assetControl = splitData[1].replace('(', '').replace(')', '');
 
             var message = "";
             if (data == '') { message += 'Serial and Asset Control, ' }
@@ -38,38 +39,77 @@
                 warning('Required', `Please fill up ${message}`);
             }
             else {
-                console.log(assetControl, serial, date, deployby, deployto, referenceno, )
-                $.ajax({
-                    type: 'POST',
-                    url: '/deploy/save',
-                    data: {
-                        assetcontrol: assetControl,
-                        serial: serial,
-                        date: date,
-                        deployby: deployby,
-                        deployto: deployto,
-                        referenceno: referenceno
-                    },
-                    success: function (result) {
-                        if (result.msg == 'success') {
-                            LoadTable()
-                            success('Saved', 'Successfully')
-                            $('#serial').val('');
-                            $('#deployto').val('');
-                            $('#referenceno').val('');
-                            $("#serialname").val('');
-                            $("#hiddenSerialValue").val('');
-                        }
+                
+                let serial = splitData[0];
+                let assetControl = splitData[1].replace('(', '').replace(')', '');
+                // console.log("Save Data: ", assetControl, serial, date, deployby, deployto, referenceno, )
+                // console.log("location check: ", location);
 
-                        if (result.msg == 'exist') {
-                            warning('Exist', `${serial} already exist!`);
-                        }
+                if (location != ''){
+                    let match = location.match(/\((.*?)\)\s*\((.*?)\)/);
 
-                    },
-                    error: function (err) {
-                        errormsg(err);
-                    }
-                })
+                    let branch = match[1].trim();
+                    let company = match[2].trim();
+
+                    console.log("Branch: ", branch);
+                    console.log("Company: ", company);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/client/checklocation',
+                        data: {
+                            company: company,
+                            branch: branch,
+                        },
+                        success: function (result) {
+                            if (result.msg == 'notexist'){
+                                warning('Not Exist', `${location} does not exist!`);
+                            } else{
+                                success('Exist', `${location} exist!` )
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/deploy/save',
+                                    data: {
+                                        assetcontrol: assetControl,
+                                        serial: serial,
+                                        date: date,
+                                        deployby: deployby,
+                                        deployto: deployto,
+                                        referenceno: referenceno
+                                    },
+                                    success: function (result) {
+                                        if (result.msg == 'success') {
+                                            LoadTable();
+                                            LoadList();
+                                            success('Saved', 'Successfully')
+                                            $('#location').val('');
+                                            $('#employeeid').val('');
+                                            $("#selectedemployee").text('Deploy By');
+                                            $('#referenceno').val('');
+                                            $("#serialname").val('');
+                                            $("#hiddenSerialValue").val('');
+                                            $("#date").val('');
+                                            $('#hiddenValue').val('');
+                                            
+                                        }
+
+                                        if (result.msg == 'exist') {
+                                            warning('Exist', `${serial} already exist!`);
+                                        }
+
+                                    },
+                                    error: function (err) {
+                                        errormsg(err);
+                                    }
+                                })
+                            }
+                        },
+                        error: function (err) {
+                            errormsg(err);
+                        }
+                    });
+                } else{
+                    warning('Not Exist', `Location does not exist!`);
+                }
             }
         })
 
@@ -135,6 +175,7 @@
 
         //#region CUSTOM DROPDOWN INPUT
         let activeSerial = [];
+        let activeDeployLocation = [];
 
         function LoadList() {
             // console.log("triggered");
@@ -143,10 +184,12 @@
                 url: "/product/load",
                 success: function (result) {
                     let container = result.data;
-                    // console.log(container);
+                    console.log("data: ", container);
                     $.each(container, (key, item) => {
-                        let newname = item.serial + " (" + item.assetcontrol + ")";
-                        activeSerial.push({ display: newname, value: item.serial });
+                        if(item.status != "DEPLOYED" && item.status != "SOLD"){
+                            let newname = item.serial + " (" + item.assetcontrol + ")";
+                            activeSerial.push({ display: newname, value: item.serial });
+                        }
                     });
                     populateCustomDropdown1();
                 },
@@ -162,23 +205,26 @@
                     let container = result.data;
                     $.each(container, (key, item) => {
                         let displayname = item.company + " - " + item.branch;
-                        let dataid = item.company + " - " + item.branch;
+                        let hiddenData = "("+ item.branch +") (" + item.company +")" 
+                        activeDeployLocation.push({ display: displayname, value: hiddenData });
+                        // let dataid = item.company + " - " + item.branch;
                         // console.log(displayname);
 
-                        var listItem = $("<li></li>")
-                            .text(displayname)
-                            .data("dataid", dataid);
+                        // var listItem = $("<li></li>")
+                        //     .text(displayname)
+                        //     .data("dataid", dataid);
 
-                        $(".deploylist").append(listItem);
+                        // $(".deploylist").append(listItem);
                     });
+                    populateCustomDropdown();
 
-                    $(".deploylist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selecteddeployId = $(this).data("dataid");
+                    // $(".deploylist").on("click", "li", function () {
+                    //     var selectedOption = $(this).text();
+                    //     var selecteddeployId = $(this).data("dataid");
 
-                        $("#selecteddeploy").text(selectedOption);
-                        $("#deployid").val(selecteddeployId).change();
-                    });
+                    //     $("#selecteddeploy").text(selectedOption);
+                    //     $("#deployid").val(selecteddeployId).change();
+                    // });
                 },
                 error: function (err) {
                     errormsg(err);
@@ -199,15 +245,15 @@
                             .text(displayname)
                             .data("dataid", dataid);
 
-                        $(".deploybylist").append(listItem);
+                        $(".employeelist").append(listItem);
                     });
 
-                    $(".deploybylist").on("click", "li", function () {
+                    $(".employeelist").on("click", "li", function () {
                         var selectedOption = $(this).text();
-                        var selecteddeploybyId = $(this).data("dataid");
+                        var selectedemployeeId = $(this).data("dataid");
 
-                        $("#selecteddeployby").text(selectedOption);
-                        $("#deploybyid").val(selecteddeploybyId).change();
+                        $("#selectedemployee").text(selectedOption);
+                        $("#employeeid").val(selectedemployeeId).change();
                     });
                 },
                 error: function (err) {
@@ -220,6 +266,12 @@
         function populateCustomDropdown1() {
             for (const serial of activeSerial) {
                 addOption2("serialDropdown", serial.display, serial.value);
+            }
+        }
+
+        function populateCustomDropdown() {
+            for (const deploy of activeDeployLocation) {
+                addOption1("locationDropdown", deploy.display, deploy.value);
             }
         }
 
@@ -268,12 +320,31 @@
             const newOption = document.createElement("div");
             newOption.className = "dropdown-option";
             newOption.textContent = displayText;
-            newOption.setAttribute("data-value", actualValue); // Store the actual value in a data attribute
+            newOption.setAttribute("data-value", actualValue); 
 
             newOption.addEventListener("click", function () {
                 const inputElement = document.getElementById("serialname");
-                inputElement.value = displayText; // Display the text in the input field
-                hiddenInput.value = actualValue; // Update the hidden input field with the actual value
+                inputElement.value = displayText; 
+                hiddenInput.value = actualValue; 
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        function addOption1(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenValue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue); 
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("location");
+                inputElement.value = displayText; 
+                hiddenInput.value = actualValue; 
                 dropdownElement.style.display = "none";
             });
 
@@ -281,6 +352,7 @@
         }
 
         setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
+        setupCustomDropdown("location", "locationDropdown", "dropdown-option");
         LoadList()
         //#endregion
     })

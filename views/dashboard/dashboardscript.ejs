@@ -1,0 +1,72 @@
+<script>
+    $(document).ready(function () {
+        LoadList();
+        $('#dateRange').daterangepicker({
+            opens: 'right',
+            startDate: moment().subtract(7, 'days'), 
+            endDate: moment(), 
+            maxDate: moment(),
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'This Week': [moment().startOf('week'), moment().endOf('week')],
+                'Last Week': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Last 3 Months': [moment().subtract(3, 'months').startOf('month'), moment().endOf('month')],
+            },
+            alwaysShowCalendars: true,
+            showCustomRangeLabel: false,
+            buttonClasses: ['btn btn-outline-inventory'],
+            locale: {
+                format: 'MMM D, YYYY'
+            }
+        });
+
+        $('#adjustDateBackward').on('click', function() {
+            var startDate = $('#dateRange').data('daterangepicker').startDate;
+            var endDate = $('#dateRange').data('daterangepicker').endDate.clone().subtract(7, 'days');
+            $('#dateRange').data('daterangepicker').setEndDate(endDate);
+            $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().subtract(7, 'days'));
+        });
+
+        $('#adjustDateForward').on('click', function() {
+            var startDate = $('#dateRange').data('daterangepicker').startDate;
+            var endDate = $('#dateRange').data('daterangepicker').endDate.clone().add(7, 'days');
+            $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().add(7, 'days'));
+            $('#dateRange').data('daterangepicker').setEndDate(endDate);
+        });
+    });
+
+    function LoadList() {
+      $.ajax({
+        type: "GET",
+        url: "/category/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let categoryname = item.name;
+            let categoryid = item.id;
+            console.log(categoryname);
+
+            var listItem = $("<li></li>")
+              .text(categoryname)
+              .data("categoryid", categoryid);
+
+            $(".categorylist").append(listItem);
+          });
+
+            $(".categorylist").on("click", "li", function () {
+                var selectedOption = $(this).text();
+                var selectedcategoryId = $(this).data("categoryid");
+
+                $("#selectedcategory").text(selectedOption);
+                $("#categoryid").val(selectedcategoryId).change();
+            });
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    }
+</script>

@@ -36,7 +36,7 @@
       var message = "";
 
       if (itemsname == "") {
-        message += "Item Name";
+        message += "Item Name, ";
       }
 
       if (categoryid == "") {
@@ -56,6 +56,9 @@
           success: function (result) {
             if (result.msg == "success") {
               LoadTable();
+              $("#itemsname").val('');
+              $("#categoryid").val('');
+              $("#selectedcategory").text('Select Category');
               success("Saved", "Successfully");
             }
 

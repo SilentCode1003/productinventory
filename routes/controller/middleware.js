@@ -53,6 +53,9 @@ var roleacess = [
     role: "User",
     routes: [
       {
+        layout: "index",
+      },
+      {
         layout: "category",
       },
       {
@@ -81,29 +84,24 @@ var roleacess = [
 ];
 
 exports.Validator = function (req, res, layout) {
-  console.log(layout);
-  console.log(roleacess.length);
+  console.log("Layout: ", layout, "Access: ", req.session.access);
 
-  if (req.session.access == "User" && layout == "index") {
-    return res.redirect("/index");
-  } else {
-    roleacess.forEach((key, item) => {
-      var routes = key.routes;
+  roleacess.forEach((key, item) => {
+    var routes = key.routes;
 
-      routes.forEach((value, index) => {
-        console.log(`${key.role} - ${value.layout}`);
+    routes.forEach((value, index) => {
+      console.log(`${key.role} - ${value.layout}`);
 
-        if (key.role == req.session.access && value.layout == layout) {
-          return res.render(`${layout}`, {
-            fullname: req.session.fullname,
-            access: req.session.access,
-            department: req.session.department,
-            position: req.session.position,
-          });
-        }
-      });
+      if (key.role == req.session.access && value.layout == layout) {
+        return res.render(`${layout}`, {
+          fullname: req.session.fullname,
+          access: req.session.access,
+          department: req.session.department,
+          position: req.session.position,
+        });
+      }
     });
+  });
 
-    res.redirect("/login");
-  }
+  res.redirect("/login");
 };

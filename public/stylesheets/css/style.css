@@ -51,6 +51,17 @@
   margin-left: 14rem;
 }
 
+.custom-br-left{
+  border-radius: 0.35rem 0 0 0.35rem !important;
+  border-right: none !important;
+  width: 45px !important;
+}
+
+.custom-br-right{
+  border-radius: 0 0.35rem 0.35rem 0 !important;
+  width: 45px !important;
+}
+
 @media (min-width: 768px) {
 
   .content-toggled {
@@ -285,7 +296,11 @@ th {
 
 td {
   text-align: center !important;
-  color: white;
+}
+
+.responsive-col{
+  flex: 0 0 33.33333%;
+  max-width: 33.33333%;
 }
 
 .custom-img{
