@@ -224,12 +224,15 @@ exports.Transfer = (data) => {
 
   data.forEach((key, item) => {
     dataResult.push({
-      id: key.r_id,
-      assetcontrol: key.r_assetcontrol,
-      serial: key.r_serial,
-      date: key.r_date,
-      repairby: key.r_repairby,
-      referenceno: key.referenceno,
+      id: key.t_id,
+      assetcontrol: key.t_assetcontrol,
+      serial: key.t_serial,
+      date: key.t_date,
+      transferby: key.t_transferby,
+      from: key.t_from,
+      receiveby: key.t_receiveby,
+      to: key.t_to,
+      referenceno: key.t_referenceno,
     });
   });
 
@@ -240,7 +243,10 @@ exports.Transfer = (data) => {
         key["assetcontrol"],
         key["serial"],
         key["date"],
-        key["r_repairby"],
+        key["transferby"],
+        key["from"],
+        key["receiveby"],
+        key["to"],
         key["referenceno"]
       )
   );
