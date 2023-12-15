@@ -266,8 +266,8 @@ exports.InsertTable = (tablename, data, callback) => {
     });
   }
 
-  if (tablename == "return") {
-    let sql = `INSERT INTO return(
+  if (tablename == "returnitem") {
+    let sql = `INSERT INTO returnitem(
       r_assetcontroll,
       r_serial,
       r_date,
