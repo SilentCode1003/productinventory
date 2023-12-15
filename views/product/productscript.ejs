@@ -98,11 +98,14 @@
                             LoadTable()
                             success('Saved', 'Successfully')
                             $('#serial').val('');
-                            $('#itemname').val('');
-                            $('#category').val('');
                             $('#podate').val('');
                             $('#ponumber').val('');
                             $('#warrantydate').val('');
+                            $("#productid").val('');
+                            $("#selectedproduct").text('Select Product');
+                            $('#categoryid').val('');
+                            $("#selectedcategory").text('Select Category');
+                            $(".productlist").empty();
                         }
 
                         if (result.msg == 'exist') {

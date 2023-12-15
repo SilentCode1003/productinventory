@@ -78,7 +78,8 @@
                                     },
                                     success: function (result) {
                                         if (result.msg == 'success') {
-                                            LoadTable()
+                                            LoadTable();
+                                            LoadList();
                                             success('Saved', 'Successfully')
                                             $('#location').val('');
                                             $('#employeeid').val('');
