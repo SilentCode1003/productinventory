@@ -1,6 +1,6 @@
 <!-- PCreated by Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-3">
-    <h1 class="cyber-title">Deploy</h1>
+    <h1 class="cyber-title">Transfer</h1>
 </div>
 <!-- Content Row -->
 <div class="row mb-2">
@@ -41,6 +41,30 @@
                             </div>
                             <input type="hidden" name="employeeid" id="employeeid">
                             <ul class="customdropdown-menu employeelist"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select/Input Transfer To" name="location2" id="location2"/>
+                          <input type="hidden" id="hiddenValue2" name="hiddenValue2" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Transfer To</span>
+                          </div>
+                        </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="location2Dropdown"></div>
+                    </div>
+
+                    <div class="col-md-6 mb-2">
+                        <div class="customdropdown">
+                            <div class="select selectemployee2">
+                              <span id="selectedemployee2">Receive By</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </div>
+                            <input type="hidden" name="employee2id" id="employee2id">
+                            <ul class="customdropdown-menu employee2list"></ul>
                         </div>
                     </div>
                 </div>
@@ -88,7 +112,7 @@
     <div class="card-header card-bg align-content-center">
         <div class="row">
             <div class="col-md-3">
-                <h5 class="m-0 font-weight-bold cyber-title mt-2">Deployment Table</h5>
+                <h5 class="m-0 font-weight-bold cyber-title mt-2">Transfer Table</h5>
             </div>
             <div class="col-md-8 mt-1">
                 <input id="search" name="search" type="text" class="form-control" placeholder="Search Serial"

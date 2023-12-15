@@ -18,8 +18,13 @@
             // const actualValue = $('#hiddenSerialValue').val();
             
             let data = $('#serialname').val();
-            let deployto = $('#location').val();
-            let deployby = $('#employeeid').val();
+
+            let transferfrom = $('#location').val();
+            let transferby = $('#employeeid').val();
+
+            let to = $('#location2').val();
+            let receiveby = $('#employee2id').val();
+
             let referenceno = $('#referenceno').val();
             let date = $('#date').val();
             let splitData = data.split(' ');
@@ -29,8 +34,12 @@
 
             var message = "";
             if (data == '') { message += 'Serial and Asset Control, ' }
-            if (deployto == '') { message += 'Deploy To, ' }
-            if (deployby == '') { message += 'Deploy By, ' }
+            if (transferfrom == '') { message += 'Transfer From, ' }
+            if (transferby == '') { message += 'Transfer By, ' }
+            
+            if (to == '') { message += 'Transfer To, ' }
+            if (receiveby == '') { message += 'Receive By, ' }
+
             if (referenceno == '') { message += 'referenceno, ' }
             if (date == '') { message += 'Date, ' }
 
@@ -38,16 +47,18 @@
                 warning('Required', `Please fill up ${message}`);
             }
             else {
-                console.log(assetControl, serial, date, deployby, deployto, referenceno, )
+                console.log(assetControl, serial, date, transferby, transferfrom, to, referenceno, )
                 $.ajax({
                     type: 'POST',
-                    url: '/deploy/save',
+                    url: '/transfer/save',
                     data: {
                         assetcontrol: assetControl,
                         serial: serial,
                         date: date,
-                        deployby: deployby,
-                        deployto: deployto,
+                        transferby: transferby,
+                        receiveby: receiveby,
+                        to: to,
+                        from: transferfrom,
                         referenceno: referenceno
                     },
                     success: function (result) {
@@ -75,7 +86,7 @@
         })
 
         function populatetable(data) {
-            console.log(data);
+            console.log("Transfer Load", data);
             const tableBody = $('#datatable tbody');
             tableBody.empty();
 
@@ -139,6 +150,7 @@
         //#region CUSTOM DROPDOWN INPUT
         let activeSerial = [];
         let activeDeployLocation = [];
+        let activeReceiveLocation = [];
 
         function LoadList() {
             // console.log("triggered");
@@ -167,24 +179,28 @@
                     $.each(container, (key, item) => {
                         let displayname = item.company + " - " + item.branch;
                         activeDeployLocation.push({ display: displayname, value: displayname });
-                        // let dataid = item.company + " - " + item.branch;
-                        // console.log(displayname);
 
-                        // var listItem = $("<li></li>")
-                        //     .text(displayname)
-                        //     .data("dataid", dataid);
-
-                        // $(".deploylist").append(listItem);
                     });
                     populateCustomDropdown();
 
-                    // $(".deploylist").on("click", "li", function () {
-                    //     var selectedOption = $(this).text();
-                    //     var selecteddeployId = $(this).data("dataid");
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
 
-                    //     $("#selecteddeploy").text(selectedOption);
-                    //     $("#deployid").val(selecteddeployId).change();
-                    // });
+            $.ajax({
+                type: "GET",
+                url: "/client/load",
+                success: function (result) {
+                    let container = result.data;
+                    $.each(container, (key, item) => {
+                        let displayname = item.company + " - " + item.branch;
+                        activeReceiveLocation.push({ display: displayname, value: displayname });
+
+                    });
+                    populateCustomDropdown2();
+
                 },
                 error: function (err) {
                     errormsg(err);
@@ -220,6 +236,36 @@
                     errormsg(err);
                 },
             });
+
+            $.ajax({
+                type: "GET",
+                url: "/employee/load",
+                success: function (result) {
+                    let container = result.data;
+                    $.each(container, (key, item) => {
+                        let displayname = item.fullname;
+                        let dataid = item.id;
+                        // console.log(displayname);
+
+                        var listItem = $("<li></li>")
+                            .text(displayname)
+                            .data("dataid", dataid);
+
+                        $(".employee2list").append(listItem);
+                    });
+
+                    $(".employee2list").on("click", "li", function () {
+                        var selectedOption = $(this).text();
+                        var selectedemployee2Id = $(this).data("dataid");
+
+                        $("#selectedemployee2").text(selectedOption);
+                        $("#employee2id").val(selectedemployee2Id).change();
+                    });
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
         
         }
 
@@ -232,6 +278,13 @@
         function populateCustomDropdown() {
             for (const deploy of activeDeployLocation) {
                 addOption1("locationDropdown", deploy.display, deploy.value);
+            }
+        }
+
+        
+        function populateCustomDropdown2() {
+            for (const deploy of activeReceiveLocation) {
+                addOption3("location2Dropdown", deploy.display, deploy.value);
             }
         }
 
@@ -311,10 +364,60 @@
             dropdownElement.appendChild(newOption);
         }
 
+        function addOption3(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenValue2");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue); 
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("location2");
+                inputElement.value = displayText; 
+                hiddenInput.value = actualValue; 
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
         setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
         setupCustomDropdown("location", "locationDropdown", "dropdown-option");
+        setupCustomDropdown("location2", "location2Dropdown", "dropdown-option");
         LoadList()
         //#endregion
+    
+        function filterTableRows() {
+            const searchQuery = $('#search').val().trim().toLowerCase();
+            let foundMatches = false;
 
+            $('#no-match-row').remove();
+
+            $('#datatable tbody tr').each(function () {
+                const rowData = $(this).text().toLowerCase();
+                if (rowData.includes(searchQuery)) {
+                    $(this).show();
+                    foundMatches = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (!foundMatches) {
+                const noMatchRow = $('<tr>').append(
+                    $('<td>', {
+                        colspan: 9,
+                        class: 'text-center',
+                        text: 'No Data Matched'
+                    })
+                );
+                $('#datatable tbody').append(noMatchRow);
+                noMatchRow.attr('id', 'no-match-row');
+            }
+        }
+
+        $('#search').on('input', filterTableRows);
     })
 </script>

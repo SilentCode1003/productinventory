@@ -1,5 +1,5 @@
 var express = require("express");
-const { Select, InsertTable } = require("./repository/spidb");
+const { Select, InsertTable, Update } = require("./repository/spidb");
 const { Return } = require("./model/spimodel");
 const { SelectStatement } = require("./repository/customhelper");
 const { GetValue, RET } = require("./repository/dictionary");

@@ -1,5 +1,5 @@
 var express = require("express");
-const { Select } = require("./repository/spidb");
+const { Select, InsertTable, Update } = require("./repository/spidb");
 const { Transfer } = require("./model/spimodel");
 const { GetValue, TRFR } = require("./repository/dictionary");
 const { SelectStatement } = require("./repository/customhelper");
@@ -32,6 +32,7 @@ router.get("/load", (req, res) => {
       if (err) console.error("Error: ", err);
 
       let data = Transfer(result);
+      console.log("transfer Data: ", data)
       res.json({
         msg: "success",
         data: data,
@@ -68,7 +69,7 @@ router.post("/save", (req, res) => {
         referenceno,
       ],
     ];
-
+    console.log(transfer)
     Check_Transfer(assetcontrol, date, from, to)
       .then((result) => {
         let data = Transfer(result);

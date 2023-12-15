@@ -19,14 +19,12 @@
         });
 
         $(document).on('click', '#addBtn', function () {
-            // const actualValue = $('#hiddenSerialValue').val();
             let location = $('#hiddenValue').val();
             let data = $('#serialname').val();
             let deployto = $('#location').val();
             let deployby = $('#employeeid').val();
             let referenceno = $('#referenceno').val();
             let date = $('#date').val();
-            let splitData = data.split(' ');
 
             var message = "";
             if (data == '') { message += 'Serial and Asset Control, ' }
@@ -39,15 +37,12 @@
                 warning('Required', `Please fill up ${message}`);
             }
             else {
-                
+                let splitData = data.split(' ');
                 let serial = splitData[0];
                 let assetControl = splitData[1].replace('(', '').replace(')', '');
-                // console.log("Save Data: ", assetControl, serial, date, deployby, deployto, referenceno, )
-                // console.log("location check: ", location);
 
                 if (location != ''){
                     let match = location.match(/\((.*?)\)\s*\((.*?)\)/);
-
                     let branch = match[1].trim();
                     let company = match[2].trim();
 
@@ -79,7 +74,6 @@
                                     success: function (result) {
                                         if (result.msg == 'success') {
                                             LoadTable();
-                                            LoadList();
                                             success('Saved', 'Successfully')
                                             $('#location').val('');
                                             $('#employeeid').val('');
@@ -89,7 +83,6 @@
                                             $("#hiddenSerialValue").val('');
                                             $("#date").val('');
                                             $('#hiddenValue').val('');
-                                            
                                         }
 
                                         if (result.msg == 'exist') {
@@ -207,24 +200,8 @@
                         let displayname = item.company + " - " + item.branch;
                         let hiddenData = "("+ item.branch +") (" + item.company +")" 
                         activeDeployLocation.push({ display: displayname, value: hiddenData });
-                        // let dataid = item.company + " - " + item.branch;
-                        // console.log(displayname);
-
-                        // var listItem = $("<li></li>")
-                        //     .text(displayname)
-                        //     .data("dataid", dataid);
-
-                        // $(".deploylist").append(listItem);
                     });
                     populateCustomDropdown();
-
-                    // $(".deploylist").on("click", "li", function () {
-                    //     var selectedOption = $(this).text();
-                    //     var selecteddeployId = $(this).data("dataid");
-
-                    //     $("#selecteddeploy").text(selectedOption);
-                    //     $("#deployid").val(selecteddeployId).change();
-                    // });
                 },
                 error: function (err) {
                     errormsg(err);
@@ -355,5 +332,36 @@
         setupCustomDropdown("location", "locationDropdown", "dropdown-option");
         LoadList()
         //#endregion
+        
+        function filterTableRows() {
+            const searchQuery = $('#search').val().trim().toLowerCase();
+            let foundMatches = false;
+
+            $('#no-match-row').remove();
+
+            $('#datatable tbody tr').each(function () {
+                const rowData = $(this).text().toLowerCase();
+                if (rowData.includes(searchQuery)) {
+                    $(this).show();
+                    foundMatches = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (!foundMatches) {
+                const noMatchRow = $('<tr>').append(
+                    $('<td>', {
+                        colspan: 9,
+                        class: 'text-center',
+                        text: 'No Data Matched'
+                    })
+                );
+                $('#datatable tbody').append(noMatchRow);
+                noMatchRow.attr('id', 'no-match-row');
+            }
+        }
+
+        $('#search').on('input', filterTableRows);
     })
 </script>
