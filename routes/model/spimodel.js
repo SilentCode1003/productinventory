@@ -12,6 +12,7 @@ const {
   MasterPositionModel,
   MasterClientModel,
   RepairModel,
+  ProductUploadModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -380,3 +381,33 @@ exports.Repair = (data) => {
       )
   );
 };
+
+//#region Upload Models
+
+exports.UploadProduct = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      category: key.category,
+      itemname: key.itemname,
+      serial: key.serial,
+      podate: key.podate,
+      ponumber: key.ponumber,
+      warrantydate: key.warrantydate,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new ProductUploadModel(
+        key["category"],
+        key["itemname"],
+        key["serial"],
+        key["podate"],
+        key["ponumber"],
+        key["warrantydate"]
+      )
+  );
+};
+//#endregion

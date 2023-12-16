@@ -2,10 +2,21 @@ var express = require("express");
 var router = express.Router();
 
 const { Select, InsertTable, SelectParameter } = require("./repository/spidb");
-const { Product } = require("./model/spimodel");
-const { GenerateAssetTag } = require("./repository/customhelper");
+const {
+  Product,
+  UploadProduct,
+  MasterCategory,
+  Return,
+  MasterItem,
+} = require("./model/spimodel");
+const {
+  GenerateAssetTag,
+  convertExcelDate,
+  SelectStatement,
+} = require("./repository/customhelper");
 const { GetValue, WH } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
+const { sq } = require("date-fns/locale");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -165,6 +176,126 @@ router.post("/getassetcontrol", (req, res) => {
   }
 });
 
+router.post("/upload", (req, res) => {
+  try {
+    const { data } = req.body;
+    let dataJSon = UploadProduct(JSON.parse(data));
+    let status = GetValue(WH());
+    let counter = 0;
+    let sequence = 0;
+    let duplicate = "";
+    let product = [];
+
+    Product_Count()
+      .then((result) => {
+        // console.log(result);
+        sequence = parseInt(result[0].total);
+        dataJSon.forEach((item) => {
+          Product_Check(item.serial)
+            .then((result) => {
+              // console.log(result);
+              if (result[0].total != 0) {
+                duplicate += item.serial;
+              } else {
+                Get_Category(item.category)
+                  .then((result) => {
+                    // console.log(result);
+                    let category = MasterCategory(result);
+                    let categoryid = category[0].id;
+                    Get_Item(item.itemname, categoryid)
+                      .then((result) => {
+                        let dataitems = MasterItem(result);
+                        // console.log(dataitems);
+                        let itemid = dataitems[0].id;
+
+                        counter += 1;
+                        sequence += 1;
+                        console.log(
+                          "sequence: ",
+                          sequence,
+                          "counter: ",
+                          counter,
+                          "item serial: ",
+                          item.serial
+                        );
+
+                        product.push([
+                          GenerateAssetTag(categoryid, sequence),
+                          item.serial,
+                          itemid,
+                          categoryid,
+                          convertExcelDate(item.podate),
+                          item.ponumber,
+                          convertExcelDate(item.warrantydate),
+                          status,
+                        ]);
+
+                        // console.log(product);
+
+                        if (counter == dataJSon.length) {
+                          console.log(product);
+                          InsertTable("product", product, (err, result) => {
+                            if (err) console.error("Error: ", err);
+                            console.log(result);
+                          });
+
+                          if (duplicate != "") {
+                            return res.json({
+                              msg: "exist",
+                              data: duplicate,
+                            });
+                          } else {
+                            return res.json({
+                              msg: "success",
+                            });
+                          }
+                        }
+                      })
+                      .catch((error) => {
+                        console.log("Get Items: ", error);
+                        res.json({
+                          msg: error,
+                        });
+                      });
+                  })
+                  .catch((error) => {
+                    console.log("Get Category: ", error);
+                    return res.json({
+                      msg: error,
+                    });
+                  });
+              }
+
+              if (counter == dataJSon.length) {
+                console.log('DUplicate!');
+                if (duplicate != "") {
+                  return res.json({
+                    msg: "exist",
+                    data: duplicate,
+                  });
+                }
+              }
+            })
+            .catch((error) => {
+              console.log("Product Check: ", error);
+              return res.json({
+                msg: error,
+              });
+            });
+        });
+      })
+      .catch((error) => {
+        console.log("Product Count: ", error);
+        res.json({
+          msg: error,
+        });
+      });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
 //#region Functions
 function Product_Count() {
   return new Promise((resolve, reject) => {
@@ -187,6 +318,31 @@ function Product_Check(serial) {
       if (err) reject(err);
 
       // console.log(result);
+      resolve(result);
+    });
+  });
+}
+
+function Get_Category(name) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_category where mc_name=?";
+    SelectParameter(sql, [name], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
+      resolve(result);
+    });
+  });
+}
+
+function Get_Item(name, category) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_item where mi_name=? and mi_category=?";
+    let command = SelectStatement(sql, [name, category]);
+    Select(command, (err, result) => {
+      if (err) reject(err);
+
+      // console.log(result);
+
       resolve(result);
     });
   });
