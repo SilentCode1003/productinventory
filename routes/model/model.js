@@ -187,6 +187,19 @@ class MasterClientModel {
   }
 }
 
+//#region Excel Model
+class ProductUploadModel {
+  constructor(category, itemname, serial, podate, ponumber, warrantydate) {
+    this.category = category;
+    this.itemname = itemname;
+    this.serial = serial;
+    this.podate = podate;
+    this.ponumber = ponumber;
+    this.warrantydate = warrantydate;
+  }
+}
+//#endregion
+
 module.exports = {
   MasterItemModel,
   MasterCategoryModel,
@@ -200,5 +213,6 @@ module.exports = {
   MasterDepartmentModel,
   MasterAccessModel,
   MasterPositionModel,
-  MasterClientModel
+  MasterClientModel,
+  ProductUploadModel,
 };
