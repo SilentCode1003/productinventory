@@ -17,7 +17,7 @@
             status = dataRow[7];
         })
 
-        $(document).on('change', '#categoryid', function() {    
+        $(document).on('change', '#categoryid', function () {
             let id = $(this).val();
             console.log(id)
 
@@ -28,7 +28,7 @@
                 type: "POST",
                 url: "/items/getitemsbycategory",
                 data: {
-                    id:id
+                    id: id
                 },
                 success: function (result) {
                     let container = result.data;
@@ -38,11 +38,11 @@
                         let productid = item.id;
 
                         let listItem = $("<li></li>")
-                        .text(productname)
-                        .data("productid", productid);
+                            .text(productname)
+                            .data("productid", productid);
 
                         $(".productlist").append(listItem);
-                        
+
                     });
 
                     $(".productlist").on("click", "li", function () {
