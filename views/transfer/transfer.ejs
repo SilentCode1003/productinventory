@@ -1,145 +1,229 @@
 <!-- PCreated by Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-3">
-    <h1 class="cyber-title">Transfer</h1>
+  <h1 class="cyber-title">Transfer</h1>
 </div>
 <!-- Content Row -->
 <div class="row mb-2">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-body">
-
-                <div class="row d-flex justify-content-center">
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                          <input class="form-control text-center custom-input" placeholder="Select/Input Asset Control or Serial" name="serialname" id="serialname"/>
-                          <input type="hidden" id="hiddenSerialValue" name="hiddenSerialValue" />
-                          <div class="input-group-append">
-                            <span class="input-group-text">Asset Control/Serial</span>
-                          </div>
-                        </div>
-                        <div class="custom-dropdown custom-dropdown-margin-left" id="serialDropdown"></div>
-                    </div>
-                </div>
-
-                <div class="row d-flex mt-2">
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                          <input class="form-control text-center custom-input" placeholder="Select/Input Transfer From" name="location" id="location"/>
-                          <input type="hidden" id="hiddenValue" name="hiddenValue" />
-                          <div class="input-group-append">
-                            <span class="input-group-text">From</span>
-                          </div>
-                        </div>
-                        <div class="custom-dropdown custom-dropdown-margin-left" id="locationDropdown"></div>
-                    </div>
-
-                    <div class="col-md-6 mb-2">
-                        <div class="customdropdown">
-                            <div class="select selectemployee">
-                              <span id="selectedemployee">Transfer By</span>
-                              <i class="fa fa-chevron-left"></i>
-                            </div>
-                            <input type="hidden" name="employeeid" id="employeeid">
-                            <ul class="customdropdown-menu employeelist"></ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mt-2">
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                          <input class="form-control text-center custom-input" placeholder="Select/Input Transfer To" name="location2" id="location2"/>
-                          <input type="hidden" id="hiddenValue2" name="hiddenValue2" />
-                          <div class="input-group-append">
-                            <span class="input-group-text">Transfer To</span>
-                          </div>
-                        </div>
-                        <div class="custom-dropdown custom-dropdown-margin-left" id="location2Dropdown"></div>
-                    </div>
-
-                    <div class="col-md-6 mb-2">
-                        <div class="customdropdown">
-                            <div class="select selectemployee2">
-                              <span id="selectedemployee2">Receive By</span>
-                              <i class="fa fa-chevron-left"></i>
-                            </div>
-                            <input type="hidden" name="employee2id" id="employee2id">
-                            <ul class="customdropdown-menu employee2list"></ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row d-flex mt-2">
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">Reference Number</span>
-                            </div>
-                            <input id="referenceno" name="referenceno" type="text" class="form-control"
-                                placeholder="Enter Reference Number" aria-label="referenceno" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">Date</span>
-                            </div>
-                            <input id="date" name="date" type="date" class="form-control"
-                                placeholder="Enter Date" aria-label="date" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row justify-content-end">
-                    <div class="col-md-4 align mt-1">
-                        <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-100">
-                            <i class="fa fa-plus" aria-hidden="true"></i>
-                            Add
-                        </button>
-                    </div>
-                </div>
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row d-flex justify-content-center">
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <input
+                class="form-control text-center custom-input"
+                placeholder="Select/Input Asset Control or Serial"
+                name="serialname"
+                id="serialname"
+              />
+              <input
+                type="hidden"
+                id="hiddenSerialValue"
+                name="hiddenSerialValue"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">Asset Control/Serial</span>
+              </div>
             </div>
+            <div
+              class="custom-dropdown custom-dropdown-margin-left"
+              id="serialDropdown"
+            ></div>
+          </div>
         </div>
+
+        <div class="row d-flex mt-2">
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <input
+                class="form-control text-center custom-input"
+                placeholder="Select/Input Transfer From"
+                name="location"
+                id="location"
+              />
+              <input type="hidden" id="hiddenValue" name="hiddenValue" />
+              <div class="input-group-append">
+                <span class="input-group-text">From</span>
+              </div>
+            </div>
+            <div
+              class="custom-dropdown custom-dropdown-margin-left"
+              id="locationDropdown"
+            ></div>
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <div class="customdropdown">
+              <div class="select selectemployee">
+                <span id="selectedemployee">Transfer By</span>
+                <i class="fa fa-chevron-left"></i>
+              </div>
+              <input type="hidden" name="employeeid" id="employeeid" />
+              <ul class="customdropdown-menu employeelist"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-2">
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <input
+                class="form-control text-center custom-input"
+                placeholder="Select/Input Transfer To"
+                name="location2"
+                id="location2"
+              />
+              <input type="hidden" id="hiddenValue2" name="hiddenValue2" />
+              <div class="input-group-append">
+                <span class="input-group-text">Transfer To</span>
+              </div>
+            </div>
+            <div
+              class="custom-dropdown custom-dropdown-margin-left"
+              id="location2Dropdown"
+            ></div>
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <div class="customdropdown">
+              <div class="select selectemployee2">
+                <span id="selectedemployee2">Receive By</span>
+                <i class="fa fa-chevron-left"></i>
+              </div>
+              <input type="hidden" name="employee2id" id="employee2id" />
+              <ul class="customdropdown-menu employee2list"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="row d-flex mt-2">
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon2"
+                  >Reference Number</span
+                >
+              </div>
+              <input
+                id="referenceno"
+                name="referenceno"
+                type="text"
+                class="form-control"
+                placeholder="Enter Reference Number"
+                aria-label="referenceno"
+                aria-describedby="basic-addon1"
+              />
+            </div>
+          </div>
+          <div class="col-md-6 mb-2">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon2">Date</span>
+              </div>
+              <input
+                id="date"
+                name="date"
+                type="date"
+                class="form-control"
+                placeholder="Enter Date"
+                aria-label="date"
+                aria-describedby="basic-addon1"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="row justify-content-end">
+          <div class="col-md-4 align mt-1">
+            <button
+              id="addBtn"
+              name="addBtn"
+              class="btn btn-sm btn-outline-cyberpower shadow-sm w-100"
+            >
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- DataTales Example -->
 <div class="card shadow mb-4 table-size">
-    <div class="progress progress-sm mb-2">
-        <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
-            aria-valuemax="100"></div>
-    </div>
-    <div class="card-header card-bg align-content-center">
-        <div class="row">
-            <div class="col-md-3">
-                <h5 class="m-0 font-weight-bold cyber-title mt-2">Transfer Table</h5>
-            </div>
-            <div class="col-md-8 mt-1">
-                <input id="search" name="search" type="text" class="form-control" placeholder="Search Serial"
-                    aria-label="search" aria-describedby="basic-addon1" />
-            </div>
+  <div class="progress progress-sm mb-2">
+    <div
+      class="progress-bar"
+      role="progressbar"
+      style="width: 0%"
+      aria-valuenow="0"
+      aria-valuemin="0"
+      aria-valuemax="100"
+    ></div>
+  </div>
+  <div class="card-header card-bg align-content-center">
+    <div class="row">
+      <div class="col-md-2 mt-2">
+        <h5 class="m-0 font-weight-bold cyber-title mt-2">Transfer Table</h5>
+      </div>
+      <div class="col-md-5 mt-2">
+        <input
+          id="search"
+          name="search"
+          type="text"
+          class="form-control"
+          placeholder="Search Serial"
+          aria-label="search"
+          aria-describedby="basic-addon1"
+        />
+      </div>
+      <div class="col-md-3 mt-2">
+        <div class="input-group mb-3">
+          <input
+            class="btn btn-outline-cyberpower w-100"
+            type="file"
+            id="fileinput"
+            placeholder="Select Image"
+          />
         </div>
+      </div>
+      <div class="col-md-2 mt-2">
+        <button
+          class="btn btn-outline-cyberpower"
+          id="uploadButton"
+          type="button"
+        >
+          <i class="fas fa-upload"></i>
+        </button>
+      </div>
     </div>
+  </div>
 
-    <div class="card-body">
-        <div class="table-responsive scrollable-table-container">
-            <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
-                <thead class="table-dark table-header">
-                    <tr>
-                        <th>ID</th>
-                        <th>Asset Control</th>
-                        <th>Serial</th>
-                        <th>Date</th>
-                        <th>Transfer By</th>
-                        <th>From</th>
-                        <th>Received By</th>
-                        <th>To</th>
-                        <th>Ref. No.</th>
-                    </tr>
-                </thead>
+  <div class="card-body">
+    <div class="table-responsive scrollable-table-container">
+      <table
+        class="table custom-mobile-table"
+        id="datatable"
+        width="100%"
+        cellspacing="10"
+      >
+        <thead class="table-dark table-header">
+          <tr>
+            <th>ID</th>
+            <th>Asset Control</th>
+            <th>Serial</th>
+            <th>Date</th>
+            <th>Transfer By</th>
+            <th>From</th>
+            <th>Received By</th>
+            <th>To</th>
+            <th>Ref. No.</th>
+          </tr>
+        </thead>
 
-                <tbody class="no-border"></tbody>
-            </table>
-        </div>
+        <tbody class="no-border"></tbody>
+      </table>
     </div>
+  </div>
 </div>

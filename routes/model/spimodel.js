@@ -13,6 +13,7 @@ const {
   MasterClientModel,
   RepairModel,
   ProductUploadModel,
+  TransferProductModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -407,6 +408,35 @@ exports.UploadProduct = (data) => {
         key["podate"],
         key["ponumber"],
         key["warrantydate"]
+      )
+  );
+};
+
+exports.TransferProduct = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      serial: key.serial,
+      date: key.date,
+      transferby: key.transferby,
+      from: key.from,
+      receivedby: key.receivedby,
+      to: key.to,
+      referenceno: key.referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new TransferProductModel(
+        key["serial"],
+        key["date"],
+        key["transferby"],
+        key["from"],
+        key["receivedby"],
+        key["to"],
+        key["referenceno"]
       )
   );
 };

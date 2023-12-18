@@ -50,7 +50,7 @@ router.get("/load", (req, res) => {
       if (result.length != 0) {
         let data = Product(result);
 
-        console.log(data);
+        // console.log(data);
         res.json({
           msg: "success",
           data: data,
