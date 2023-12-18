@@ -25,10 +25,10 @@ router.get("/load", (req, res) => {
     INNER JOIN master_position on mp_id = e_position`;
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
-      console.log(result);
+      // console.log(result);
       if (result.length != 0) {
         let data = Employee(result);
-        console.log(data);
+        // console.log(data);
         res.json({
           msg: "success",
           data: data,

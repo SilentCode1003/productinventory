@@ -130,7 +130,7 @@ class TransferModel {
     date,
     transferby,
     from,
-    receivedby,
+    receiveby,
     to,
     referenceno
   ) {
@@ -140,7 +140,7 @@ class TransferModel {
     this.date = date;
     this.transferby = transferby;
     this.from = from;
-    this.receivedby = receivedby;
+    this.receiveby = receiveby;
     this.to = to;
     this.referenceno = referenceno;
   }
@@ -198,6 +198,18 @@ class ProductUploadModel {
     this.warrantydate = warrantydate;
   }
 }
+
+class TransferProductModel {
+  constructor(serial, date, transferby, from, receivedby, to, referenceno) {
+    this.serial = serial;
+    this.date = date;
+    this.transferby = transferby;
+    this.from = from;
+    this.receivedby = receivedby;
+    this.to = to;
+    this.referenceno = referenceno;
+  }
+}
 //#endregion
 
 module.exports = {
@@ -215,4 +227,5 @@ module.exports = {
   MasterPositionModel,
   MasterClientModel,
   ProductUploadModel,
+  TransferProductModel,
 };
