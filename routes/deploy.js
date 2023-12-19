@@ -111,6 +111,7 @@ router.post("/upload", (req, res) => {
     let deploy = [];
     let counter = 0;
     let noentry = [];
+    let dupentry = [];
     dataJson.forEach((item) => {
       // console.log(item.serial);
       Check_Product(item.serial)
@@ -119,47 +120,80 @@ router.post("/upload", (req, res) => {
           let product = Product(result);
           Check_Employee(item.deployby)
             .then((result) => {
-              counter += 1;
-
               let employee = Employee(result);
               let deployby = employee[0].id;
 
-              if (product.length != 0) {
-                let assetcontrol = product[0].assetcontrol;
-
-                deploy.push([
-                  assetcontrol,
-                  item.serial,
-                  convertExcelDate(item.date),
-                  deployby,
-                  item.deployto,
-                  item.referenceno,
-                ]);
-              } else {
-                noentry.push(item.serial);
-              }
-
-              // console.log("Counter: ", counter, "Current: ", dataJson.length);
-
-              if (counter == dataJson.length) {
-                console.log(noentry);
-                InsertTable("deploy", deploy, (err, result) => {
-                  if (err) console.error("Error: ", err);
-
-                  console.log(result);
-
-                  if (noentry != 0) {
-                    res.json({
-                      msg: "noentry",
-                      data: noentry,
-                    });
+              Check_Deploy(
+                product[0].assetcontrol,
+                convertExcelDate(item.date),
+                item.deployto
+              )
+                .then((result) => {
+                  counter += 1;
+                  let deploydup = Deploy(result);
+                  console.log(deploydup[0].assetcontrol);
+                  if (deploydup.length != 0) {
+                    dupentry.push(item.serial);
                   } else {
-                    res.json({
-                      msg: "success",
-                    });
+                    if (product.length != 0) {
+                      let assetcontrol = product[0].assetcontrol;
+
+                      deploy.push([
+                        assetcontrol,
+                        item.serial,
+                        convertExcelDate(item.date),
+                        deployby,
+                        item.deployto,
+                        item.referenceno,
+                      ]);
+                    } else {
+                      noentry.push(item.serial);
+                    }
+
+                    // console.log("Counter: ", counter, "Current: ", dataJson.length);
                   }
+
+                  if (counter == dataJson.length) {
+                    console.log(noentry);
+
+                    if (deploy.length != 0) {
+                      InsertTable("deploy", deploy, (err, result) => {
+                        if (err) console.error("Error: ", err);
+
+                        console.log(result);
+                      });
+                    }
+
+                    let message = "";
+
+                    if (noentry != 0) {
+                      message += "noentry";
+                    }
+                    if (dupentry != 0) {
+                      message += "dupentry";
+                    }
+
+                    if (message != "") {
+                      return res.json({
+                        msg: message,
+                        data: {
+                          noentry: noentry,
+                          dupentry: dupentry,
+                        },
+                      });
+                    } else {
+                      res.json({
+                        msg: "success",
+                      });
+                    }
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error: ", error);
+                  return res.json({
+                    msg: error,
+                  });
                 });
-              }
             })
             .catch((error) => {
               console.error("Error: ", error);
@@ -200,7 +234,7 @@ function Check_Employee(fullname) {
     let sql = "select * from employee where e_fullname=?";
     SelectParameter(sql, [fullname], (err, result) => {
       if (err) reject(err);
-      console.log(result);
+      // console.log(result);
 
       resolve(result);
     });
