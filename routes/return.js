@@ -94,7 +94,7 @@ router.post("/save", (req, res) => {
 
 function Check_Return(assetcontrol, date, from, to) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from returnitem where r_assetcontrol-? and r_date=?";
+    let sql = "select * from returnitem where r_assetcontrol=? and r_date=?";
     let command = SelectStatement(sql, [assetcontrol, date]);
 
     Select(command, (err, result) => {
