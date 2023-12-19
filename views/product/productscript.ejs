@@ -111,7 +111,7 @@
           success: function (result) {
             //console.log(result);
             if (result.msg == "success") {
-              LoadTable();
+              resettable()
               success("Saved", "Successfully");
               $("#serial").val("");
               $("#podate").val("");
@@ -134,6 +134,8 @@
         });
       }
     });
+
+    //#region LOAD TABLE
 
     function populatetable(data) {
       //console.log(data);
@@ -243,7 +245,7 @@
                   })
                 );
                 tableBody.append(tr);
-              }else{
+              } else {
                 if (data.msg === "success") {
                   populatetable(data.data);
                   currentPage++;
@@ -258,6 +260,7 @@
         error: function (error) {
           console.error(error);
           isFetchingData = false;
+          hasMoreData = fals
         },
       });
     }
@@ -276,6 +279,16 @@
         LoadTable();
       }
     });
+
+    function resettable() {
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+      currentPage = 1;
+      hasMoreData = true;
+      LoadTable();
+    }
+
+    //#endregion LOAD TABLE
 
     function LoadList() {
       $.ajax({
@@ -321,7 +334,7 @@
         },
         success: function (result) {
           if (result.msg == "success") {
-            LoadTable();
+            resettable()
             success("Saved", "Successfully");
           }
 
@@ -347,7 +360,7 @@
         },
         success: function (result) {
           if (result.msg == "success") {
-            LoadTable();
+            resettable()
             success("Saved", "Successfully");
           }
 
@@ -363,36 +376,109 @@
 
     LoadList();
 
+    let searchTimeout;
+
     function filterTableRows() {
-      const searchQuery = $("#search").val().trim().toLowerCase();
-      let foundMatches = false;
+      const keyword = $("#search").val().trim().toLowerCase();
 
-      $("#no-match-row").remove();
+      clearTimeout(searchTimeout);
 
-      $("#datatable tbody tr").each(function () {
-        const rowData = $(this).text().toLowerCase();
-        if (rowData.includes(searchQuery)) {
-          $(this).show();
-          foundMatches = true;
+      searchTimeout = setTimeout(function () {
+        if (keyword != '') {
+          $.ajax({
+            type: "POST",
+            url: "/product/search",
+            data: {
+              keyword: keyword,
+            },
+            success: function (result) {
+              console.log(result.data);
+              let data = result.data;
+              const tableBody = $("#datatable tbody");
+              tableBody.empty();
+
+              if (data.length === 0) {
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 8,
+                    class: "text-center",
+                    text: "No Data Matched",
+                  })
+                );
+                tableBody.append(tr);
+              } else {
+                data.forEach((item) => {
+                  let action = "";
+                  if (item.status === "ACTIVE") {
+                    action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                  } else if (item.status === "INACTIVE") {
+                    action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                  }
+
+                  const tr = $("<tr>").append(
+                    $("<td>", {
+                      text: item.assetcontrol,
+                      "data-label": "Asset Control",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.serial,
+                      "data-label": "Serial",
+                      class: "custom-mobile-align no-wrap",
+                    }),
+                    $("<td>", {
+                      text: item.itemname,
+                      "data-label": "Item Name",
+                      class: "custom-mobile-align no-wrap",
+                    }),
+                    $("<td>", {
+                      text: item.category,
+                      "data-label": "Category",
+                      class: "custom-mobile-align no-wrap",
+                    }),
+                    $("<td>", {
+                      text: item.podate,
+                      "data-label": "PO Date",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.ponumber,
+                      "data-label": "PO Number",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.warrantydate,
+                      "data-label": "Warranty Date",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.status,
+                      "data-label": "Status",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      html: action,
+                      "data-label": "Action",
+                      class: "",
+                    })
+                  );
+
+                  tableBody.append(tr);
+                });
+              }
+            },
+            error: function (err) {
+              errormsg(err);
+            },
+          });
         } else {
-          $(this).hide();
+          resettable();
         }
-      });
-
-      if (!foundMatches) {
-        const noMatchRow = $("<tr>").append(
-          $("<td>", {
-            colspan: 9,
-            class: "text-center",
-            text: "No Data Matched",
-          })
-        );
-        $("#datatable tbody").append(noMatchRow);
-        noMatchRow.attr("id", "no-match-row");
-      }
+      }, 1500);
     }
 
     $("#search").on("input", filterTableRows);
+
 
     //#region Upload
     $(document).on("click", "#uploadButton", function () {
@@ -513,7 +599,7 @@
             // });
           } else {
             success("Saved!", "Data saved!");
-            LoadTable();
+            resettable()
             // swal({
             //   title: "Success",
             //   text: "Data saved!",
