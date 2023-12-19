@@ -15,6 +15,7 @@ const {
   ProductUploadModel,
   TransferProductModel,
   SearchModel,
+  DeployProductModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -437,6 +438,31 @@ exports.TransferProduct = (data) => {
         key["from"],
         key["receivedby"],
         key["to"],
+        key["referenceno"]
+      )
+  );
+};
+
+exports.DeployProduct = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      serial: key.serial,
+      date: key.date,
+      deployby: key.deployby,
+      deployto: key.deployto,
+      referenceno: key.referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new DeployProductModel(
+        key["serial"],
+        key["date"],
+        key["deployby"],
+        key["deployto"],
         key["referenceno"]
       )
   );

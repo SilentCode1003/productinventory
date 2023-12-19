@@ -124,8 +124,6 @@ router.post("/upload", (req, res) => {
     let counter = 0;
     let noentry = [];
 
-    console.log("hit");
-
     dataJson.forEach((item) => {
       Check_Product(item.serial)
         .then((result) => {

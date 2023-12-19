@@ -1,7 +1,21 @@
 var express = require("express");
-const { Select, InsertTable, Update } = require("./repository/spidb");
-const { Deploy, Return } = require("./model/spimodel");
-const { SelectStatement } = require("./repository/customhelper");
+const {
+  Select,
+  InsertTable,
+  Update,
+  SelectParameter,
+} = require("./repository/spidb");
+const {
+  Deploy,
+  Return,
+  DeployProduct,
+  Product,
+  Employee,
+} = require("./model/spimodel");
+const {
+  SelectStatement,
+  convertExcelDate,
+} = require("./repository/customhelper");
 const { GetValue, DLV, DLY } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
 var router = express.Router();
@@ -89,6 +103,109 @@ router.post("/save", (req, res) => {
     });
   }
 });
+
+router.post("/upload", (req, res) => {
+  try {
+    const { data } = req.body;
+    let dataJson = DeployProduct(JSON.parse(data));
+    let deploy = [];
+    let counter = 0;
+    let noentry = [];
+    dataJson.forEach((item) => {
+      // console.log(item.serial);
+      Check_Product(item.serial)
+        .then((result) => {
+          // console.log(item.serial, "Result: ", result);
+          let product = Product(result);
+          Check_Employee(item.deployby)
+            .then((result) => {
+              counter += 1;
+
+              let employee = Employee(result);
+              let deployby = employee[0].id;
+
+              if (product.length != 0) {
+                let assetcontrol = product[0].assetcontrol;
+
+                deploy.push([
+                  assetcontrol,
+                  item.serial,
+                  convertExcelDate(item.date),
+                  deployby,
+                  item.deployto,
+                  item.referenceno,
+                ]);
+              } else {
+                noentry.push(item.serial);
+              }
+
+              // console.log("Counter: ", counter, "Current: ", dataJson.length);
+
+              if (counter == dataJson.length) {
+                console.log(noentry);
+                InsertTable("deploy", deploy, (err, result) => {
+                  if (err) console.error("Error: ", err);
+
+                  console.log(result);
+
+                  if (noentry != 0) {
+                    res.json({
+                      msg: "noentry",
+                      data: noentry,
+                    });
+                  } else {
+                    res.json({
+                      msg: "success",
+                    });
+                  }
+                });
+              }
+            })
+            .catch((error) => {
+              console.error("Error: ", error);
+              return res.json({
+                msg: error,
+              });
+            });
+        })
+        .catch((error) => {
+          console.error("Serial: ", item.serial, "Error: ", error);
+          return res.json({
+            msg: error,
+          });
+        });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+function Check_Product(serial) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from product where p_serial=?";
+    // console.log(serial);
+    SelectParameter(sql, [serial], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+
+function Check_Employee(fullname) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from employee where e_fullname=?";
+    SelectParameter(sql, [fullname], (err, result) => {
+      if (err) reject(err);
+      console.log(result);
+
+      resolve(result);
+    });
+  });
+}
 
 //#region
 function Check_Deploy(assetcontrol, date, deployto) {
