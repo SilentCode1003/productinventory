@@ -2,6 +2,7 @@
   $(document).ready(function () {
     //Functionality
     let isFetchingData = false;
+    let hasMoreData = true;
     let currentPage = 1;
 
     var activePositions = [];
@@ -139,7 +140,6 @@
       const tableBody = $("#datatable tbody");
 
       if (data.length === 0) {
-        // Handle the case where there is no data
         const tr = $("<tr>").append(
           $("<td>", {
             colspan: 8,
@@ -210,8 +210,10 @@
       }
     }
 
-
     function LoadTable() {
+      if (!hasMoreData) {
+        return;
+      }
       $(".progress").hide();
       $(".progress").slideDown();
       $.ajax({
@@ -230,11 +232,24 @@
         success: function (data) {
           setTimeout(function () {
             $(".progress").slideUp(function () {
-              if (data.msg === "success") {
-                populatetable(data.data);
-                currentPage++;
-              } else {
-                console.error(data.msg);
+              hasMoreData = data.data.length > 0;
+              if (!hasMoreData) {
+                const tableBody = $("#datatable tbody");
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 9,
+                    class: "text-center",
+                    text: "No More Data",
+                  })
+                );
+                tableBody.append(tr);
+              }else{
+                if (data.msg === "success") {
+                  populatetable(data.data);
+                  currentPage++;
+                } else {
+                  console.error(data.msg);
+                }
               }
               isFetchingData = false;
             });
