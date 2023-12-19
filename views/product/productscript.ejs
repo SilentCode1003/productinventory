@@ -1,6 +1,9 @@
 <script>
   $(document).ready(function () {
     //Functionality
+    let isFetchingData = false;
+    let currentPage = 1;
+
     var activePositions = [];
     let assetcontrol = "";
     let status = "";
@@ -15,14 +18,14 @@
         .each(function () {
           dataRow.push($(this).text());
         });
-      console.log(dataRow);
+      //console.log(dataRow);
       assetcontrol = dataRow[0];
       status = dataRow[7];
     });
 
     $(document).on("change", "#categoryid", function () {
       let id = $(this).val();
-      console.log(id);
+      //console.log(id);
 
       $(".productlist").empty();
       $("#selectedproduct").text("Select Product");
@@ -35,7 +38,7 @@
         },
         success: function (result) {
           let container = result.data;
-          console.log(container);
+          //console.log(container);
           $.each(container, (key, item) => {
             let productname = item.name;
             let productid = item.id;
@@ -92,7 +95,7 @@
       if (message != "") {
         warning("Required", `Please fill up ${message}`);
       } else {
-        console.log(serial, itemname, category, podate, ponumber, warrantydate);
+        //console.log(serial, itemname, category, podate, ponumber, warrantydate);
         $.ajax({
           type: "POST",
           url: "/product/save",
@@ -105,7 +108,7 @@
             warrantydate: warrantydate,
           },
           success: function (result) {
-            console.log(result);
+            //console.log(result);
             if (result.msg == "success") {
               LoadTable();
               success("Saved", "Successfully");
@@ -132,11 +135,11 @@
     });
 
     function populatetable(data) {
-      console.log(data);
+      //console.log(data);
       const tableBody = $("#datatable tbody");
-      tableBody.empty();
 
       if (data.length === 0) {
+        // Handle the case where there is no data
         const tr = $("<tr>").append(
           $("<td>", {
             colspan: 8,
@@ -149,11 +152,9 @@
         data.forEach((item) => {
           let action = "";
           if (item.status === "ACTIVE") {
-            action = `
-                            <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+            action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
           } else if (item.status === "INACTIVE") {
-            action = `
-                            <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+            action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
           }
 
           const tr = $("<tr>").append(
@@ -197,12 +198,18 @@
               "data-label": "Status",
               class: "custom-mobile-align",
             }),
-            $("<td>", { html: action, "data-label": "Action", class: "" })
+            $("<td>", {
+              html: action,
+              "data-label": "Action",
+              class: "",
+            })
           );
+
           tableBody.append(tr);
         });
       }
     }
+
 
     function LoadTable() {
       $(".progress").hide();
@@ -211,6 +218,7 @@
         url: "/product/load",
         method: "GET",
         dataType: "json",
+        data: { page: currentPage },
         xhrFields: {
           onprogress: function (e) {
             if (e.lengthComputable) {
@@ -224,17 +232,35 @@
             $(".progress").slideUp(function () {
               if (data.msg === "success") {
                 populatetable(data.data);
+                currentPage++;
               } else {
                 console.error(data.msg);
               }
+              isFetchingData = false;
             });
           }, 1000);
         },
         error: function (error) {
           console.error(error);
+          isFetchingData = false;
         },
       });
     }
+
+    $(".scrollable-table-container").scroll(function () {
+      const container = $(this);
+      if (isFetchingData) {
+        return;
+      }
+      if (
+        container.scrollTop() + container.innerHeight() >=
+        container[0].scrollHeight - 10
+      ) {
+        //console.log("Append Triggered!");
+        isFetchingData = true;
+        LoadTable();
+      }
+    });
 
     function LoadList() {
       $.ajax({
@@ -245,7 +271,7 @@
           $.each(container, (key, item) => {
             let categoryname = item.name;
             let categoryid = item.id;
-            console.log(categoryname);
+            //console.log(categoryname);
 
             var listItem = $("<li></li>")
               .text(categoryname)
@@ -269,8 +295,8 @@
     }
 
     $(document).on("click", "#activeBtn", function () {
-      console.log(assetcontrol);
-      console.log(status);
+      //console.log(assetcontrol);
+      //console.log(status);
       $.ajax({
         type: "POST",
         url: "/product/status",
@@ -295,8 +321,8 @@
     });
 
     $(document).on("click", "#inactiveBtn", function () {
-      console.log(assetcontrol);
-      console.log(status);
+      //console.log(assetcontrol);
+      //console.log(status);
       $.ajax({
         type: "POST",
         url: "/product/status",
@@ -355,9 +381,14 @@
 
     //#region Upload
     $(document).on("click", "#uploadButton", function () {
-      //   console.log("clicked!");
-      showspinner();
-      UploadProcess();
+      let uploaddata = $("#fileinput").val();
+      if (uploaddata != '') {
+        showspinner();
+        UploadProcess();
+      } else {
+        warning('Warning!', "No File Chosen!")
+      }
+
     });
 
     function UploadProcess() {
@@ -482,7 +513,7 @@
           console.error(result);
         },
       });
-      
+
     }
     //#endregion
   });
