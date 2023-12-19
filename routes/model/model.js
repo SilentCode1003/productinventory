@@ -210,6 +210,16 @@ class TransferProductModel {
     this.referenceno = referenceno;
   }
 }
+
+class DeployProductModel {
+  constructor(serial, date, deployby, deployto, referenceno) {
+    this.serial = serial;
+    this.date = date;
+    this.deployby = deployby;
+    this.deployto = deployto;
+    this.referenceno = referenceno;
+  }
+}
 //#endregion
 
 //#region Search
@@ -292,4 +302,5 @@ module.exports = {
   ProductUploadModel,
   TransferProductModel,
   SearchModel,
+  DeployProductModel
 };

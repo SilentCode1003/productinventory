@@ -311,8 +311,8 @@ router.post("/search", (req, res) => {
     const { keyword } = req.body;
     let sql = `select
     p_assetcontrol as assetcontrol,
-    p_category as category,
-    p_itemname as itemname,
+    mc_name as category,
+    mi_name as itemname,
     p_serial as serial,
     p_podate as podate,
     p_ponumber as ponumber,
@@ -339,6 +339,8 @@ router.post("/search", (req, res) => {
     sold.s_soldto as soldto,
     sold.s_referenceno as soldreferenceno
     from product
+    inner join master_category on mc_id = p_category
+    inner join master_item on mi_id = p_itemname
     left join transfer on p_serial = t_serial
     left join deploy on p_serial = d_serial
     left join returnitem on p_serial = returnitem.r_serial
@@ -422,4 +424,5 @@ function Get_Item(name, category) {
     });
   });
 }
+
 //#endregion
