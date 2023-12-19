@@ -8,6 +8,7 @@ const {
   MasterCategory,
   Return,
   MasterItem,
+  Search,
 } = require("./model/spimodel");
 const {
   GenerateAssetTag,
@@ -16,7 +17,7 @@ const {
 } = require("./repository/customhelper");
 const { GetValue, WH } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
-const { sq } = require("date-fns/locale");
+const { sq, da } = require("date-fns/locale");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -275,7 +276,7 @@ router.post("/upload", (req, res) => {
               }
 
               if (counter == dataJSon.length) {
-                console.log('DUplicate!');
+                console.log("DUplicate!");
                 if (duplicate != "") {
                   return res.json({
                     msg: "exist",
@@ -298,6 +299,72 @@ router.post("/upload", (req, res) => {
           msg: error,
         });
       });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/search", (req, res) => {
+  try {
+    const { keyword } = req.body;
+    let sql = `select
+    p_assetcontrol as assetcontrol,
+    p_category as category,
+    p_itemname as itemname,
+    p_serial as serial,
+    p_podate as podate,
+    p_ponumber as ponumber,
+    p_warrantydate as warrantydate,
+    p_status as status,
+    transfer.t_date as transferdate,
+    transfer.t_transferby as transferby,
+    transfer.t_to transferto,
+    transfer.t_receiveby as transferby,
+    transfer.t_from as transferfrom,
+    transfer.t_referenceno as transferreferenceno,
+    deploy.d_date as deploydate,
+    deploy.d_deployby as deployby,
+    deploy.d_deployto as deployto,
+    deploy.d_referenceno as deployreferenceno,
+    repair.r_date as repairdate,
+    repair.r_repairby as repairby,
+    repair.r_referenceno as repairreferenceno,
+    returnitem.r_date as returndate,
+    returnitem.r_returnby as returnby,
+    returnitem.r_returnfrom as returnfrom,
+    sold.s_date as solddate,
+    sold.s_soldby as soldby,
+    sold.s_soldto as soldto,
+    sold.s_referenceno as soldreferenceno
+    from product
+    left join transfer on p_serial = t_serial
+    left join deploy on p_serial = d_serial
+    left join returnitem on p_serial = returnitem.r_serial
+    left join repair on p_serial = repair.r_serial
+    left join sold on p_serial = s_serial
+    where p_serial like ? 
+    or p_assetcontrol like ?`;
+    let command = SelectStatement(sql, [`${keyword}%`, `${keyword}%`]);
+
+    Select(command, (err, result) => {
+      if (err) console.error("Error: ", err);
+      let data = Search(result);
+      if (data.length != 0) {
+        let data = Search(result);
+
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
   } catch (error) {
     res.json({
       msg: error,
