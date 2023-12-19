@@ -356,8 +356,14 @@
     //#region Upload
     $(document).on("click", "#uploadButton", function () {
       //   console.log("clicked!");
-      showspinner();
-      UploadProcess();
+      let uploaddata = $("#fileinput").val();
+      if (uploaddata != '') {
+        showspinner();
+        UploadProcess();
+      } else {
+        warning('Warning!', "No File Chosen!")
+      }
+
     });
 
     function UploadProcess() {
