@@ -87,12 +87,28 @@
     </div>
     <div class="card-header card-bg align-content-center">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-2 mt-2">
                 <h5 class="m-0 font-weight-bold cyber-title mt-2">Deployment Table</h5>
             </div>
-            <div class="col-md-8 mt-1">
+            <div class="col-md-5 mt-2">
                 <input id="search" name="search" type="text" class="form-control" placeholder="Search Serial"
                     aria-label="search" aria-describedby="basic-addon1" />
+            </div>
+            <div class="col-md-3 mt-2">
+                <div class="input-group mb-3">
+                    <input
+                        class="btn btn-outline-cyberpower w-100"
+                        type="file"
+                        id="fileinput"
+                        accept=".xlsx, .xls"
+                        placeholder="Select Excel File"
+                    />
+                </div>                
+            </div>
+            <div class="col-md-2 mt-2">
+                <button class="btn btn-outline-cyberpower" id="uploadButton" type="button">
+                    <i class="fas fa-upload"></i>
+                </button>
             </div>
         </div>
     </div>

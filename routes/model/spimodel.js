@@ -14,6 +14,8 @@ const {
   RepairModel,
   ProductUploadModel,
   TransferProductModel,
+  SearchModel,
+  DeployProductModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -437,6 +439,102 @@ exports.TransferProduct = (data) => {
         key["receivedby"],
         key["to"],
         key["referenceno"]
+      )
+  );
+};
+
+exports.DeployProduct = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      serial: key.serial,
+      date: key.date,
+      deployby: key.deployby,
+      deployto: key.deployto,
+      referenceno: key.referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new DeployProductModel(
+        key["serial"],
+        key["date"],
+        key["deployby"],
+        key["deployto"],
+        key["referenceno"]
+      )
+  );
+};
+//#endregion
+
+//#region Search
+exports.Search = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      assetcontrol: key.assetcontrol,
+      category: key.category,
+      itemname: key.itemname,
+      serial: key.serial,
+      podate: key.podate,
+      ponumber: key.ponumber,
+      warrantydate: key.warrantydate,
+      status: key.status,
+      transferdate: key.transferdate,
+      transferby: key.transferby,
+      transferto: key.transferto,
+      transferfrom: key.transferfrom,
+      transferreferenceno: key.transferreferenceno,
+      deploydate: key.deploydate,
+      deployby: key.deployby,
+      deployto: key.deployto,
+      deployreferenceno: key.deployreferenceno,
+      repairdate: key.repairdate,
+      repairby: key.repairby,
+      repairreferenceno: key.repairreferenceno,
+      returndate: key.returndate,
+      returnby: key.returnby,
+      returnfrom: key.returnfrom,
+      solddate: key.solddate,
+      soldby: key.soldby,
+      soldto: key.soldto,
+      soldreferenceno: key.soldreferenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new SearchModel(
+        key["assetcontrol"],
+        key["category"],
+        key["itemname"],
+        key["serial"],
+        key["podate"],
+        key["ponumber"],
+        key["warrantydate"],
+        key["status"],
+        key["transferdate"],
+        key["transferby"],
+        key["transferto"],
+        key["transferfrom"],
+        key["transferreferenceno"],
+        key["deploydate"],
+        key["deployby"],
+        key["deployto"],
+        key["deployreferenceno"],
+        key["repairdate"],
+        key["repairby"],
+        key["repairreferenceno"],
+        key["returndate"],
+        key["returnby"],
+        key["returnfrom"],
+        key["solddate"],
+        key["soldby"],
+        key["soldto"],
+        key["soldreferenceno"]
       )
   );
 };

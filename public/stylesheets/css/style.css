@@ -103,6 +103,11 @@
 
 .cbi-link{
   color: var(--clr-default);
+  cursor: pointer;
+}
+
+.modal-xlg {
+    max-width: 1200px !important;
 }
 
 /* TABLE */

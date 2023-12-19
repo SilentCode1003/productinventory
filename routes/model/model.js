@@ -210,6 +210,79 @@ class TransferProductModel {
     this.referenceno = referenceno;
   }
 }
+
+class DeployProductModel {
+  constructor(serial, date, deployby, deployto, referenceno) {
+    this.serial = serial;
+    this.date = date;
+    this.deployby = deployby;
+    this.deployto = deployto;
+    this.referenceno = referenceno;
+  }
+}
+//#endregion
+
+//#region Search
+
+class SearchModel {
+  constructor(
+    assetcontrol,
+    category,
+    itemname,
+    serial,
+    podate,
+    ponumber,
+    warrantydate,
+    status,
+    transferdate,
+    transferby,
+    transferto,
+    transferfrom,
+    transferreferenceno,
+    deploydate,
+    deployby,
+    deployto,
+    deployreferenceno,
+    repairdate,
+    repairby,
+    repairreferenceno,
+    returndate,
+    returnby,
+    returnfrom,
+    solddate,
+    soldby,
+    soldto,
+    soldreferenceno
+  ) {
+    this.assetcontrol = assetcontrol;
+    this.category = category;
+    this.itemname = itemname;
+    this.serial = serial;
+    this.podate = podate;
+    this.ponumber = ponumber;
+    this.warrantydate = warrantydate;
+    this.status = status;
+    this.transferdate = transferdate;
+    this.transferby = transferby;
+    this.transferto = transferto;
+    this.transferfrom = transferfrom;
+    this.transferreferenceno = transferreferenceno;
+    this.deploydate = deploydate;
+    this.deployby = deployby;
+    this.deployto = deployto;
+    this.deployreferenceno = deployreferenceno;
+    this.repairdate = repairdate;
+    this.repairby = repairby;
+    this.repairreferenceno = repairreferenceno;
+    this.returndate = returndate;
+    this.returnby = returnby;
+    this.returnfrom = returnfrom;
+    this.solddate = solddate;
+    this.soldby = soldby;
+    this.soldto = soldto;
+    this.soldreferenceno = soldreferenceno;
+  }
+}
 //#endregion
 
 module.exports = {
@@ -228,4 +301,6 @@ module.exports = {
   MasterClientModel,
   ProductUploadModel,
   TransferProductModel,
+  SearchModel,
+  DeployProductModel
 };

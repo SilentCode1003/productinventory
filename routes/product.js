@@ -1,13 +1,19 @@
 var express = require("express");
 var router = express.Router();
 
-const { Select, InsertTable, SelectParameter } = require("./repository/spidb");
+const {
+  Select,
+  InsertTable,
+  SelectParameter,
+  StoredProcedure,
+} = require("./repository/spidb");
 const {
   Product,
   UploadProduct,
   MasterCategory,
   Return,
   MasterItem,
+  Search,
 } = require("./model/spimodel");
 const {
   GenerateAssetTag,
@@ -16,7 +22,7 @@ const {
 } = require("./repository/customhelper");
 const { GetValue, WH } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
-const { sq } = require("date-fns/locale");
+const { sq, da } = require("date-fns/locale");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -28,21 +34,29 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let sql = `SELECT 
-    p.p_assetcontrol as p_assetcontrol,
-    p.p_serial as p_serial,
-    mi.mi_name as p_itemname,
-    mc.mc_name as p_category,
-    p.p_podate as p_podate,
-    p.p_ponumber as p_ponumber,
-    p.p_warrantydate as p_warrantydate,
-    p.p_status as p_status
-    FROM 
+    const page = req.query.page || 1;
+    const itemsPerPage = 50;
+    const offset = (page - 1) * itemsPerPage;
+
+    let sql = `
+      SELECT 
+        p.p_assetcontrol as p_assetcontrol,
+        p.p_serial as p_serial,
+        mi.mi_name as p_itemname,
+        mc.mc_name as p_category,
+        p.p_podate as p_podate,
+        p.p_ponumber as p_ponumber,
+        p.p_warrantydate as p_warrantydate,
+        p.p_status as p_status
+      FROM 
         product p
-    INNER JOIN 
+      INNER JOIN 
         master_item mi ON p.p_itemname = mi.mi_id
-    INNER JOIN 
-        master_category mc ON p.p_category = mc.mc_id`;
+      INNER JOIN 
+        master_category mc ON p.p_category = mc.mc_id
+      ORDER BY p.p_podate DESC
+      LIMIT ${itemsPerPage} OFFSET ${offset};
+    `;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -267,7 +281,7 @@ router.post("/upload", (req, res) => {
               }
 
               if (counter == dataJSon.length) {
-                console.log('DUplicate!');
+                console.log("DUplicate!");
                 if (duplicate != "") {
                   return res.json({
                     msg: "exist",
@@ -296,6 +310,96 @@ router.post("/upload", (req, res) => {
     });
   }
 });
+
+router.post("/search", (req, res) => {
+  try {
+    const { keyword } = req.body;
+    let sql = `select
+    p_assetcontrol as assetcontrol,
+    mc_name as category,
+    mi_name as itemname,
+    p_serial as serial,
+    p_podate as podate,
+    p_ponumber as ponumber,
+    p_warrantydate as warrantydate,
+    p_status as status,
+    transfer.t_date as transferdate,
+    transfer.t_transferby as transferby,
+    transfer.t_to transferto,
+    transfer.t_receiveby as transferby,
+    transfer.t_from as transferfrom,
+    transfer.t_referenceno as transferreferenceno,
+    deploy.d_date as deploydate,
+    deploy.d_deployby as deployby,
+    deploy.d_deployto as deployto,
+    deploy.d_referenceno as deployreferenceno,
+    repair.r_date as repairdate,
+    repair.r_repairby as repairby,
+    repair.r_referenceno as repairreferenceno,
+    returnitem.r_date as returndate,
+    returnitem.r_returnby as returnby,
+    returnitem.r_returnfrom as returnfrom,
+    sold.s_date as solddate,
+    sold.s_soldby as soldby,
+    sold.s_soldto as soldto,
+    sold.s_referenceno as soldreferenceno
+    from product
+    inner join master_category on mc_id = p_category
+    inner join master_item on mi_id = p_itemname
+    left join transfer on p_serial = t_serial
+    left join deploy on p_serial = d_serial
+    left join returnitem on p_serial = returnitem.r_serial
+    left join repair on p_serial = repair.r_serial
+    left join sold on p_serial = s_serial
+    where p_serial like ? 
+    or p_assetcontrol like ?`;
+    let command = SelectStatement(sql, [`${keyword}%`, `${keyword}%`]);
+
+    Select(command, (err, result) => {
+      if (err) console.error("Error: ", err);
+      let data = Search(result);
+      if (data.length != 0) {
+        let data = Search(result);
+
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/producthistory", (req, res) => {
+  try {
+    const { assetcontrol } = req.body;
+    let sql = "call cyberpowerproduct.getproducthistory(?)";
+
+    StoredProcedure(sql, assetcontrol, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      console.log(result);
+      res.json({
+        msg: "success",
+        data: result,
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 //#region Functions
 function Product_Count() {
   return new Promise((resolve, reject) => {
@@ -347,4 +451,5 @@ function Get_Item(name, category) {
     });
   });
 }
+
 //#endregion

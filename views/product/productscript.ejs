@@ -1,6 +1,10 @@
 <script>
   $(document).ready(function () {
     //Functionality
+    let isFetchingData = false;
+    let hasMoreData = true;
+    let currentPage = 1;
+
     var activePositions = [];
     let assetcontrol = "";
     let status = "";
@@ -15,14 +19,14 @@
         .each(function () {
           dataRow.push($(this).text());
         });
-      console.log(dataRow);
+      //console.log(dataRow);
       assetcontrol = dataRow[0];
       status = dataRow[7];
     });
 
     $(document).on("change", "#categoryid", function () {
       let id = $(this).val();
-      console.log(id);
+      //console.log(id);
 
       $(".productlist").empty();
       $("#selectedproduct").text("Select Product");
@@ -35,7 +39,7 @@
         },
         success: function (result) {
           let container = result.data;
-          console.log(container);
+          //console.log(container);
           $.each(container, (key, item) => {
             let productname = item.name;
             let productid = item.id;
@@ -92,7 +96,7 @@
       if (message != "") {
         warning("Required", `Please fill up ${message}`);
       } else {
-        console.log(serial, itemname, category, podate, ponumber, warrantydate);
+        //console.log(serial, itemname, category, podate, ponumber, warrantydate);
         $.ajax({
           type: "POST",
           url: "/product/save",
@@ -105,9 +109,9 @@
             warrantydate: warrantydate,
           },
           success: function (result) {
-            console.log(result);
+            //console.log(result);
             if (result.msg == "success") {
-              LoadTable();
+              resettable()
               success("Saved", "Successfully");
               $("#serial").val("");
               $("#podate").val("");
@@ -131,10 +135,11 @@
       }
     });
 
+    //#region LOAD TABLE
+
     function populatetable(data) {
-      console.log(data);
+      //console.log(data);
       const tableBody = $("#datatable tbody");
-      tableBody.empty();
 
       if (data.length === 0) {
         const tr = $("<tr>").append(
@@ -149,11 +154,9 @@
         data.forEach((item) => {
           let action = "";
           if (item.status === "ACTIVE") {
-            action = `
-                            <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+            action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
           } else if (item.status === "INACTIVE") {
-            action = `
-                            <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+            action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
           }
 
           const tr = $("<tr>").append(
@@ -197,20 +200,29 @@
               "data-label": "Status",
               class: "custom-mobile-align",
             }),
-            $("<td>", { html: action, "data-label": "Action", class: "" })
+            $("<td>", {
+              html: action,
+              "data-label": "Action",
+              class: "",
+            })
           );
+
           tableBody.append(tr);
         });
       }
     }
 
     function LoadTable() {
+      if (!hasMoreData) {
+        return;
+      }
       $(".progress").hide();
       $(".progress").slideDown();
       $.ajax({
         url: "/product/load",
         method: "GET",
         dataType: "json",
+        data: { page: currentPage },
         xhrFields: {
           onprogress: function (e) {
             if (e.lengthComputable) {
@@ -222,19 +234,61 @@
         success: function (data) {
           setTimeout(function () {
             $(".progress").slideUp(function () {
-              if (data.msg === "success") {
-                populatetable(data.data);
+              hasMoreData = data.data.length > 0;
+              if (!hasMoreData) {
+                const tableBody = $("#datatable tbody");
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 9,
+                    class: "text-center",
+                    text: "No More Data",
+                  })
+                );
+                tableBody.append(tr);
               } else {
-                console.error(data.msg);
+                if (data.msg === "success") {
+                  populatetable(data.data);
+                  currentPage++;
+                } else {
+                  console.error(data.msg);
+                }
               }
+              isFetchingData = false;
             });
           }, 1000);
         },
         error: function (error) {
           console.error(error);
+          isFetchingData = false;
+          hasMoreData = fals
         },
       });
     }
+
+    $(".scrollable-table-container").scroll(function () {
+      const container = $(this);
+      if (isFetchingData) {
+        return;
+      }
+      if (
+        container.scrollTop() + container.innerHeight() >=
+        container[0].scrollHeight - 10
+      ) {
+        //console.log("Append Triggered!");
+        isFetchingData = true;
+        LoadTable();
+      }
+    });
+
+    function resettable() {
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+      currentPage = 1;
+      hasMoreData = true;
+      LoadTable();
+    }
+
+    //#endregion LOAD TABLE
 
     function LoadList() {
       $.ajax({
@@ -245,7 +299,7 @@
           $.each(container, (key, item) => {
             let categoryname = item.name;
             let categoryid = item.id;
-            console.log(categoryname);
+            //console.log(categoryname);
 
             var listItem = $("<li></li>")
               .text(categoryname)
@@ -269,8 +323,8 @@
     }
 
     $(document).on("click", "#activeBtn", function () {
-      console.log(assetcontrol);
-      console.log(status);
+      //console.log(assetcontrol);
+      //console.log(status);
       $.ajax({
         type: "POST",
         url: "/product/status",
@@ -280,7 +334,7 @@
         },
         success: function (result) {
           if (result.msg == "success") {
-            LoadTable();
+            resettable()
             success("Saved", "Successfully");
           }
 
@@ -295,8 +349,8 @@
     });
 
     $(document).on("click", "#inactiveBtn", function () {
-      console.log(assetcontrol);
-      console.log(status);
+      //console.log(assetcontrol);
+      //console.log(status);
       $.ajax({
         type: "POST",
         url: "/product/status",
@@ -306,7 +360,7 @@
         },
         success: function (result) {
           if (result.msg == "success") {
-            LoadTable();
+            resettable()
             success("Saved", "Successfully");
           }
 
@@ -322,42 +376,120 @@
 
     LoadList();
 
+    let searchTimeout;
+
     function filterTableRows() {
-      const searchQuery = $("#search").val().trim().toLowerCase();
-      let foundMatches = false;
+      const keyword = $("#search").val().trim().toLowerCase();
 
-      $("#no-match-row").remove();
+      clearTimeout(searchTimeout);
 
-      $("#datatable tbody tr").each(function () {
-        const rowData = $(this).text().toLowerCase();
-        if (rowData.includes(searchQuery)) {
-          $(this).show();
-          foundMatches = true;
+      searchTimeout = setTimeout(function () {
+        if (keyword != '') {
+          $.ajax({
+            type: "POST",
+            url: "/product/search",
+            data: {
+              keyword: keyword,
+            },
+            success: function (result) {
+              console.log(result.data);
+              let data = result.data;
+              const tableBody = $("#datatable tbody");
+              tableBody.empty();
+
+              if (data.length === 0) {
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 8,
+                    class: "text-center",
+                    text: "No Data Matched",
+                  })
+                );
+                tableBody.append(tr);
+              } else {
+                data.forEach((item) => {
+                  let action = "";
+                  if (item.status === "ACTIVE") {
+                    action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                  } else if (item.status === "INACTIVE") {
+                    action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                  }
+
+                  const tr = $("<tr>").append(
+                    $("<td>", {
+                      text: item.assetcontrol,
+                      "data-label": "Asset Control",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.serial,
+                      "data-label": "Serial",
+                      class: "custom-mobile-align no-wrap",
+                    }),
+                    $("<td>", {
+                      text: item.itemname,
+                      "data-label": "Item Name",
+                      class: "custom-mobile-align no-wrap",
+                    }),
+                    $("<td>", {
+                      text: item.category,
+                      "data-label": "Category",
+                      class: "custom-mobile-align no-wrap",
+                    }),
+                    $("<td>", {
+                      text: item.podate,
+                      "data-label": "PO Date",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.ponumber,
+                      "data-label": "PO Number",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.warrantydate,
+                      "data-label": "Warranty Date",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.status,
+                      "data-label": "Status",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      html: action,
+                      "data-label": "Action",
+                      class: "",
+                    })
+                  );
+
+                  tableBody.append(tr);
+                });
+              }
+            },
+            error: function (err) {
+              errormsg(err);
+            },
+          });
         } else {
-          $(this).hide();
+          resettable();
         }
-      });
-
-      if (!foundMatches) {
-        const noMatchRow = $("<tr>").append(
-          $("<td>", {
-            colspan: 9,
-            class: "text-center",
-            text: "No Data Matched",
-          })
-        );
-        $("#datatable tbody").append(noMatchRow);
-        noMatchRow.attr("id", "no-match-row");
-      }
+      }, 1500);
     }
 
     $("#search").on("input", filterTableRows);
 
+
     //#region Upload
     $(document).on("click", "#uploadButton", function () {
-      //   console.log("clicked!");
-      showspinner();
-      UploadProcess();
+      let uploaddata = $("#fileinput").val();
+      if (uploaddata != '') {
+        showspinner();
+        UploadProcess();
+      } else {
+        warning('Warning!', "No File Chosen!")
+      }
+
     });
 
     function UploadProcess() {
@@ -467,7 +599,7 @@
             // });
           } else {
             success("Saved!", "Data saved!");
-            LoadTable();
+            resettable()
             // swal({
             //   title: "Success",
             //   text: "Data saved!",
@@ -482,7 +614,7 @@
           console.error(result);
         },
       });
-      
+
     }
     //#endregion
   });

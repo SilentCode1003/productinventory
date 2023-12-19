@@ -47,6 +47,9 @@ var roleacess = [
       {
         layout: "users",
       },
+      {
+        layout: "search",
+      },
     ],
   },
   {
@@ -78,6 +81,9 @@ var roleacess = [
       },
       {
         layout: "transfer",
+      },
+      {
+        layout: "search",
       },
     ],
   },

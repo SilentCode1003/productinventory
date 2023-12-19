@@ -124,8 +124,6 @@ router.post("/upload", (req, res) => {
     let counter = 0;
     let noentry = [];
 
-    console.log("hit");
-
     dataJson.forEach((item) => {
       Check_Product(item.serial)
         .then((result) => {
@@ -182,7 +180,7 @@ router.post("/upload", (req, res) => {
 function Check_Transfer(assetcontrol, date, from, to) {
   return new Promise((resolve, reject) => {
     let sql =
-      "select * from transfer where t_assetcontrol-? and t_date=? and t_from=? and t_to=?";
+      "select * from transfer where t_assetcontrol=? and t_date=? and t_from=? and t_to=?";
     let command = SelectStatement(sql, [assetcontrol, date, from, to]);
 
     Select(command, (err, result) => {

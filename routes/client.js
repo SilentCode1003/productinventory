@@ -22,7 +22,11 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let sql = `select * from master_client`;
+    const page = req.query.page || 1;
+    const itemsPerPage = 50;
+    const offset = (page - 1) * itemsPerPage;
+
+    let sql = `select * from master_client LIMIT ${itemsPerPage} OFFSET ${offset}`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -149,8 +153,8 @@ router.post("/status", (req, res) => {
     let data = [status, id];
 
     let sql_Update = `UPDATE master_client 
-                     SET ma_status = ?
-                     WHERE ma_id = ?`;
+                     SET mc_status = ?
+                     WHERE mc_id = ?`;
 
     console.log(data);
 
