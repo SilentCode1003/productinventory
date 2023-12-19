@@ -73,6 +73,16 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+  $("#searchproduct").on("click", function () {
+    let searchdata = $("#searchdata").val();
+    if(searchdata != ''){
+      localStorage.setItem('searchdata', searchdata);
+      location.replace("/search");
+    }else{
+      warning('Empty Input!', "Enter Asset Number/Serial Number!")
+    }
+  })
+
   hidespinner();
 
   function showspinner() {
