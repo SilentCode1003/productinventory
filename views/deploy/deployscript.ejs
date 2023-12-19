@@ -511,10 +511,10 @@
         },
         success: function (result) {
           hidespinner();
-          if (result.msg != "success") {
-            warning(
-              "Duplicate",
-              `Some data not exist on the database. ID[${result.data}]`
+          if (result.msg == "noentry") {
+            return warning(
+              "Product Not Registered",
+              `List of serials not yet registered [${result.data.noentry}]`
             );
 
             // swal({
@@ -523,16 +523,29 @@
             //   icon: "warning",
             //   button: "OK!",
             // });
-          } else {
-            success("Saved!", "Data saved!");
-            LoadTable();
-            // swal({
-            //   title: "Success",
-            //   text: "Data saved!",
-            //   icon: "success",
-            //   button: "OK!",
-            // });
           }
+          if (result.msg == "dupentry") {
+            return warning(
+              "Already Exist",
+              `List of serials that already deployed [${result.data.dupentry}]`
+            );
+          }
+
+          if (result.msg == "noentrydupentry") {
+            return warning(
+              "Warning",
+              `List of serials that are not yet register [${result.data.noentry}]\nList of serials that already dployed [${result.data.dupentry}]`
+            );
+          }
+
+          success("Saved!", "Data saved!");
+          LoadTable();
+          // swal({
+          //   title: "Success",
+          //   text: "Data saved!",
+          //   icon: "success",
+          //   button: "OK!",
+          // });
 
           // $('#item-tbl').DataTable().ajax.reload();
         },

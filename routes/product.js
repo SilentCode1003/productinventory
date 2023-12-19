@@ -1,7 +1,12 @@
 var express = require("express");
 var router = express.Router();
 
-const { Select, InsertTable, SelectParameter } = require("./repository/spidb");
+const {
+  Select,
+  InsertTable,
+  SelectParameter,
+  StoredProcedure,
+} = require("./repository/spidb");
 const {
   Product,
   UploadProduct,
@@ -373,6 +378,28 @@ router.post("/search", (req, res) => {
     });
   }
 });
+
+router.post("/producthistory", (req, res) => {
+  try {
+    const { assetcontrol } = req.body;
+    let sql = "call cyberpowerproduct.getproducthistory(?)";
+
+    StoredProcedure(sql, assetcontrol, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      console.log(result);
+      res.json({
+        msg: "success",
+        data: result,
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 //#region Functions
 function Product_Count() {
   return new Promise((resolve, reject) => {
