@@ -23,24 +23,24 @@
 
                 <div class="row d-flex mt-2">
                     <div class="col-md-6 mb-2">
-                        <div class="customdropdown">
-                            <div class="select selectreturnfrom">
-                              <span id="selectedreturnfrom">Return From</span>
-                              <i class="fa fa-chevron-left"></i>
-                            </div>
-                            <input type="hidden" name="returnfromid" id="returnfromid">
-                            <ul class="customdropdown-menu returnfromlist"></ul>
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select/Input Return From" name="location" id="location"/>
+                          <input type="hidden" id="hiddenValue" name="hiddenValue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Return From</span>
+                          </div>
                         </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="locationDropdown"></div>
                     </div>
 
                     <div class="col-md-6 mb-2">
                         <div class="customdropdown">
-                            <div class="select selectreturnby">
-                              <span id="selectedreturnby">Return By</span>
+                            <div class="select selectemployee">
+                              <span id="selectedemployee">Return By</span>
                               <i class="fa fa-chevron-left"></i>
                             </div>
-                            <input type="hidden" name="returnbyid" id="returnbyid">
-                            <ul class="customdropdown-menu returnbylist"></ul>
+                            <input type="hidden" name="employeeid" id="employeeid">
+                            <ul class="customdropdown-menu employeelist"></ul>
                         </div>
                     </div>
                 </div>
@@ -87,12 +87,28 @@
     </div>
     <div class="card-header card-bg align-content-center">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-2 mt-2">
                 <h5 class="m-0 font-weight-bold cyber-title mt-2">Return Table</h5>
             </div>
-            <div class="col-md-8 mt-1">
+            <div class="col-md-5 mt-2">
                 <input id="search" name="search" type="text" class="form-control" placeholder="Search Serial"
                     aria-label="search" aria-describedby="basic-addon1" />
+            </div>
+            <div class="col-md-3 mt-2">
+                <div class="input-group mb-3">
+                    <input
+                        class="btn btn-outline-cyberpower w-100"
+                        type="file"
+                        id="fileinput"
+                        accept=".xlsx, .xls"
+                        placeholder="Select Excel File"
+                    />
+                </div>                
+            </div>
+            <div class="col-md-2 mt-2">
+                <button class="btn btn-outline-cyberpower" id="uploadButton" type="button">
+                    <i class="fas fa-upload"></i>
+                </button>
             </div>
         </div>
     </div>

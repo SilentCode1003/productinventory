@@ -1,35 +1,49 @@
 var express = require("express");
-const { Select } = require("./repository/spidb");
-const { Transfer } = require("./model/spimodel");
+const {
+  Select,
+  InsertTable,
+  Update,
+  SelectParameter,
+} = require("./repository/spidb");
+const { Transfer, TransferProduct, Product } = require("./model/spimodel");
 const { GetValue, TRFR } = require("./repository/dictionary");
-const { SelectStatement } = require("./repository/customhelper");
+const {
+  SelectStatement,
+  convertExcelDate,
+} = require("./repository/customhelper");
+const { Validator } = require("./controller/middleware");
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("transfer", { title: "Express" });
+  // res.render("transfer", { title: "Express" });
+  Validator(req, res, "transfer");
 });
 
 module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let sql = `select 
+    let sql = `SELECT 
     t_id,
     t_assetcontrol,
     t_serial,
     t_date,
-    e_fullname as t_transferby,
+    emptransfer.e_fullname as t_transferby,
     t_from,
-    t_receiveby,
+    empreceive.e_fullname as t_receiveby,
     t_to,
     t_referenceno
-    from transfer
-    inner join employee on e_id = t_transferby`;
+    FROM 
+    transfer
+    INNER JOIN 
+    employee as emptransfer on emptransfer.e_id = transfer.t_transferby
+    inner join employee as empreceive on empreceive.e_id = transfer.t_receiveby`;
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
       let data = Transfer(result);
+      console.log("transfer Data: ", data);
       res.json({
         msg: "success",
         data: data,
@@ -66,7 +80,7 @@ router.post("/save", (req, res) => {
         referenceno,
       ],
     ];
-
+    console.log(transfer);
     Check_Transfer(assetcontrol, date, from, to)
       .then((result) => {
         let data = Transfer(result);
@@ -75,7 +89,7 @@ router.post("/save", (req, res) => {
             msg: "exist",
           });
         } else {
-          Transfer_Product()
+          Transfer_Product(assetcontrol)
             .then((result) => {
               InsertTable("transfer", transfer, (err, result) => {
                 if (err) console.error("Error: ", err);
@@ -105,12 +119,71 @@ router.post("/save", (req, res) => {
   }
 });
 
+router.post("/upload", (req, res) => {
+  try {
+    const { data } = req.body;
+    let dataJson = TransferProduct(JSON.parse(data));
+    let transfer = [];
+    let counter = 0;
+    let noentry = [];
+
+    dataJson.forEach((item) => {
+      Check_Product(item.serial)
+        .then((result) => {
+          counter += 1;
+          let data = Product(result);
+          // console.log(data);
+
+          if (data.length != 0) {
+            let assetcontrol = data[0].assetcontrol;
+
+            transfer.push([
+              assetcontrol,
+              item.serial,
+              convertExcelDate(item.date),
+              item.transferby,
+              item.from,
+              item.receivedby,
+              item.to,
+              item.referenceno,
+            ]);
+          } else {
+            noentry.push(item.serial);
+          }
+
+          if (counter == dataJson.length) {
+            console.log("No Entry: ", noentry);
+            console.log("Done: ");
+            InsertTable("transfer", transfer, (err, result) => {
+              if (err) console.error("Error: ", err);
+              console.log(result);
+
+              return res.json({
+                msg: "success",
+              });
+            });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          return res.json({
+            msg: error,
+          });
+        });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 //#region Function
 
 function Check_Transfer(assetcontrol, date, from, to) {
   return new Promise((resolve, reject) => {
     let sql =
-      "select * from transfer where t_assetcontrol-? and t_date=? and t_from=? and t_to=?";
+      "select * from transfer where t_assetcontrol=? and t_date=? and t_from=? and t_to=?";
     let command = SelectStatement(sql, [assetcontrol, date, from, to]);
 
     Select(command, (err, result) => {
@@ -138,4 +211,16 @@ function Transfer_Product(assetcontrol) {
   });
 }
 
+function Check_Product(serial) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from product where p_serial=?";
+    // console.log(serial);
+    SelectParameter(sql, [serial], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
+
+      resolve(result);
+    });
+  });
+}
 //#endregion

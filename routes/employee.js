@@ -4,11 +4,13 @@ const { Employee } = require("./model/spimodel");
 const { GetValue, ACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
 const { Encrypter } = require("./repository/cryptography");
+const { Validator } = require("./controller/middleware");
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("employee", { title: "Express" });
+  // res.render("employee", { title: "Express" });
+  Validator(req, res, "employee");
 });
 
 module.exports = router;
@@ -23,10 +25,10 @@ router.get("/load", (req, res) => {
     INNER JOIN master_position on mp_id = e_position`;
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
-      console.log(result);
+      // console.log(result);
       if (result.length != 0) {
         let data = Employee(result);
-        console.log(data);
+        // console.log(data);
         res.json({
           msg: "success",
           data: data,

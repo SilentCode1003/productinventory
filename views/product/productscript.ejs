@@ -1,281 +1,621 @@
 <script>
-    $(document).ready(function () {
-        //Functionality
-        var activePositions = [];
-        let assetcontrol = "";
-        let status = "";
+  $(document).ready(function () {
+    //Functionality
+    let isFetchingData = false;
+    let hasMoreData = true;
+    let currentPage = 1;
 
-        LoadTable();
+    var activePositions = [];
+    let assetcontrol = "";
+    let status = "";
 
-        $('#data-table tbody').on('click', 'tr', function () {
-            var dataRow = [];
-            $(this).closest('tr').find('td').each(function () {
-                dataRow.push($(this).text());
-            });
-            console.log(dataRow);
-            assetcontrol = dataRow[0];
-            status = dataRow[7];
-        })
+    LoadTable();
 
-        $(document).on('change', '#categoryid', function() {    
-            let id = $(this).val();
-            console.log(id)
-
-            $(".productlist").empty();
-            $("#selectedproduct").text('Select Product');
-            $("#productid").val('')
-            $.ajax({
-                type: "POST",
-                url: "/items/getitemsbycategory",
-                data: {
-                    id:id
-                },
-                success: function (result) {
-                    let container = result.data;
-                    console.log(container)
-                    $.each(container, (key, item) => {
-                        let productname = item.name;
-                        let productid = item.id;
-
-                        let listItem = $("<li></li>")
-                        .text(productname)
-                        .data("productid", productid);
-
-                        $(".productlist").append(listItem);
-                        
-                    });
-
-                    $(".productlist").on("click", "li", function () {
-                        let selectedOption = $(this).text();
-                        let selectedproductId = $(this).data("productid");
-
-                        $("#selectedproduct").text(selectedOption);
-                        $("#productid").val(selectedproductId).change();
-                    });
-
-                },
-                error: function (err) {
-                    errormsg(err);
-                },
-            });
+    $("#data-table tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
         });
+      //console.log(dataRow);
+      assetcontrol = dataRow[0];
+      status = dataRow[7];
+    });
 
-        $(document).on('click', '#addBtn', function () {
-            let serial = $('#serial').val();
-            let itemname = $('#productid').val();
-            let category = $('#categoryid').val();
-            let podate = $('#podate').val();
-            let ponumber = $('#ponumber').val();
-            let warrantydate = $('#warrantydate').val();
+    $(document).on("change", "#categoryid", function () {
+      let id = $(this).val();
+      //console.log(id);
 
-            var message = "";
-            if (serial == '') { message += 'Serial, ' }
-            if (itemname == '') { message += 'Item Name, ' }
-            if (category == '') { message += 'Category, ' }
-            if (podate == '') { message += 'PO Date, ' }
-            if (ponumber == '') { message += 'PO Number, ' }
-            if (warrantydate == '') { message += 'Warranty Date, ' }
+      $(".productlist").empty();
+      $("#selectedproduct").text("Select Product");
+      $("#productid").val("");
+      $.ajax({
+        type: "POST",
+        url: "/items/getitemsbycategory",
+        data: {
+          id: id,
+        },
+        success: function (result) {
+          let container = result.data;
+          //console.log(container);
+          $.each(container, (key, item) => {
+            let productname = item.name;
+            let productid = item.id;
 
-            if (message != '') {
-                warning('Required', `Please fill up ${message}`);
+            let listItem = $("<li></li>")
+              .text(productname)
+              .data("productid", productid);
+
+            $(".productlist").append(listItem);
+          });
+
+          $(".productlist").on("click", "li", function () {
+            let selectedOption = $(this).text();
+            let selectedproductId = $(this).data("productid");
+
+            $("#selectedproduct").text(selectedOption);
+            $("#productid").val(selectedproductId).change();
+          });
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    });
+
+    $(document).on("click", "#addBtn", function () {
+      let serial = $("#serial").val();
+      let itemname = $("#productid").val();
+      let category = $("#categoryid").val();
+      let podate = $("#podate").val();
+      let ponumber = $("#ponumber").val();
+      let warrantydate = $("#warrantydate").val();
+
+      var message = "";
+      if (serial == "") {
+        message += "Serial, ";
+      }
+      if (itemname == "") {
+        message += "Item Name, ";
+      }
+      if (category == "") {
+        message += "Category, ";
+      }
+      if (podate == "") {
+        message += "PO Date, ";
+      }
+      if (ponumber == "") {
+        message += "PO Number, ";
+      }
+      if (warrantydate == "") {
+        message += "Warranty Date, ";
+      }
+
+      if (message != "") {
+        warning("Required", `Please fill up ${message}`);
+      } else {
+        //console.log(serial, itemname, category, podate, ponumber, warrantydate);
+        $.ajax({
+          type: "POST",
+          url: "/product/save",
+          data: {
+            serial: serial,
+            itemname: itemname,
+            category: category,
+            podate: podate,
+            ponumber: ponumber,
+            warrantydate: warrantydate,
+          },
+          success: function (result) {
+            //console.log(result);
+            if (result.msg == "success") {
+              resettable()
+              success("Saved", "Successfully");
+              $("#serial").val("");
+              $("#podate").val("");
+              $("#ponumber").val("");
+              $("#warrantydate").val("");
+              $("#productid").val("");
+              $("#selectedproduct").text("Select Product");
+              $("#categoryid").val("");
+              $("#selectedcategory").text("Select Category");
+              $(".productlist").empty();
             }
-            else {
-                console.log(serial, itemname, category, podate, ponumber, warrantydate)
-                $.ajax({
-                    type: 'POST',
-                    url: '/product/save',
-                    data: {
-                        serial: serial,
-                        itemname: itemname,
-                        category: category,
-                        podate: podate,
-                        ponumber: ponumber,
-                        warrantydate: warrantydate
-                    },
-                    success: function (result) {
-                        console.log(result);
-                        if (result.msg == 'success') {
-                            LoadTable()
-                            success('Saved', 'Successfully')
-                            $('#serial').val('');
-                            $('#itemname').val('');
-                            $('#category').val('');
-                            $('#podate').val('');
-                            $('#ponumber').val('');
-                            $('#warrantydate').val('');
-                        }
 
-                        if (result.msg == 'exist') {
-                            warning('Exist', `${serial} already exist!`);
-                        }
-
-                    },
-                    error: function (err) {
-                        errormsg(err);
-                    }
-                })
+            if (result.msg == "exist") {
+              warning("Exist", `${serial} already exist!`);
             }
-        })
+          },
+          error: function (err) {
+            errormsg(err);
+          },
+        });
+      }
+    });
 
-        function populatetable(data) {
-            console.log(data);
-            const tableBody = $('#datatable tbody');
-            tableBody.empty();
+    //#region LOAD TABLE
 
-            if (data.length === 0) {
-                const tr = $('<tr>').append($('<td>', {
-                    colspan: 8,
-                    class: 'text-center',
-                    text: 'No Data Matched'
-                }));
+    function populatetable(data) {
+      //console.log(data);
+      const tableBody = $("#datatable tbody");
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 8,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let action = "";
+          if (item.status === "ACTIVE") {
+            action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+          } else if (item.status === "INACTIVE") {
+            action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+          }
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.assetcontrol,
+              "data-label": "Asset Control",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.serial,
+              "data-label": "Serial",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.itemname,
+              "data-label": "Item Name",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.category,
+              "data-label": "Category",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.podate,
+              "data-label": "PO Date",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.ponumber,
+              "data-label": "PO Number",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.warrantydate,
+              "data-label": "Warranty Date",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.status,
+              "data-label": "Status",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              html: action,
+              "data-label": "Action",
+              class: "",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+
+    function LoadTable() {
+      if (!hasMoreData) {
+        return;
+      }
+      $(".progress").hide();
+      $(".progress").slideDown();
+      $.ajax({
+        url: "/product/load",
+        method: "GET",
+        dataType: "json",
+        data: { page: currentPage },
+        xhrFields: {
+          onprogress: function (e) {
+            if (e.lengthComputable) {
+              var percentComplete = (e.loaded / e.total) * 100;
+              $(".progress-bar").css("width", percentComplete + "%");
+            }
+          },
+        },
+        success: function (data) {
+          setTimeout(function () {
+            $(".progress").slideUp(function () {
+              hasMoreData = data.data.length > 0;
+              if (!hasMoreData) {
+                const tableBody = $("#datatable tbody");
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 9,
+                    class: "text-center",
+                    text: "No More Data",
+                  })
+                );
                 tableBody.append(tr);
-            } else {
-                data.forEach(item => {
-                    let action = "";
-                    if (item.status === 'ACTIVE') {
-                        action = `
-                            <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
-                    } else if (item.status === 'INACTIVE') {
-                        action = `
-                            <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
-                    }
+              } else {
+                if (data.msg === "success") {
+                  populatetable(data.data);
+                  currentPage++;
+                } else {
+                  console.error(data.msg);
+                }
+              }
+              isFetchingData = false;
+            });
+          }, 1000);
+        },
+        error: function (error) {
+          console.error(error);
+          isFetchingData = false;
+          hasMoreData = fals
+        },
+      });
+    }
 
-                    const tr = $('<tr>').append(
-                        $('<td>', { text: item.assetcontrol, 'data-label': 'Asset Control', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.serial, 'data-label': 'Serial', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: item.itemname, 'data-label': 'Item Name', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: item.category, 'data-label': 'Category', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: item.podate, 'data-label': 'PO Date', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.ponumber, 'data-label': 'PO Number', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.warrantydate, 'data-label': 'Warranty Date', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
-                        $('<td>', { html: action, 'data-label': 'Action', class: '' })
-                    );
-                    tableBody.append(tr);
+    $(".scrollable-table-container").scroll(function () {
+      const container = $(this);
+      if (isFetchingData) {
+        return;
+      }
+      if (
+        container.scrollTop() + container.innerHeight() >=
+        container[0].scrollHeight - 10
+      ) {
+        //console.log("Append Triggered!");
+        isFetchingData = true;
+        LoadTable();
+      }
+    });
+
+    function resettable() {
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+      currentPage = 1;
+      hasMoreData = true;
+      LoadTable();
+    }
+
+    //#endregion LOAD TABLE
+
+    function LoadList() {
+      $.ajax({
+        type: "GET",
+        url: "/category/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let categoryname = item.name;
+            let categoryid = item.id;
+            //console.log(categoryname);
+
+            var listItem = $("<li></li>")
+              .text(categoryname)
+              .data("categoryid", categoryid);
+
+            $(".categorylist").append(listItem);
+          });
+
+          $(".categorylist").on("click", "li", function () {
+            var selectedOption = $(this).text();
+            var selectedcategoryId = $(this).data("categoryid");
+
+            $("#selectedcategory").text(selectedOption);
+            $("#categoryid").val(selectedcategoryId).change();
+          });
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    }
+
+    $(document).on("click", "#activeBtn", function () {
+      //console.log(assetcontrol);
+      //console.log(status);
+      $.ajax({
+        type: "POST",
+        url: "/product/status",
+        data: {
+          status: status,
+          assetcontrol: assetcontrol,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            resettable()
+            success("Saved", "Successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${assetcontrol} does not exist!`);
+          }
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    });
+
+    $(document).on("click", "#inactiveBtn", function () {
+      //console.log(assetcontrol);
+      //console.log(status);
+      $.ajax({
+        type: "POST",
+        url: "/product/status",
+        data: {
+          status: status,
+          assetcontrol: assetcontrol,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            resettable()
+            success("Saved", "Successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${assetcontrol} does not exist!`);
+          }
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    });
+
+    LoadList();
+
+    let searchTimeout;
+
+    function filterTableRows() {
+      const keyword = $("#search").val().trim().toLowerCase();
+
+      clearTimeout(searchTimeout);
+
+      searchTimeout = setTimeout(function () {
+        if (keyword != '') {
+          $.ajax({
+            type: "POST",
+            url: "/product/search",
+            data: {
+              keyword: keyword,
+            },
+            success: function (result) {
+              console.log(result.data);
+              let data = result.data;
+              const tableBody = $("#datatable tbody");
+              tableBody.empty();
+
+              if (data.length === 0) {
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 8,
+                    class: "text-center",
+                    text: "No Data Matched",
+                  })
+                );
+                tableBody.append(tr);
+              } else {
+                data.forEach((item) => {
+                  let action = "";
+                  if (item.status === "ACTIVE") {
+                    action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                  } else if (item.status === "INACTIVE") {
+                    action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                  }
+
+                  const tr = $("<tr>").append(
+                    $("<td>", {
+                      text: item.assetcontrol,
+                      "data-label": "Asset Control",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.serial,
+                      "data-label": "Serial",
+                      class: "custom-mobile-align no-wrap",
+                    }),
+                    $("<td>", {
+                      text: item.itemname,
+                      "data-label": "Item Name",
+                      class: "custom-mobile-align no-wrap",
+                    }),
+                    $("<td>", {
+                      text: item.category,
+                      "data-label": "Category",
+                      class: "custom-mobile-align no-wrap",
+                    }),
+                    $("<td>", {
+                      text: item.podate,
+                      "data-label": "PO Date",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.ponumber,
+                      "data-label": "PO Number",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.warrantydate,
+                      "data-label": "Warranty Date",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      text: item.status,
+                      "data-label": "Status",
+                      class: "custom-mobile-align",
+                    }),
+                    $("<td>", {
+                      html: action,
+                      "data-label": "Action",
+                      class: "",
+                    })
+                  );
+
+                  tableBody.append(tr);
                 });
-            }
+              }
+            },
+            error: function (err) {
+              errormsg(err);
+            },
+          });
+        } else {
+          resettable();
         }
+      }, 1500);
+    }
 
-        function LoadTable() {
-            $(".progress").hide();
-            $(".progress").slideDown();
-            $.ajax({
-                url: '/product/load',
-                method: 'GET',
-                dataType: 'json',
-                xhrFields: {
-                    onprogress: function (e) {
-                        if (e.lengthComputable) {
-                            var percentComplete = (e.loaded / e.total) * 100;
-                            $(".progress-bar").css("width", percentComplete + "%");
-                        }
-                    }
-                },
-                success: function (data) {
-                    setTimeout(function () {
-                        $(".progress").slideUp(function () {
-                            if (data.msg === 'success') {
-                                populatetable(data.data);
-                            } else {
-                                console.error(data.msg);
-                            }
-                        });
-                    }, 1000);
-                },
-                error: function (error) {
-                    console.error(error);
-                }
-            });
+    $("#search").on("input", filterTableRows);
+
+
+    //#region Upload
+    $(document).on("click", "#uploadButton", function () {
+      let uploaddata = $("#fileinput").val();
+      if (uploaddata != '') {
+        showspinner();
+        UploadProcess();
+      } else {
+        warning('Warning!', "No File Chosen!")
+      }
+
+    });
+
+    function UploadProcess() {
+      //Reference the FileUpload element.
+      var fileUpload = document.getElementById("fileinput");
+
+      //Validate whether File is valid Excel file.
+      var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx|.csv|.ods)$/;
+      if (regex.test(fileUpload.value.toLowerCase())) {
+        if (typeof FileReader != "undefined") {
+          var reader = new FileReader();
+
+          //For Browsers other than IE.
+          if (reader.readAsBinaryString) {
+            reader.onload = function (e) {
+              GetTableFromExcel(e.target.result);
+            };
+            reader.readAsBinaryString(fileUpload.files[0]);
+          } else {
+            //For IE Browser.
+            reader.onload = function (e) {
+              var data = "";
+              var bytes = new Uint8Array(e.target.result);
+              for (var i = 0; i < bytes.byteLength; i++) {
+                data += String.fromCharCode(bytes[i]);
+              }
+              GetTableFromExcel(data);
+            };
+            reader.readAsArrayBuffer(fileUpload.files[0]);
+          }
+        } else {
+          warning("Upload", "This browser does not support HTML5.");
         }
+      } else {
+        warning("Upload", "Please upload a valid Excel file.");
+      }
+    }
 
-        function LoadList() {
-            $.ajax({
-                type: "GET",
-                url: "/category/load",
-                success: function (result) {
-                    let container = result.data;
-                    $.each(container, (key, item) => {
-                        let categoryname = item.name;
-                        let categoryid = item.id;
-                        console.log(categoryname);
+    function GetTableFromExcel(data) {
+      //Read the Excel File data in binary
+      var workbook = XLSX.read(data, {
+        type: "binary",
+      });
 
-                        var listItem = $("<li></li>")
-                            .text(categoryname)
-                            .data("categoryid", categoryid);
+      //get the name of First Sheet.
+      var Sheet = workbook.SheetNames[0];
 
-                        $(".categorylist").append(listItem);
-                    });
+      //Read all rows from First Sheet into an JSON array.
+      var excelRows = XLSX.utils.sheet_to_row_object_array(
+        workbook.Sheets[Sheet]
+      );
+      var columns = Object.keys(excelRows[0]);
 
+      //Create a HTML Table element.
+      var myTable = document.createElement("table");
+      myTable.border = "1";
 
-                    $(".categorylist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selectedcategoryId = $(this).data("categoryid");
+      //Add the header row.
+      var row = myTable.insertRow(-1);
 
-                        $("#selectedcategory").text(selectedOption);
-                        $("#categoryid").val(selectedcategoryId).change();
-                    });
-                },
-                error: function (err) {
-                    errormsg(err);
-                },
-            });
+      var dataExcelArr = [];
+      //Add the data rows from Excel file.
+      for (var i = 0; i < excelRows.length; i++) {
+        //Add the data row.
+        var data = [];
+        var row = myTable.insertRow(-1);
+        for (var j = 0; j < columns.length; j++) {
+          var cell = row.insertCell(-1);
+          cell.innerHTML = excelRows[i][columns[j]];
+          data.push({
+            item: excelRows[i][columns[j]],
+          });
         }
-
-        $(document).on('click', '#activeBtn', function () {
-            console.log(assetcontrol);
-            console.log(status);
-            $.ajax({
-                type: 'POST',
-                url: '/product/status',
-                data: {
-                    status: status,
-                    assetcontrol: assetcontrol,
-                },
-                success: function (result) {
-                    if (result.msg == 'success') {
-                        LoadTable();
-                        success('Saved', 'Successfully')
-                    }
-
-                    if (result.msg == 'notexist') {
-                        warning(`${assetcontrol} does not exist!`);
-                    }
-
-                },
-                error: function (err) {
-                    errormsg(err);
-                }
-            })
+        dataExcelArr.push({
+          category: data[0].item,
+          itemname: data[1].item,
+          serial: data[2].item,
+          podate: data[3].item,
+          ponumber: data[4].item,
+          warrantydate: data[5].item,
         });
+      }
+      excelDataSave(dataExcelArr);
+    }
 
-        $(document).on('click', '#inactiveBtn', function () {
-            console.log(assetcontrol);
-            console.log(status);
-            $.ajax({
-                type: 'POST',
-                url: '/product/status',
-                data: {
-                    status: status,
-                    assetcontrol: assetcontrol,
-                },
-                success: function (result) {
-                    if (result.msg == 'success') {
-                        LoadTable();
-                        success('Saved', 'Successfully')
-                    }
+    function excelDataSave(data) {
+      var dataraw = JSON.stringify(data, null, 2);
+      $.ajax({
+        type: "POST",
+        url: "/product/upload",
+        data: {
+          data: dataraw,
+        },
+        success: function (result) {
+          hidespinner();
+          if (result.msg != "success") {
+            warning(
+              "Duplicate",
+              `Some data already exist on the database. ID[${result.data}]`
+            );
 
-                    if (result.msg == 'notexist') {
-                        warning(`${assetcontrol} does not exist!`);
-                    }
+            // swal({
+            //   title: "Exist",
+            //   text: "Some data already exist on the database. ID[${result.data}]",
+            //   icon: "warning",
+            //   button: "OK!",
+            // });
+          } else {
+            success("Saved!", "Data saved!");
+            resettable()
+            // swal({
+            //   title: "Success",
+            //   text: "Data saved!",
+            //   icon: "success",
+            //   button: "OK!",
+            // });
+          }
 
-                },
-                error: function (err) {
-                    errormsg(err);
-                }
-            })
-        });
+          // $('#item-tbl').DataTable().ajax.reload();
+        },
+        error: function (result) {
+          console.error(result);
+        },
+      });
 
-        LoadList()
-
-    })
+    }
+    //#endregion
+  });
 </script>

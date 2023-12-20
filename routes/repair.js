@@ -1,13 +1,15 @@
 var express = require("express");
 const { Repair } = require("./model/spimodel");
-const { Select, InsertTable } = require("./repository/spidb");
+const { Select, InsertTable, Update } = require("./repository/spidb");
 const { SelectStatement } = require("./repository/customhelper");
 const { GetValue, RPRD } = require("./repository/dictionary");
+const { Validator } = require("./controller/middleware");
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("repair", { title: "Express" });
+  // res.render("repair", { title: "Express" });
+  Validator(req, res, "repair");
 });
 
 module.exports = router;
@@ -44,7 +46,7 @@ router.post("/save", (req, res) => {
   try {
     const { assetcontrol, serial, date, repairby, referenceno } = req.body;
     let repair = [[assetcontrol, serial, date, repairby, referenceno]];
-
+    console.log("repair data: ", repair)
     Check_Repair(assetcontrol, date)
       .then((result) => {
         let data = Repair(result);
@@ -87,13 +89,13 @@ router.post("/save", (req, res) => {
 //#region
 function Check_Repair(assetcontrol, date) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from repair where d_assetcontrol=? and d_date=?";
+    let sql = "select * from repair where r_assetcontrol=? and r_date=?";
     let command = SelectStatement(sql, [assetcontrol, date]);
 
     Select(command, (err, result) => {
       if (err) reject(err);
 
-      console.log(result);
+      // console.log(result);
       resolve(result);
     });
   });

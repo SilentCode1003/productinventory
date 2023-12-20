@@ -1,13 +1,15 @@
 var express = require("express");
-const { Select, InsertTable } = require("./repository/spidb");
+const { Select, InsertTable, Update } = require("./repository/spidb");
 const { Return } = require("./model/spimodel");
 const { SelectStatement } = require("./repository/customhelper");
 const { GetValue, RET } = require("./repository/dictionary");
+const { Validator } = require("./controller/middleware");
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("return", { title: "Express" });
+  // res.render("return", { title: "Express" });
+  Validator(req, res, "return");
 });
 
 module.exports = router;
@@ -48,7 +50,7 @@ router.post("/save", (req, res) => {
     let returnitem = [
       [assetcontrol, serial, date, returnby, returnfrom, referenceno],
     ];
-    console.log(returnitem)
+    console.log("return data", returnitem)
 
     Check_Return(assetcontrol, date)
       .then((result) => {
@@ -58,7 +60,7 @@ router.post("/save", (req, res) => {
             msg: "exist",
           });
         } else {
-          Return_Product()
+          Return_Product(assetcontrol)
             .then((result) => {
               InsertTable("returnitem", returnitem, (err, result) => {
                 if (err) console.error("Error: ", err);
@@ -92,7 +94,7 @@ router.post("/save", (req, res) => {
 
 function Check_Return(assetcontrol, date, from, to) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from returnitem where r_assetcontrol-? and r_date=?";
+    let sql = "select * from returnitem where r_assetcontrol=? and r_date=?";
     let command = SelectStatement(sql, [assetcontrol, date]);
 
     Select(command, (err, result) => {

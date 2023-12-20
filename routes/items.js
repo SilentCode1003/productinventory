@@ -10,10 +10,12 @@ const {
 const dictionary = require("./repository/dictionary");
 const helper = require("./repository/customhelper");
 const { MasterItem } = require("./model/spimodel");
+const { Validator } = require("./controller/middleware");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("items", { title: "Express" });
+  // res.render("items", { title: "Express" });
+  Validator(req, res, "items");
 });
 
 module.exports = router;

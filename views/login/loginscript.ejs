@@ -1,0 +1,44 @@
+<script>
+    $(document).ready(function () {
+  
+          $(document).on('click', '#loginBtn', function () {
+              let username = $('#username').val();
+              let password = $('#password').val();
+              
+              var message = "";
+  
+              if (username == '') { message += 'Username ' }
+              if (password == '') { message += 'Password ' }
+  
+              if (message != '') {
+                  warning('Required', `Please fill up ${message}`);
+              }
+              else {
+                  $.ajax({
+                      type: 'POST',
+                      url: '/login/login',
+                      data: {
+                          username: username,
+                          password: password,
+                      },
+                      success: function (result) {
+                          if (result.msg == 'success') {
+                            $('#username').val('');
+                            $('#password').val('');
+                            successlogin('Logged In', 'Successfully')
+                            location.replace("/");
+                          }
+  
+                          if (result.msg == 'incorrect') {
+                              warning('Invalid Credentials.');
+                          }
+  
+                      },
+                      error: function (err) {
+                          errormsg(err);
+                      }
+                  })
+              }
+          })
+        })
+  </script> 

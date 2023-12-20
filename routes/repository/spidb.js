@@ -82,7 +82,7 @@ exports.SelectParameter = (sql, condition, callback) => {
     if (error) {
       return callback(error, null);
     }
-    console.log(results);
+    // console.log(results);
 
     callback(null, results);
   });
@@ -266,9 +266,9 @@ exports.InsertTable = (tablename, data, callback) => {
     });
   }
 
-  if (tablename == "return") {
-    let sql = `INSERT INTO return(
-      r_assetcontroll,
+  if (tablename == "returnitem") {
+    let sql = `INSERT INTO returnitem(
+      r_assetcontrol,
       r_serial,
       r_date,
       r_returnby,

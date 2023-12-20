@@ -1,0 +1,309 @@
+<script>
+    $(document).ready(function () {
+        let searchdata = localStorage.getItem('searchdata');
+        let assetcontrol = "";
+        let serial = "";
+        let itemname = "";
+        let category = "";
+        let podate = "";
+        let ponumber = "";
+        let warrantydate = "";
+        let status = "";
+        $('#datatable tbody').on('click', 'tr', function () {
+            var dataRow = [];
+            $(this).closest('tr').find('td').each(function () {
+                dataRow.push($(this).text());
+            });
+            assetcontrol = dataRow[0];
+            serial = dataRow[1];
+            itemname = dataRow[2];
+            category = dataRow[3];
+            podate = dataRow[4];
+            ponumber = dataRow[5];
+            warrantydate = dataRow[6];
+            status = dataRow[7];
+        })
+
+        if (searchdata == null) {
+            const tableBody = $("#datatable tbody");
+            tableBody.empty();
+            const tr = $("<tr>").append(
+                $("<td>", {
+                    colspan: 8,
+                    class: "text-center",
+                    text: "No Data Matched",
+                })
+            );
+            tableBody.append(tr);
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "/product/search",
+                data: {
+                    keyword: searchdata,
+                },
+                success: function (result) {
+                    console.log(result.data);
+                    let data = result.data;
+                    const tableBody = $("#datatable tbody");
+                    tableBody.empty();
+
+                    if (data.length === 0) {
+                        const tr = $("<tr>").append(
+                            $("<td>", {
+                                colspan: 8,
+                                class: "text-center",
+                                text: "No Data Matched",
+                            })
+                        );
+                        tableBody.append(tr);
+                    } else {
+                        data.forEach((item) => {
+                            let action = "";
+                            if (item.status === "ACTIVE") {
+                                action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                            } else if (item.status === "INACTIVE") {
+                                action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                            }
+
+                            const tr = $("<tr>").append(
+                                $("<td>", {
+                                    text: item.assetcontrol,
+                                    "data-label": "Asset Control",
+                                    class: "custom-mobile-align cbi-link",
+                                    "data-toggle": "modal",
+                                    "data-target": "#editModal",
+                                }),
+                                $("<td>", {
+                                    text: item.serial,
+                                    "data-label": "Serial",
+                                    class: "custom-mobile-align no-wrap text-white",
+                                }),
+                                $("<td>", {
+                                    text: item.itemname,
+                                    "data-label": "Item Name",
+                                    class: "custom-mobile-align no-wrap text-white",
+                                }),
+                                $("<td>", {
+                                    text: item.category,
+                                    "data-label": "Category",
+                                    class: "custom-mobile-align no-wrap text-white",
+                                }),
+                                $("<td>", {
+                                    text: item.podate,
+                                    "data-label": "PO Date",
+                                    class: "custom-mobile-align text-white",
+                                }),
+                                $("<td>", {
+                                    text: item.ponumber,
+                                    "data-label": "PO Number",
+                                    class: "custom-mobile-align text-white",
+                                }),
+                                $("<td>", {
+                                    text: item.warrantydate,
+                                    "data-label": "Warranty Date",
+                                    class: "custom-mobile-align text-white",
+                                }),
+                                $("<td>", {
+                                    text: item.status,
+                                    "data-label": "Status",
+                                    class: "custom-mobile-align text-white",
+                                })
+                            );
+
+                            tableBody.append(tr);
+                        });
+                    }
+                    // localStorage.removeItem('searchdata');
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        }
+        $(document).on('click', '.cbi-link', function () {
+            var myDiv = document.getElementById('historydata');
+            myDiv.innerHTML = '';
+            console.log(category)
+            $(".assetcontrol").text(assetcontrol);
+            $(".serial").text(serial);
+            $(".itemname").text(itemname);
+            $(".category").text(category);
+            $(".podate").text(podate);
+            $(".ponumber").text(ponumber);
+            $(".warrantydate").text(warrantydate);
+            $(".status").text(status);
+
+            console.log(assetcontrol)
+            $.ajax({
+                type: 'POST',
+                url: '/product/producthistory',
+                data: {
+                    assetcontrol: assetcontrol,
+                },
+                success: function (result) {
+                    let data = result.data;
+                    console.log("modal data: ", data)
+                    if (data.length == 0) {
+                        let historydiv = $(`
+                            <div class="row justify-content-center">
+                                <h5 class="text-white">NO CURRENT HISTORY</h5>
+                            </div>
+                            <hr class="sidebar-divider">`);
+                        $('#historydata').append(historydiv);
+                    } else {
+                        $.each(data, function (key, item) {
+                            var details = JSON.parse(item.details);
+                            console.log("test: ", details)
+
+
+                            if (details.return) {
+                                let historydiv = $(`
+                            <div class="row">
+                                <div class="col-3 text-center" style="margin-top: 32px;">
+                                    <div>
+                                        <span class="text-white">${details.return.date}</span>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center" style="margin-top: 32px;">
+                                    <h5 class="text-white">RETURN</h5>
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <h5>Returned By: <span class="text-white">${details.return.returnby}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Return From: <span class="text-white">${details.return.returnfrom}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Reference No.: <span class="referenceno text-white">${details.return.referenceno}</span></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="sidebar-divider">`);
+                                $('#historydata').append(historydiv);
+                            }
+
+                            if (details.transfer) {
+                                let historydiv = $(`
+                            <div class="row">
+                                <div class="col-3 text-center" style="margin-top: 45px;">
+                                    <div>
+                                        <span class="text-white">${details.transfer.date}</span>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center" style="margin-top: 45px;">
+                                    <h5 class="text-white">TRANSFER</h5>
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <h5>Transfer By: <span class="text-white">${details.transfer.transferby}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Transfer To: <span class="text-white">${details.transfer.to}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Transfer From: <span class="text-white">${details.transfer.from}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Receive By: <span class="text-white">${details.transfer.receivedby}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Reference No.: <span class="referenceno text-white">${details.transfer.referenceno}</span></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="sidebar-divider">`);
+                                $('#historydata').append(historydiv);
+                            }
+
+                            if (details.deploy) {
+                                let historydiv = $(`
+                            <div class="row">
+                                <div class="col-3 text-center" style="margin-top: 32px;">
+                                    <div>
+                                        <span class="text-white">${details.deploy.date}</span>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center" style="margin-top: 32px;">
+                                    <h5 class="text-white">DEPLOYED</h5>
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <h5>Deploy By: <span class="text-white">${details.deploy.deployby}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Deploy To: <span class="text-white">${details.deploy.deployto}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Reference No.: <span class="referenceno text-white">${details.deploy.referenceno}</span></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="sidebar-divider">`);
+                                $('#historydata').append(historydiv);
+                            }
+
+                            if (details.repair) {
+                                let historydiv = $(`
+                            <div class="row">
+                                <div class="col-3 text-center" style="margin-top: 32px;">
+                                    <div>
+                                        <span class="text-white">${details.repair.date}</span>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center" style="margin-top: 32px;">
+                                    <h5 class="text-white">REPAIR</h5>
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <h5>Repair By: <span class="text-white">${details.repair.repairby}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Reference No.: <span class="referenceno text-white">${details.repair.referenceno}</span></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="sidebar-divider">`);
+                                $('#historydata').append(historydiv);
+                            }
+
+                            if (details.sold) {
+                                let historydiv = $(`
+                            <div class="row">
+                                <div class="col-3 text-center" style="margin-top: 32px;">
+                                    <div>
+                                        <span class="text-white">${details.sold.date}</span>
+                                    </div>
+                                </div>
+                                <div class="col-3 text-center" style="margin-top: 32px;">
+                                    <h5 class="text-white">SOLD</h5>
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <h5>Sold By: <span class="text-white">${details.sold.soldby}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Sold To: <span class="text-white">${details.sold.soldto}</span></h5>
+                                    </div>
+                                    <div class="row">
+                                        <h5>Reference No.: <span class="referenceno text-white">${details.sold.referenceno}</span></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="sidebar-divider">`);
+                                $('#historydata').append(historydiv);
+                            }
+
+                        });
+                    }
+
+
+                },
+                error: function (err) {
+                    errormsg(err);
+                }
+            });
+        })
+    });
+</script>

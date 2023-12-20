@@ -50,6 +50,11 @@
 <!-- PCreated by level custom scripts -->
 <script src="/javascripts/js/demo/datatables-demo.js"></script>
 
+<!-- DATE RANGE PICKER -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
 <!-- SWAL-->
 <script src="/javascripts/sweetalert.min.js"></script>
 <script src="/javascripts/toastr.min.js"></script>
@@ -64,7 +69,20 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/css/DateTimePicker.min.css" />
 <script type="text/javascript" src="/javascripts/DateTimePicker.min.js"></script>
 
+<!--CHART-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
+  $("#searchproduct").on("click", function () {
+    let searchdata = $("#searchdata").val();
+    if (searchdata != '') {
+      localStorage.setItem('searchdata', searchdata);
+      location.replace("/search");
+    } else {
+      warning('Empty Input!', "Enter Asset Number/Serial Number!")
+    }
+  })
+
   hidespinner();
 
   function showspinner() {
@@ -183,6 +201,7 @@
       "hideMethod": "fadeOut"
     });
   }
+
   function success(title, text) {
     toastr.success(text, title, {
       "closeButton": false,

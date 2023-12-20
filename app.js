@@ -21,6 +21,7 @@ var departmentRouter = require("./routes/department");
 var positionRouter = require("./routes/position");
 var clientRouter = require("./routes/client");
 var loginRouter = require("./routes/login");
+var searchRouter = require("./routes/search");
 
 var app = express();
 
@@ -33,11 +34,13 @@ app.set("view engine", "ejs");
 
 app.use(logger("dev"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
+app.use("/index", indexRouter);
 app.use("/users", usersRouter);
 app.use("/category", categoryRouter);
 app.use("/deploy", deployRouter);
@@ -53,6 +56,7 @@ app.use("/department", departmentRouter);
 app.use("/position", positionRouter);
 app.use("/client", clientRouter);
 app.use("/login", loginRouter);
+app.use("/search", searchRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

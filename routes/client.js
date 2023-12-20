@@ -10,10 +10,12 @@ const {
 const dictionary = require("./repository/dictionary");
 const helper = require("./repository/customhelper");
 const { MasterClient } = require("./model/spimodel");
+const { Validator } = require("./controller/middleware");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("client", { title: "Express" });
+  // res.render("client", { title: "Express" });
+  Validator(req, res, "client");
 });
 
 module.exports = router;
@@ -25,12 +27,47 @@ router.get("/load", (req, res) => {
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
-      console.log(result);
+      // console.log(result);
 
       if (result.length != 0) {
         let data = MasterClient(result);
 
-        console.log(data);
+        // console.log(data);
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.get("/loadclient", (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const itemsPerPage = 50;
+    const offset = (page - 1) * itemsPerPage;
+
+    let sql = `select * from master_client LIMIT ${itemsPerPage} OFFSET ${offset}`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      // console.log(result);
+
+      if (result.length != 0) {
+        let data = MasterClient(result);
+
+        // console.log(data);
         res.json({
           msg: "success",
           data: data,
@@ -109,7 +146,7 @@ router.post("/edit", (req, res) => {
     sql_update = sql_update.slice(0, -1);
     sql_update += " WHERE mc_id=?";
     data.push(id);
-
+    console.log("Update Data: ", data)
     let sql_check = `SELECT * FROM master_client WHERE mc_id='${id}'`;
     Select(sql_check, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -147,8 +184,8 @@ router.post("/status", (req, res) => {
     let data = [status, id];
 
     let sql_Update = `UPDATE master_client 
-                     SET ma_status = ?
-                     WHERE ma_id = ?`;
+                     SET mc_status = ?
+                     WHERE mc_id = ?`;
 
     console.log(data);
 
@@ -209,7 +246,33 @@ router.post("/getbranch", (req, res) => {
   }
 });
 
+router.post("/checklocation", (req, res) => {
+  try{
+    const { branch, company } = req.body;
+    Check_Client(branch, company)
+    .then((result) =>{
+      let data = MasterClient(result);
+
+      if (data.length != 0) {
+        return res.json({
+          msg: "exist",
+        });
+      }else{
+        return res.json({
+          msg: "notexist",
+        });
+      }
+    });
+    
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 //#region Function
+
 function Check_Client(branch, company) {
   return new Promise((resolve, reject) => {
     let sql = "select * from master_client where mc_branch=? and mc_company=?";

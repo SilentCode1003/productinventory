@@ -1,4 +1,5 @@
 var express = require('express');
+const { Validator } = require('./controller/middleware');
 var router = express.Router();
 
 /* GET users listing. */
