@@ -220,6 +220,17 @@ class DeployProductModel {
     this.referenceno = referenceno;
   }
 }
+
+class EmployeeUploadModel {
+  constructor(lastname, middlename, firstname, department, position, access) {
+    this.lastname = lastname;
+    this.middlename = middlename;
+    this.firstname = firstname;
+    this.department = department;
+    this.position = position;
+    this.access = access;
+  }
+}
 //#endregion
 
 //#region Search
@@ -302,5 +313,6 @@ module.exports = {
   ProductUploadModel,
   TransferProductModel,
   SearchModel,
-  DeployProductModel
+  DeployProductModel,
+  EmployeeUploadModel,
 };

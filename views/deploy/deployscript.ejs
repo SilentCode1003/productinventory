@@ -1,6 +1,9 @@
 <script>
   $(document).ready(function () {
     //Functionality
+    let isFetchingData = false;
+    let hasMoreData = true;
+    let currentPage = 1;
     let assetcontrol = "";
 
     LoadTable();
@@ -58,8 +61,8 @@
           let branch = match[1].trim();
           let company = match[2].trim();
 
-          console.log("Branch: ", branch);
-          console.log("Company: ", company);
+          // console.log("Branch: ", branch);
+          // console.log("Company: ", company);
           $.ajax({
             type: "POST",
             url: "/client/checklocation",
@@ -118,9 +121,7 @@
     });
 
     function populatetable(data) {
-      console.log(data);
       const tableBody = $("#datatable tbody");
-      tableBody.empty();
 
       if (data.length === 0) {
         const tr = $("<tr>").append(
@@ -176,12 +177,16 @@
     }
 
     function LoadTable() {
+      if (!hasMoreData) {
+        return;
+      }
       $(".progress").hide();
       $(".progress").slideDown();
       $.ajax({
         url: "/deploy/load",
         method: "GET",
         dataType: "json",
+        data: { page: currentPage },
         xhrFields: {
           onprogress: function (e) {
             if (e.lengthComputable) {
@@ -193,18 +198,58 @@
         success: function (data) {
           setTimeout(function () {
             $(".progress").slideUp(function () {
-              if (data.msg === "success") {
-                populatetable(data.data);
+              hasMoreData = data.data.length > 0;
+              if (!hasMoreData) {
+                const tableBody = $("#datatable tbody");
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 9,
+                    class: "text-center",
+                    text: "No More Data",
+                  })
+                );
+                tableBody.append(tr);
               } else {
-                console.error(data.msg);
+                if (data.msg === "success") {
+                  populatetable(data.data);
+                  currentPage++;
+                } else {
+                  console.error(data.msg);
+                }
               }
+              isFetchingData = false;
             });
           }, 1000);
         },
         error: function (error) {
           console.error(error);
+          isFetchingData = false;
+          hasMoreData = fals
         },
       });
+    }
+
+    $(".scrollable-table-container").scroll(function () {
+      const container = $(this);
+      if (isFetchingData) {
+        return;
+      }
+      if (
+        container.scrollTop() + container.innerHeight() >=
+        container[0].scrollHeight - 10
+      ) {
+        //console.log("Append Triggered!");
+        isFetchingData = true;
+        LoadTable();
+      }
+    });
+
+    function resettable() {
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+      currentPage = 1;
+      hasMoreData = true;
+      LoadTable();
     }
 
     //#region CUSTOM DROPDOWN INPUT
@@ -218,7 +263,7 @@
         url: "/product/load",
         success: function (result) {
           let container = result.data;
-          console.log("data: ", container);
+          // console.log("data: ", container);
           $.each(container, (key, item) => {
             if (item.status != "DEPLOYED" && item.status != "SOLD") {
               let newname = item.serial + " (" + item.assetcontrol + ")";

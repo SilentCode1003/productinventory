@@ -16,6 +16,7 @@ const {
   TransferProductModel,
   SearchModel,
   DeployProductModel,
+  EmployeeUploadModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -464,6 +465,33 @@ exports.DeployProduct = (data) => {
         key["deployby"],
         key["deployto"],
         key["referenceno"]
+      )
+  );
+};
+
+exports.EmployeeUpload = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      lastname: key.lastname,
+      middlename: key.middlename,
+      firstname: key.firstname,
+      department: key.department,
+      position: key.position,
+      access: key.access,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new EmployeeUploadModel(
+        key["lastname"],
+        key["middlename"],
+        key["firstname"],
+        key["department"],
+        key["position"],
+        key["access"]
       )
   );
 };
