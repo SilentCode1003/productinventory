@@ -33,7 +33,7 @@ router.get("/load", (req, res) => {
       if (result.length != 0) {
         let data = Sold(result);
 
-        console.log(data);
+        // console.log(data);
         res.json({
           msg: "success",
           data: data,
