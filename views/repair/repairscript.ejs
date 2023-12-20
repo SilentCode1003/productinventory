@@ -75,7 +75,7 @@
         })
 
         function populatetable(data) {
-            // console.log(data);
+            console.log(data);
             const tableBody = $('#datatable tbody');
 
             if (data.length === 0) {
@@ -107,7 +107,7 @@
             $(".progress").hide();
             $(".progress").slideDown();
             $.ajax({
-                url: "/deploy/load",
+                url: "/repair/load",
                 method: "GET",
                 dataType: "json",
                 data: { page: currentPage },
