@@ -137,6 +137,10 @@ router.post("/upload", (req, res) => {
                   } else {
                     if (product.length != 0) {
                       let assetcontrol = product[0].assetcontrol;
+                      let status = GetValue(DLY());
+                      let update_product =
+                        "update product set p_status=? where p_assetcontrol=?";
+                      let update_product_data = [status, assetcontrol];
 
                       deploy.push([
                         assetcontrol,
@@ -146,6 +150,11 @@ router.post("/upload", (req, res) => {
                         item.deployto,
                         item.referenceno,
                       ]);
+
+                      Update(update_product, update_product_data, (err, result) => {
+                        if (err) console.error("Error: ", err);
+                        console.log(result);
+                      });
                     } else {
                       noentry.push(item.serial);
                     }

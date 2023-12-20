@@ -1,382 +1,588 @@
 <script>
-    $(document).ready(function () {
-        //Functionality
-        var activePositions = [];
-        let employeeid = "";
-        let firstname;
-        let middlename;
-        let lastname;
-        let contactnumber;
-        let status = "";
-    
-        LoadTable();
-    
-        $('#datatable tbody').on('click', 'tr', function () {
-            var dataRow = [];
-            $(this).closest('tr').find('td').each(function () {
-                dataRow.push($(this).text());
-            });
-            console.log(dataRow);
-            employeeid = dataRow[0];
-            firstname = dataRow[1];
-            middlename = dataRow[2];
-            lastname = dataRow[3];
-            contactnumber = dataRow[6];
-            status = dataRow[8];
-        }) 
-    
-        $(document).on('click', '#editBtn', function(){
-            $('#employeeidmodal').val(employeeid);
-            $('#firstnamemodal').val(firstname);
-            $('#middlenamemodal').val(middlename);
-            $('#lastnamemodal').val(lastname);
-            $('#contactnomodal').val(contactnumber);
-            $('#employeesModal').modal('show');
-        })
-    
-        $(document).on('click', '#editBtn', function(){
-            $('#editModal').modal('show');
-        })
+  $(document).ready(function () {
+    //Functionality
+    var activePositions = [];
+    let employeeid = "";
+    let firstname;
+    let middlename;
+    let lastname;
+    let contactnumber;
+    let status = "";
 
-        $(document).on('change', '#department', function() {    
-            let id = $(this).val();
-            console.log(id)
+    LoadTable();
+
+    $("#datatable tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
         });
-    
-        $(document).on('click', '#addBtn', function () {
-            let fullname = $('#fullname').val();
-            let username = $('#username').val();
-            let password = $('#password').val();
-            let position = $('#position').val();
-            let department = $('#department').val();
-            let access = $('#access').val();
+      console.log(dataRow);
+      employeeid = dataRow[0];
+      firstname = dataRow[1];
+      middlename = dataRow[2];
+      lastname = dataRow[3];
+      contactnumber = dataRow[6];
+      status = dataRow[8];
+    });
 
-            var message = "";
-            if (fullname == '') { message += 'Full Name, ' }
-            if (username == '') { message += 'User Name, ' }
-            if (password == '') { message += 'Password, ' }
-            if (position == '') { message += 'Position, ' }
-            if (department == '') { message += 'Department, ' }
-            if (access == '') { message += 'Access, ' }
-    
-            if (message != '') {
-                warning('Required', `Please fill up ${message}`);
+    $(document).on("click", "#editBtn", function () {
+      $("#employeeidmodal").val(employeeid);
+      $("#firstnamemodal").val(firstname);
+      $("#middlenamemodal").val(middlename);
+      $("#lastnamemodal").val(lastname);
+      $("#contactnomodal").val(contactnumber);
+      $("#employeesModal").modal("show");
+    });
+
+    $(document).on("click", "#editBtn", function () {
+      $("#editModal").modal("show");
+    });
+
+    $(document).on("change", "#department", function () {
+      let id = $(this).val();
+      console.log(id);
+    });
+
+    $(document).on("click", "#addBtn", function () {
+      let fullname = $("#fullname").val();
+      let username = $("#username").val();
+      let password = $("#password").val();
+      let position = $("#position").val();
+      let department = $("#department").val();
+      let access = $("#access").val();
+
+      var message = "";
+      if (fullname == "") {
+        message += "Full Name, ";
+      }
+      if (username == "") {
+        message += "User Name, ";
+      }
+      if (password == "") {
+        message += "Password, ";
+      }
+      if (position == "") {
+        message += "Position, ";
+      }
+      if (department == "") {
+        message += "Department, ";
+      }
+      if (access == "") {
+        message += "Access, ";
+      }
+
+      if (message != "") {
+        warning("Required", `Please fill up ${message}`);
+      } else {
+        console.log(fullname, username, password, position, department, access);
+        $.ajax({
+          type: "POST",
+          url: "/employee/save",
+          data: {
+            fullname: fullname,
+            username: username,
+            password: password,
+            position: position,
+            department: department,
+            access: access,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Saved", "Successfully");
+              $("#fullname").val("");
+              $("#username").val("");
+              $("#password").val("");
+              $("#position").val("");
+              $("#department").val("");
+              $("#access").val("");
+              $("#selectedposition").text("Select Position");
+              $("#selectedaccess").text("Select Access");
+              $("#selecteddepartment").text("Select Department");
             }
-            else {
-                console.log(fullname, username, password, position, department, access)
-                $.ajax({
-                    type: 'POST',
-                    url: '/employee/save',
-                    data: {
-                        fullname: fullname,
-                        username: username,
-                        password: password,
-                        position: position,
-                        department: department,
-                        access: access
-                    },
-                    success: function (result) {
-                        if (result.msg == 'success') {
-                            LoadTable()
-                            success('Saved', 'Successfully')
-                            $('#fullname').val('');
-                            $('#username').val('');
-                            $('#password').val('');
-                            $('#position').val('');
-                            $('#department').val('');
-                            $('#access').val('');
-                            $("#selectedposition").text("Select Position");
-                            $("#selectedaccess").text("Select Access");
-                            $("#selecteddepartment").text("Select Department");
-                        }
-    
-                        if (result.msg == 'exist') {
-                            warning('Exist', `${fullname} already exist!`);
-                        }
-    
-                    },
-                    error: function (err) {
-                        errormsg(err);
-                    }
-                })
+
+            if (result.msg == "exist") {
+              warning("Exist", `${fullname} already exist!`);
             }
-        })
-     
-        function populatedatatable(data) {
-            console.log(data);
-            const tableBody = $('#datatable tbody');
-            tableBody.empty();
-    
-            if (data.length === 0) {
-                const tr = $('<tr>').append($('<td>', {
-                    colspan: 10,
-                    class: 'text-center',
-                    text: 'No Data Matched'
-                }));
-                tableBody.append(tr);
-            } else {
-                data.forEach(item => {
-                    let action = "";
-                    if (item.status === 'ACTIVE') {
-                        action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+          },
+          error: function (err) {
+            errormsg(err);
+          },
+        });
+      }
+    });
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 10,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let action = "";
+          if (item.status === "ACTIVE") {
+            action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
                                 <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
-                    } else if (item.status === 'INACTIVE') {
-                        action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+          } else if (item.status === "INACTIVE") {
+            action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
                                 <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
-                    }
+          }
 
-                    const tr = $('<tr>').append(
-                        $('<td>', { text: item.id, 'data-label': 'Employee ID', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.fullname, 'data-label': 'First Name', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: item.position, 'data-label': 'oposition', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: item.department, 'data-label': 'Department', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: item.username, 'data-label': 'username', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.password, 'data-label': 'password', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.access, 'data-label': 'Access Type', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { html: action, 'data-label': 'Action', class: '' })
-                    );
-                    tableBody.append(tr);
-                });
-            }
-        }
-    
-        function LoadTable() {
-            $(".progress").hide();
-            $(".progress").slideDown();
-
-            $.ajax({
-                url: '/employee/load',
-                method: 'GET',
-                dataType: 'json',
-                xhrFields: {
-                    onprogress: function (e) {
-                        if (e.lengthComputable) {
-                            var percentComplete = (e.loaded / e.total) * 100;
-                            $(".progress-bar").css("width", percentComplete + "%");
-                        }
-                    }
-                },
-                success: function (data) {
-                    setTimeout(function () {
-                        $(".progress").slideUp(function () {
-                            if (data.msg === 'success') {
-                                populatedatatable(data.data);
-                            } else {
-                                console.error(data.msg);
-                            }
-                        });
-                    }, 1000);
-                },
-                error: function (error) {
-                    console.error(error);
-                }
-            });
-        }
-
-        function LoadList() {
-            $.ajax({
-                type: "GET",
-                url: "/access/load",
-                success: function (result) {
-                    let container = result.data;
-                    $.each(container, (key, item) => {
-                        let accessname = item.name;
-                        let accessid = item.id;
-                        // console.log(accessname);
-
-                        var listItem = $("<li></li>")
-                        .text(accessname)
-                        .data("access", accessid);
-
-                        $(".accesslist").append(listItem);
-                    });
-
-                    $(".accesslist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selectedaccessid = $(this).data("access");
-
-                        $("#selectedaccess").text(selectedOption);
-                        $("#access").val(selectedaccessid).change();
-                    });
-                },
-                error: function (err) {
-                errormsg(err);
-                },
-            });
-
-            $.ajax({
-                type: "GET",
-                url: "/position/load",
-                success: function (result) {
-                    let container = result.data;
-                    $.each(container, (key, item) => {
-                        let positionname = item.name;
-                        let positionid = item.id;
-                        // console.log(positionname);
-
-                        var listItem = $("<li></li>")
-                        .text(positionname)
-                        .data("position", positionid);
-
-                        $(".positionlist").append(listItem);
-                    });
-
-                    $(".positionlist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selectedpositionid = $(this).data("position");
-
-                        $("#selectedposition").text(selectedOption);
-                        $("#position").val(selectedpositionid).change();
-                    });
-                    
-                },
-                error: function (err) {
-                errormsg(err);
-                },
-            });
-
-            $.ajax({
-                type: "GET",
-                url: "/department/load",
-                success: function (result) {
-                    let container = result.data;
-                    $.each(container, (key, item) => {
-                        let departmentname = item.name;
-                        let departmentid = item.id;
-                        // console.log(departmentname);
-
-                        var listItem = $("<li></li>")
-                        .text(departmentname)
-                        .data("department", departmentid);
-
-                        $(".departmentlist").append(listItem);
-                    });
-
-                    $(".departmentlist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selecteddepartmentid = $(this).data("department");
-
-                        $("#selecteddepartment").text(selectedOption);
-                        $("#department").val(selecteddepartmentid).change();
-                    });
-                },
-                error: function (err) {
-                errormsg(err);
-                },
-            });
-        }
-    
-        $(document).on('click', '#activeBtn', function(){
-            console.log(employeeid);
-            console.log(status);
-            $.ajax({
-                type: 'POST',
-                url: '/employee/status',
-                data: {
-                    status: status,
-                    employeeid: employeeid,
-                },
-                success: function (result) {
-                    if (result.msg == 'success') {
-                        LoadTable();
-                        success('Saved', 'Successfully')
-                    }
-    
-                    if (result.msg == 'notexist') {
-                        warning(`${employeeid} does not exist!`);
-                    }
-    
-                },
-                error: function (err) {
-                    errormsg(err);
-                }
-            })
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "Employee ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.fullname,
+              "data-label": "First Name",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.position,
+              "data-label": "oposition",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.department,
+              "data-label": "Department",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.username,
+              "data-label": "username",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.password,
+              "data-label": "password",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.access,
+              "data-label": "Access Type",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.status,
+              "data-label": "Status",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.createdby,
+              "data-label": "Created By",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.createddate,
+              "data-label": "Created Date",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", { html: action, "data-label": "Action", class: "" })
+          );
+          tableBody.append(tr);
         });
-    
-        $(document).on('click', '#inactiveBtn', function(){
-            console.log(employeeid);
-            console.log(status);
-            $.ajax({
-                type: 'POST',
-                url: '/employee/status',
-                data: {
-                    status: status,
-                    employeeid: employeeid,
-                },
-                success: function (result) {
-                    if (result.msg == 'success') {
-                        LoadTable();
-                        success('Saved', 'Successfully')
-                    }
-    
-                    if (result.msg == 'notexist') {
-                        warning(`${employeeid} does not exist!`);
-                    }
-    
-                },
-                error: function (err) {
-                    errormsg(err);
-                }
-            })
+      }
+    }
+
+    function LoadTable() {
+      $(".progress").hide();
+      $(".progress").slideDown();
+
+      $.ajax({
+        url: "/employee/load",
+        method: "GET",
+        dataType: "json",
+        xhrFields: {
+          onprogress: function (e) {
+            if (e.lengthComputable) {
+              var percentComplete = (e.loaded / e.total) * 100;
+              $(".progress-bar").css("width", percentComplete + "%");
+            }
+          },
+        },
+        success: function (data) {
+          setTimeout(function () {
+            $(".progress").slideUp(function () {
+              if (data.msg === "success") {
+                populatedatatable(data.data);
+              } else {
+                console.error(data.msg);
+              }
+            });
+          }, 1000);
+        },
+        error: function (error) {
+          console.error(error);
+        },
+      });
+    }
+
+    function LoadList() {
+      $.ajax({
+        type: "GET",
+        url: "/access/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let accessname = item.name;
+            let accessid = item.id;
+            // console.log(accessname);
+
+            var listItem = $("<li></li>")
+              .text(accessname)
+              .data("access", accessid);
+
+            $(".accesslist").append(listItem);
+          });
+
+          $(".accesslist").on("click", "li", function () {
+            var selectedOption = $(this).text();
+            var selectedaccessid = $(this).data("access");
+
+            $("#selectedaccess").text(selectedOption);
+            $("#access").val(selectedaccessid).change();
+          });
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "/position/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let positionname = item.name;
+            let positionid = item.id;
+            // console.log(positionname);
+
+            var listItem = $("<li></li>")
+              .text(positionname)
+              .data("position", positionid);
+
+            $(".positionlist").append(listItem);
+          });
+
+          $(".positionlist").on("click", "li", function () {
+            var selectedOption = $(this).text();
+            var selectedpositionid = $(this).data("position");
+
+            $("#selectedposition").text(selectedOption);
+            $("#position").val(selectedpositionid).change();
+          });
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "/department/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let departmentname = item.name;
+            let departmentid = item.id;
+            // console.log(departmentname);
+
+            var listItem = $("<li></li>")
+              .text(departmentname)
+              .data("department", departmentid);
+
+            $(".departmentlist").append(listItem);
+          });
+
+          $(".departmentlist").on("click", "li", function () {
+            var selectedOption = $(this).text();
+            var selecteddepartmentid = $(this).data("department");
+
+            $("#selecteddepartment").text(selectedOption);
+            $("#department").val(selecteddepartmentid).change();
+          });
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    }
+
+    $(document).on("click", "#activeBtn", function () {
+      console.log(employeeid);
+      console.log(status);
+      $.ajax({
+        type: "POST",
+        url: "/employee/status",
+        data: {
+          status: status,
+          employeeid: employeeid,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${employeeid} does not exist!`);
+          }
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    });
+
+    $(document).on("click", "#inactiveBtn", function () {
+      console.log(employeeid);
+      console.log(status);
+      $.ajax({
+        type: "POST",
+        url: "/employee/status",
+        data: {
+          status: status,
+          employeeid: employeeid,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${employeeid} does not exist!`);
+          }
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    });
+
+    $(document).on("click", "#updateBtn", function () {
+      let employeeid = $("#employeeidmodal").val();
+      let firstname = $("#firstnamemodal").val();
+      let middlename = $("#middlenamemodal").val();
+      let lastname = $("#lastnamemodal").val();
+      let position = $("#positionlistmodal").val();
+      let accesstype = $("#accesslistmodal").val();
+      let contactno = $("#contactnomodal").val();
+
+      var message = "";
+
+      if (
+        position == "" &&
+        contactno == "" &&
+        middlename == "0" &&
+        firstname == "" &&
+        lastname == "" &&
+        access == "0"
+      ) {
+        message += "Fill up atleast 1 input field before updating";
+      }
+
+      if (message != "") {
+        warning("Required", `${message}`);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/mastermeployee/edit",
+          data: {
+            employeeid: employeeid,
+            firstname: firstname,
+            middlename: middlename,
+            lastname: lastname,
+            position: position,
+            accesstype: accesstype,
+            contactno: contactno,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              $("#employeesModal").modal("hide");
+              $("#employeeidmodal").val("");
+              $("#firstnamemodal").val("");
+              $("#middlenamemodal").val("");
+              $("#lastnamemodal").val("");
+              $("#positionlistmodal").val("");
+              $("#accesslistmodal").val("");
+              $("#contactnomodal").val("");
+              success("Saved", "Successfully");
+            }
+          },
+          error: function (err) {
+            errormsg(err);
+          },
         });
-    
-        $(document).on('click', '#updateBtn', function () {
-            let employeeid = $('#employeeidmodal').val();
-            let firstname = $('#firstnamemodal').val();
-            let middlename = $('#middlenamemodal').val();
-            let lastname = $('#lastnamemodal').val();
-            let position = $('#positionlistmodal').val();
-            let accesstype = $('#accesslistmodal').val();
-            let contactno = $('#contactnomodal').val();
-    
-            var message = "";
-    
-            if (position == '' && contactno == '' &&  middlename == '0' && firstname == '' && lastname == '' &&  access == '0'){
-                    message += 'Fill up atleast 1 input field before updating'
-                }
-    
-            if (message != '') {
-                warning('Required', `${message}`);
-            }
-            else {
-                $.ajax({
-                    type: 'POST',
-                    url: '/mastermeployee/edit',
-                    data: {
-                        employeeid: employeeid,
-                        firstname: firstname,
-                        middlename: middlename,
-                        lastname: lastname,
-                        position: position,
-                        accesstype: accesstype,
-                        contactno: contactno,
-                    },
-                    success: function (result) {
-                        if (result.msg == 'success') {
-                            LoadTable();
-                            $('#employeesModal').modal('hide');
-                            $('#employeeidmodal').val('');
-                            $('#firstnamemodal').val('');
-                            $('#middlenamemodal').val('');
-                            $('#lastnamemodal').val('');
-                            $('#positionlistmodal').val('');
-                            $('#accesslistmodal').val('');
-                            $('#contactnomodal').val('');
-                            success('Saved', 'Successfully')
-                        }
-    
-                    },
-                    error: function (err) {
-                        errormsg(err);
-                    }
-                })
-            }
-        })
-    
-        LoadList()
-    
-    })
+      }
+    });
+
+    LoadList();
+
+    //#region Upload
+    $(document).on("click", "#uploadButton", function () {
+      //   console.log("clicked!");
+      let uploaddata = $("#fileinput").val();
+      if (uploaddata != "") {
+        showspinner();
+        UploadProcess();
+      } else {
+        warning("Warning!", "No File Chosen!");
+      }
+    });
+
+    function UploadProcess() {
+      //Reference the FileUpload element.
+      var fileUpload = document.getElementById("fileinput");
+
+      //Validate whether File is valid Excel file.
+      var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx|.csv|.ods)$/;
+      if (regex.test(fileUpload.value.toLowerCase())) {
+        if (typeof FileReader != "undefined") {
+          var reader = new FileReader();
+
+          //For Browsers other than IE.
+          if (reader.readAsBinaryString) {
+            reader.onload = function (e) {
+              GetTableFromExcel(e.target.result);
+            };
+            reader.readAsBinaryString(fileUpload.files[0]);
+          } else {
+            //For IE Browser.
+            reader.onload = function (e) {
+              var data = "";
+              var bytes = new Uint8Array(e.target.result);
+              for (var i = 0; i < bytes.byteLength; i++) {
+                data += String.fromCharCode(bytes[i]);
+              }
+              GetTableFromExcel(data);
+            };
+            reader.readAsArrayBuffer(fileUpload.files[0]);
+          }
+        } else {
+          warning("Upload", "This browser does not support HTML5.");
+        }
+      } else {
+        warning("Upload", "Please upload a valid Excel file.");
+      }
+    }
+
+    function GetTableFromExcel(data) {
+      //Read the Excel File data in binary
+      var workbook = XLSX.read(data, {
+        type: "binary",
+      });
+
+      //get the name of First Sheet.
+      var Sheet = workbook.SheetNames[0];
+
+      //Read all rows from First Sheet into an JSON array.
+      var excelRows = XLSX.utils.sheet_to_row_object_array(
+        workbook.Sheets[Sheet]
+      );
+      var columns = Object.keys(excelRows[0]);
+
+      //Create a HTML Table element.
+      var myTable = document.createElement("table");
+      myTable.border = "1";
+
+      //Add the header row.
+      var row = myTable.insertRow(-1);
+
+      var dataExcelArr = [];
+      //Add the data rows from Excel file.
+      for (var i = 0; i < excelRows.length; i++) {
+        //Add the data row.
+        var data = [];
+        var row = myTable.insertRow(-1);
+        for (var j = 0; j < columns.length; j++) {
+          var cell = row.insertCell(-1);
+          cell.innerHTML = excelRows[i][columns[j]];
+          data.push({
+            item: excelRows[i][columns[j]],
+          });
+        }
+        dataExcelArr.push({
+          lastname: data[0].item,
+          middlename: data[1].item,
+          firstname: data[2].item,
+          department: data[3].item,
+          position: data[4].item,
+          access: data[5].item,
+        });
+      }
+      excelDataSave(dataExcelArr);
+    }
+
+    function excelDataSave(data) {
+      var dataraw = JSON.stringify(data, null, 2);
+      $.ajax({
+        type: "POST",
+        url: "/employee/upload",
+        data: {
+          data: dataraw,
+        },
+        success: function (result) {
+          hidespinner();
+          if (result.msg == "noentry") {
+            return warning(
+              "Product Not Registered",
+              `List of serials not yet registered [${result.data.noentry}]`
+            );
+
+            // swal({
+            //   title: "Exist",
+            //   text: "Some data already exist on the database. ID[${result.data}]",
+            //   icon: "warning",
+            //   button: "OK!",
+            // });
+          }
+          if (result.msg == "dupentry") {
+            return warning(
+              "Already Exist",
+              `List of serials that already deployed [${result.data.dupentry}]`
+            );
+          }
+
+          if (result.msg == "noentrydupentry") {
+            return warning(
+              "Warning",
+              `List of serials that are not yet register [${result.data.noentry}]\nList of serials that already dployed [${result.data.dupentry}]`
+            );
+          }
+
+          success("Saved!", "Data saved!");
+          LoadTable();
+          // swal({
+          //   title: "Success",
+          //   text: "Data saved!",
+          //   icon: "success",
+          //   button: "OK!",
+          // });
+
+          // $('#item-tbl').DataTable().ajax.reload();
+        },
+        error: function (result) {
+          console.error(result);
+        },
+      });
+    }
+    //#endregion
+  });
 </script>
