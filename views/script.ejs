@@ -75,10 +75,10 @@
 <script>
   $("#searchproduct").on("click", function () {
     let searchdata = $("#searchdata").val();
-    if(searchdata != ''){
+    if (searchdata != '') {
       localStorage.setItem('searchdata', searchdata);
       location.replace("/search");
-    }else{
+    } else {
       warning('Empty Input!', "Enter Asset Number/Serial Number!")
     }
   })
@@ -201,7 +201,7 @@
       "hideMethod": "fadeOut"
     });
   }
-  
+
   function success(title, text) {
     toastr.success(text, title, {
       "closeButton": false,

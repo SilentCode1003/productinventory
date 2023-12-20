@@ -95,7 +95,7 @@
 .form-control{
   background-color: transparent !important;
   border-left: 1px solid var(--clr-text) !important;
-  border-right: transparent !important;
+  border-right: transparent !important; 
   border-top: transparent !important;
   border-bottom: 1px solid var(--clr-text) !important;
 

@@ -22,6 +22,37 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
+    let sql = `select * from master_client`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      // console.log(result);
+
+      if (result.length != 0) {
+        let data = MasterClient(result);
+
+        // console.log(data);
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.get("/loadclient", (req, res) => {
+  try {
     const page = req.query.page || 1;
     const itemsPerPage = 50;
     const offset = (page - 1) * itemsPerPage;
