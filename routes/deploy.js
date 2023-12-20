@@ -29,16 +29,22 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
+    const page = req.query.page || 1;
+    const itemsPerPage = 50;
+    const offset = (page - 1) * itemsPerPage;
     let sql = `select 
-    d_id,
-    d_assetcontrol,
-    d_serial,
-    d_date,
-    e_fullname as d_deployby,
-    d_deployto,
-    d_referenceno
-    from deploy
-    inner join employee on e_id = d_deployby`;
+      d_id,
+      d_assetcontrol,
+      d_serial,
+      d_date,
+      e_fullname as d_deployby,
+      d_deployto,
+      d_referenceno
+      from deploy
+      inner join employee on e_id = d_deployby
+      ORDER BY p.p_podate DESC
+      LIMIT ${itemsPerPage} OFFSET ${offset}`;
+      
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
