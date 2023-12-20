@@ -136,7 +136,11 @@ router.post("/upload", (req, res) => {
 
           if (data.length != 0) {
             let assetcontrol = data[0].assetcontrol;
-
+            let status = GetValue(TRFR());
+            let update_product =
+              "update product set p_status=? where p_assetcontrol=?";
+            let update_product_data = [status, assetcontrol];
+            
             transfer.push([
               assetcontrol,
               item.serial,
@@ -147,6 +151,11 @@ router.post("/upload", (req, res) => {
               item.to,
               item.referenceno,
             ]);
+
+            Update(update_product, update_product_data, (err, result) => {
+              if (err) console.error("Error: ", err);
+              console.log(result);
+            });
           } else {
             noentry.push(item.serial);
           }
