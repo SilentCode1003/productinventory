@@ -7,7 +7,10 @@ const {
 } = require("./repository/spidb");
 const { Transfer, TransferProduct, Product } = require("./model/spimodel");
 const { GetValue, TRFR } = require("./repository/dictionary");
-const { SelectStatement } = require("./repository/customhelper");
+const {
+  SelectStatement,
+  convertExcelDate,
+} = require("./repository/customhelper");
 const { Validator } = require("./controller/middleware");
 var router = express.Router();
 
@@ -137,7 +140,7 @@ router.post("/upload", (req, res) => {
             transfer.push([
               assetcontrol,
               item.serial,
-              item.date,
+              convertExcelDate(item.date),
               item.transferby,
               item.from,
               item.receivedby,
