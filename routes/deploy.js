@@ -131,7 +131,7 @@ router.post("/upload", (req, res) => {
                 .then((result) => {
                   counter += 1;
                   let deploydup = Deploy(result);
-                  console.log(deploydup[0].assetcontrol);
+                  // console.log(deploydup[0].assetcontrol);
                   if (deploydup.length != 0) {
                     dupentry.push(item.serial);
                   } else {
