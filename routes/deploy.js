@@ -42,7 +42,6 @@ router.get("/load", (req, res) => {
       d_referenceno
       from deploy
       inner join employee on e_id = d_deployby
-      ORDER BY p.p_podate DESC
       LIMIT ${itemsPerPage} OFFSET ${offset}`;
       
     Select(sql, (err, result) => {
