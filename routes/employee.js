@@ -1,6 +1,12 @@
 var express = require("express");
 const { SelectParameter, Select, InsertTable } = require("./repository/spidb");
-const { Employee } = require("./model/spimodel");
+const {
+  Employee,
+  EmployeeUpload,
+  MasterDepartment,
+  MasterPosition,
+  MasterAccess,
+} = require("./model/spimodel");
 const { GetValue, ACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
 const { Encrypter } = require("./repository/cryptography");
@@ -102,6 +108,130 @@ router.post("/save", (req, res) => {
   }
 });
 
+router.post("/upload", (req, res) => {
+  try {
+    const { data } = req.body;
+    let dataJson = EmployeeUpload(JSON.parse(data));
+    let _employee = [];
+    let _counter = 0;
+    let _dupentry = [];
+    let message = "";
+
+    dataJson.forEach((employee) => {
+      let user = `${employee.firstname[0]}${employee.lastname}`;
+      Encrypter(user, (err, encrypted) => {
+        if (err) console.error(err);
+
+        GetDepartment(employee.department)
+          .then((result) => {
+            let _department = MasterDepartment(result);
+            let departmentid = _department[0].id;
+            GetPosition(employee.position)
+              .then((result) => {
+                let _position = MasterPosition(result);
+                let positionid = _position[0].id;
+
+                GetAccesss(employee.access)
+                  .then((result) => {
+                    let _access = MasterAccess(result);
+                    let accessid = _access[0].id;
+                    let status = GetValue(ACT());
+                    let createdby = req.session.fullname;
+                    let createddate = GetCurrentDatetime();
+                    let fullname = `${employee.firstname} ${employee.lastname}`;
+
+                    Check_Employee(fullname)
+                      .then((result) => {
+                        let check_employee = Employee(result);
+                        _counter += 1;
+
+                        if (check_employee != 0) {
+                          _dupentry.push(fullname);
+                        } else {
+                          _employee.push([
+                            fullname,
+                            positionid,
+                            departmentid,
+                            user,
+                            encrypted,
+                            accessid,
+                            status,
+                            createdby,
+                            createddate,
+                          ]);
+                        }
+
+                        console.log(
+                          "Counter: ",
+                          _counter,
+                          "Data Length: ",
+                          dataJson.length
+                        );
+                        if (_counter == dataJson.length) {
+                          if (_employee != 0) {
+                            InsertTable(
+                              "employee",
+                              _employee,
+                              (err, result) => {
+                                if (err) console.error("Error: ", err);
+
+                                console.log(result);
+                              }
+                            );
+                          } else {
+                            message += "dupentry";
+                          }
+
+                          if (message != "") {
+                            return res.json({
+                              msg: message,
+                              data: {
+                                dupentry: _dupentry,
+                              },
+                            });
+                          } else {
+                            res.json({
+                              msg: "success",
+                            });
+                          }
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        return res.json({
+                          msg: error,
+                        });
+                      });
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                    return res.json({
+                      msg: error,
+                    });
+                  });
+              })
+              .catch((error) => {
+                console.log(error);
+                return res.json({
+                  msg: error,
+                });
+              });
+          })
+          .catch((error) => {
+            console.log(error);
+            return res.json({
+              msg: error,
+            });
+          });
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 //#region Function
 function Check_Employee(fullname) {
   return new Promise((resolve, reject) => {
@@ -109,6 +239,42 @@ function Check_Employee(fullname) {
     SelectParameter(sql, [fullname], (err, result) => {
       if (err) reject(err);
       console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+
+function GetDepartment(name) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_department where md_name=?";
+
+    SelectParameter(sql, [name], (err, result) => {
+      if (err) reject(err);
+
+      resolve(result);
+    });
+  });
+}
+
+function GetPosition(name) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_position where mp_name=?";
+
+    SelectParameter(sql, [name], (err, result) => {
+      if (err) reject(err);
+
+      resolve(result);
+    });
+  });
+}
+
+function GetAccesss(name) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_access where ma_name=?";
+
+    SelectParameter(sql, [name], (err, result) => {
+      if (err) reject(err);
 
       resolve(result);
     });
