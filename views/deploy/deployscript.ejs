@@ -88,7 +88,7 @@
                   },
                   success: function (result) {
                     if (result.msg == "success") {
-                      LoadTable();
+                      resettable();
                       success("Saved", "Successfully");
                       $("#location").val("");
                       $("#employeeid").val("");
@@ -224,7 +224,7 @@
         error: function (error) {
           console.error(error);
           isFetchingData = false;
-          hasMoreData = fals
+          hasMoreData = false
         },
       });
     }
@@ -584,7 +584,7 @@
           }
 
           success("Saved!", "Data saved!");
-          LoadTable();
+          resettable();
           // swal({
           //   title: "Success",
           //   text: "Data saved!",

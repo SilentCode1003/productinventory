@@ -15,6 +15,10 @@ router.get("/", function (req, res, next) {
 module.exports = router;
 
 router.get("/load", (req, res) => {
+  const page = req.query.page || 1;
+  const itemsPerPage = 50;
+  const offset = (page - 1) * itemsPerPage;
+  
   try {
     let sql = `select 
     r_id,
@@ -25,7 +29,8 @@ router.get("/load", (req, res) => {
     r_returnfrom,
     r_referenceno
     from returnitem
-    inner join employee on e_id = r_returnby;`;
+    inner join employee on e_id = r_returnby
+    LIMIT ${itemsPerPage} OFFSET ${offset};`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
