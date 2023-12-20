@@ -90,15 +90,15 @@ var roleacess = [
 ];
 
 exports.Validator = function (req, res, layout) {
-  console.log("Layout: ", layout, "Access: ", req.session.access);
-
+  let ismatch = false;
+  let counter = 0;
   roleacess.forEach((key, item) => {
     var routes = key.routes;
-
+    counter += 1;
     routes.forEach((value, index) => {
-      console.log(`${key.role} - ${value.layout}`);
-
       if (key.role == req.session.access && value.layout == layout) {
+        console.log("Layout: ", layout, "Access: ", req.session.access);
+        ismatch = true;
         return res.render(`${layout}`, {
           fullname: req.session.fullname,
           access: req.session.access,
@@ -107,7 +107,10 @@ exports.Validator = function (req, res, layout) {
         });
       }
     });
+    if (counter == roleacess.length) {
+      if (!ismatch) {
+        res.redirect("/login");
+      }
+    }
   });
-
-  res.redirect("/login");
 };
