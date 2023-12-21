@@ -17,6 +17,8 @@ const {
   SearchModel,
   DeployProductModel,
   EmployeeUploadModel,
+  MasterItemPriceModel,
+  PriceHistoryModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -492,6 +494,60 @@ exports.EmployeeUpload = (data) => {
         key["department"],
         key["position"],
         key["access"]
+      )
+  );
+};
+
+exports.MasterItemPrice = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.id,
+      itemid: key.itemid,
+      fobprice: key.fobprice,
+      status: key.status,
+      createdby: key.createdby,
+      createddate: key.createddate,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new MasterItemPriceModel(
+        key["id"],
+        key["itemid"],
+        key["fobprice"],
+        key["status"],
+        key["createdby"],
+        key["createddate"]
+      )
+  );
+};
+
+exports.PriceHistory = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.id,
+      itempriceid: key.itempriceid,
+      fobprice: key.fobprice,
+      status: key.status,
+      createdby: key.createdby,
+      createddate: key.createddate,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new PriceHistoryModel(
+        key["id"],
+        key["itempriceid"],
+        key["fobprice"],
+        key["status"],
+        key["createdby"],
+        key["createddate"]
       )
   );
 };
