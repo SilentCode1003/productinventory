@@ -21,14 +21,14 @@
                     </div>
                       
                     <div class="col-md-6 mb-2">
-                        <div class="customdropdown">
-                            <div class="select selectrepairby">
-                              <span id="selectedrepairby">Repair By</span>
-                              <i class="fa fa-chevron-left"></i>
-                            </div>
-                            <input type="hidden" name="repairbyid" id="repairbyid">
-                            <ul class="customdropdown-menu repairbylist"></ul>
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee"/>
+                          <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Repair By</span>
+                          </div>
                         </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
                     </div>
                 </div>
 

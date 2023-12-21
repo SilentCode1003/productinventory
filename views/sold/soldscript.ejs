@@ -7,6 +7,7 @@
         let assetcontrol = "";
         let activeSerial = [];
         let activeDeployLocation = [];
+        let activeEmployee = [];
 
         LoadTable();
 
@@ -23,22 +24,34 @@
             $('#hiddenValue').val('');
         });
 
+        $(document).on("input", "#employee", function () {
+            $("#hiddenemmployeevalue").val("");
+        });
+
+        $(document).on("input", "#serialname", function () {
+            $("#hiddenSerialValue").val("");
+        });
+
         $(document).on('click', '#addBtn', function () {
             // const actualValue = $('#hiddenSerialValue').val();
             let location = $('#hiddenValue').val();
+            let serialasset = $("#hiddenSerialValue").val();
             let data = $('#serialname').val();
             let soldto = $('#location').val();
-            let soldby = $('#employeeid').val();
+            let soldby = $('#hiddenemmployeevalue').val();
+            let employee = $("#employee").val();
             let referenceno = $('#referenceno').val();
             let date = $('#date').val();
 
-
             var message = "";
-            if (data == '') { message += 'Serial and Asset Control, ' }
-            if (soldto == '') { message += 'Sold To, ' }
-            if (soldby == '') { message += 'Sold By, ' }
-            if (referenceno == '') { message += 'referenceno, ' }
-            if (date == '') { message += 'Date, ' }
+
+            if (serialasset == "") {
+                message += "Serial and Asset Control does not Exist " + `${data}, `;
+            }
+            if (soldto == '') { message += 'Empty Sold To, ' }
+            if (soldby == '') { message += "Employee does not Exist " + `${employee}, `; }
+            if (referenceno == '') { message += "Empty Reference Number, "; }
+            if (date == '') { message += "Empty Date, "; }
 
             if (message != '') {
                 warning('Required', `Please fill up ${message}`);
@@ -84,8 +97,8 @@
                                             success('Saved', 'Successfully');
                                             resettable()
                                             $('#location').val('');
-                                            $('#employeeid').val('');
-                                            $("#selectedemployee").text('Sold By');
+                                            $('#employee').val('');
+                                            $("#hiddenemmployeevalue").val('');
                                             $('#referenceno').val('');
                                             $("#serialname").val('');
                                             $("#hiddenSerialValue").val('');
@@ -261,31 +274,29 @@
                 url: "/employee/load",
                 success: function (result) {
                     let container = result.data;
+                    // console.log(container)
                     $.each(container, (key, item) => {
                         let displayname = item.fullname;
                         let dataid = item.id;
-                        // console.log(displayname);
-
-                        var listItem = $("<li></li>")
-                            .text(displayname)
-                            .data("dataid", dataid);
-
-                        $(".employeelist").append(listItem);
+                        activeEmployee.push({
+                            display: displayname,
+                            value: dataid,
+                        });
                     });
+                    populateCustomDropdown2()
 
-                    $(".employeelist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selectedemployeeId = $(this).data("dataid");
-
-                        $("#selectedemployee").text(selectedOption);
-                        $("#employeeid").val(selectedemployeeId).change();
-                    });
                 },
                 error: function (err) {
                     errormsg(err);
                 },
             });
 
+        }
+
+        function populateCustomDropdown2() {
+            for (const employee of activeEmployee) {
+                addOption3("employeeDropdown", employee.display, employee.value);
+            }
         }
 
         function populateCustomDropdown1() {
@@ -338,6 +349,25 @@
             });
         }
 
+        function addOption3(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenemmployeevalue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("employee");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
         function addOption2(dropdownId, displayText, actualValue) {
             const dropdownElement = document.getElementById(dropdownId);
             const hiddenInput = document.getElementById("hiddenSerialValue");
@@ -378,6 +408,7 @@
 
         setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
         setupCustomDropdown("location", "locationDropdown", "dropdown-option");
+        setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
         LoadList()
         //#endregion
 

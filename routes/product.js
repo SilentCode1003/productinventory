@@ -125,7 +125,7 @@ router.get("/getstocks", (req, res) => {
 router.get("/loadproduct", (req, res) => {
   try {
     const page = req.query.page || 1;
-    const itemsPerPage = 50;
+    const itemsPerPage = 500;
     const offset = (page - 1) * itemsPerPage;
 
     let sql = `

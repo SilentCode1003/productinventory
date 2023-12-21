@@ -32,7 +32,6 @@
       $("#hiddenSerialValue").val("");
     });
 
-
     $(document).on("click", "#addBtn", function () {
       let location = $("#hiddenValue").val();
       let serialasset = $("#hiddenSerialValue").val();
@@ -42,7 +41,7 @@
       let referenceno = $("#referenceno").val();
       let date = $("#date").val();
       let employee = $("#employee").val();
-
+      
       var message = "";
 
       if (serialasset == "") {

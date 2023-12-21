@@ -16,7 +16,7 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   const page = req.query.page || 1;
-  const itemsPerPage = 50;
+  const itemsPerPage = 500;
   const offset = (page - 1) * itemsPerPage;
   
   try {
