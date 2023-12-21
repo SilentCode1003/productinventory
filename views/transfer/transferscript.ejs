@@ -1,6 +1,9 @@
 <script>
   $(document).ready(function () {
     //Functionality
+    let isFetchingData = false;
+    let hasMoreData = true;
+    let currentPage = 1;
     let assetcontrol = "";
 
     LoadTable();
@@ -87,7 +90,7 @@
           },
           success: function (result) {
             if (result.msg == "success") {
-              LoadTable();
+              resettable();
               success("Saved", "Successfully");
               $("#serial").val("");
               $("#deployto").val("");
@@ -109,9 +112,8 @@
     });
 
     function populatetable(data) {
-      console.log("Transfer Load", data);
+      // console.log("Transfer Load", data);
       const tableBody = $("#datatable tbody");
-      tableBody.empty();
 
       if (data.length === 0) {
         const tr = $("<tr>").append(
@@ -177,12 +179,16 @@
     }
 
     function LoadTable() {
+      if (!hasMoreData) {
+        return;
+      }
       $(".progress").hide();
       $(".progress").slideDown();
       $.ajax({
         url: "/transfer/load",
         method: "GET",
         dataType: "json",
+        data: { page: currentPage },
         xhrFields: {
           onprogress: function (e) {
             if (e.lengthComputable) {
@@ -194,18 +200,58 @@
         success: function (data) {
           setTimeout(function () {
             $(".progress").slideUp(function () {
-              if (data.msg === "success") {
-                populatetable(data.data);
+              hasMoreData = data.data.length > 0;
+              if (!hasMoreData) {
+                const tableBody = $("#datatable tbody");
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 9,
+                    class: "text-center",
+                    text: "No More Data",
+                  })
+                );
+                tableBody.append(tr);
               } else {
-                console.error(data.msg);
+                if (data.msg === "success") {
+                  populatetable(data.data);
+                  currentPage++;
+                } else {
+                  console.error(data.msg);
+                }
               }
+              isFetchingData = false;
             });
           }, 1000);
         },
         error: function (error) {
           console.error(error);
+          isFetchingData = false;
+          hasMoreData = false
         },
       });
+    }
+
+    $(".scrollable-table-container").scroll(function () {
+      const container = $(this);
+      if (isFetchingData) {
+        return;
+      }
+      if (
+        container.scrollTop() + container.innerHeight() >=
+        container[0].scrollHeight - 10
+      ) {
+        //console.log("Append Triggered!");
+        isFetchingData = true;
+        LoadTable();
+      }
+    });
+
+    function resettable() {
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+      currentPage = 1;
+      hasMoreData = true;
+      LoadTable();
     }
 
     //#region CUSTOM DROPDOWN INPUT
@@ -222,8 +268,10 @@
           let container = result.data;
           // console.log(container);
           $.each(container, (key, item) => {
-            let newname = item.serial + " (" + item.assetcontrol + ")";
-            activeSerial.push({ display: newname, value: item.serial });
+            if (item.status != "DEPLOYED" && item.status != "SOLD") {
+              let newname = item.serial + " (" + item.assetcontrol + ")";
+              activeSerial.push({ display: newname, value: item.serial });
+            }
           });
           populateCustomDropdown1();
         },
@@ -602,7 +650,7 @@
             // });
           } else {
             success("Saved!", "Data saved!");
-            LoadTable();
+            resettable();
             // swal({
             //   title: "Success",
             //   text: "Data saved!",

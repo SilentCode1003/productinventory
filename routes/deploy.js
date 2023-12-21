@@ -32,6 +32,7 @@ router.get("/load", (req, res) => {
     const page = req.query.page || 1;
     const itemsPerPage = 50;
     const offset = (page - 1) * itemsPerPage;
+
     let sql = `select 
       d_id,
       d_assetcontrol,
