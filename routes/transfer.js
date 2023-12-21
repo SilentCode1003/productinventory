@@ -160,7 +160,7 @@ router.post("/upload", (req, res) => {
 
             Update(update_product, update_product_data, (err, result) => {
               if (err) console.error("Error: ", err);
-              console.log(result);
+              // console.log(result);
             });
           } else {
             noentry.push(item.serial);

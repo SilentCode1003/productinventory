@@ -120,7 +120,7 @@ exports.Update = async (sql, data, callback) => {
       if (error) {
         callback(error, null);
       }
-      console.log("Rows affected:", results.affectedRows);
+      // console.log("Rows affected:", results.affectedRows);
 
       callback(null, `Rows affected: ${results.affectedRows}`);
     });
