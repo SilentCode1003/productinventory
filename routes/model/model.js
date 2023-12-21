@@ -231,6 +231,28 @@ class EmployeeUploadModel {
     this.access = access;
   }
 }
+
+class MasterItemPriceModel {
+  constructor(id, itemid, fobprice, status, createdby, createddate) {
+    this.id = id;
+    this.itemid = itemid;
+    this.fobprice = fobprice;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
+
+class PriceHistoryModel {
+  constructor(id, itempriceid, fobprice, status, createdby, createddate) {
+    this.id = id;
+    this.itempriceid = itempriceid;
+    this.fobprice = fobprice;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
 //#endregion
 
 //#region Search
@@ -315,4 +337,6 @@ module.exports = {
   SearchModel,
   DeployProductModel,
   EmployeeUploadModel,
+  MasterItemPriceModel,
+  PriceHistoryModel,
 };

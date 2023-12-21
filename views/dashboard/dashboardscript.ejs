@@ -46,7 +46,7 @@
             if (myChart) {
                 myChart.destroy();
             }
-            console.log(category)
+            // console.log(category)
             getData(dateRange, category);
         });
 
@@ -56,7 +56,7 @@
             if (myChart) {
                 myChart.destroy();
             }
-            console.log(dateRange)
+            // console.log(dateRange)
             if(category != ''){
                 getData(dateRange, category);
             }else{
@@ -73,7 +73,7 @@
                     $.each(container, (key, item) => {
                         let categoryname = item.name;
                         let categoryid = item.id;
-                        console.log(categoryname);
+                        // console.log(categoryname);
 
                         var listItem = $("<li></li>")
                             .text(categoryname)
@@ -94,7 +94,6 @@
                     errormsg(err);
                 },
             });
-
         }
 
         function getData(daterange, category) {
@@ -103,8 +102,8 @@
             let formattedStartDate = startDate.format('MM/DD/YYYY');
             let formattedEndDate = endDate.format('MM/DD/YYYY');
             let formattedDate = formattedStartDate + ' - ' + formattedEndDate;
-            console.log(formattedDate)
-            console.log("Paylaod: ", daterange, category)
+            // console.log(formattedDate)
+            // console.log("Paylaod: ", daterange, category)
             $.ajax({
                 url: '/sold/getsold',
                 method: 'POST',
@@ -115,7 +114,7 @@
                 },
                 success: function (data) {
                     if (data.msg === 'success') {
-                        console.log("Data: ", data.data)
+                        // console.log("Data: ", data.data)
                         if (data.data.length != 0){
                             var productByDate = {};
 
@@ -137,7 +136,7 @@
                                 productByDate[date][productName] = (productByDate[date][productName] || 0) + 1;
                             });
 
-                            console.log("data: ",productByDate);
+                            // console.log("data: ",productByDate);
 
                             const dates = Object.keys(productByDate);
                             const products = getAllProducts(data.data);
@@ -255,6 +254,65 @@
                 dates.add(item.date);
             });
             return Array.from(dates);
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "/product/getstocks",
+            success: function (result) {
+                let container = result.data;
+                // console.log("stocks: ",container)
+
+                let allCategories = [...new Set(container.map(item => item.category.toUpperCase()))];
+
+                let counts = getCategoryCounts(container);
+
+                let stocks = [];
+
+                allCategories.forEach(category => {
+                    let count = counts[category] || 0;
+                    stocks.push({ category, count });
+                });
+                let labels = stocks.map(entry => entry.category);
+                let data = stocks.map(entry => entry.count);
+
+                let ctx = document.getElementById('myChart1').getContext('2d');
+                let myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Stock Counts',
+                            data: data,
+                            backgroundColor: 'rgb(69, 237, 242, 0.2)', 
+                            borderColor: 'rgb(69, 237, 242)', 
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            },
+            error: function (err) {
+                errormsg(err);
+            },
+        });
+
+        function getCategoryCounts(data) {
+            const categoryCounts = {};
+
+            data.forEach(item => {
+                const category = item.category.toUpperCase();
+                categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+            });
+
+            return categoryCounts;
         }
 
     });

@@ -24,6 +24,10 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
+    const page = req.query.page || 1;
+    const itemsPerPage = 50;
+    const offset = (page - 1) * itemsPerPage;
+
     let sql = `SELECT 
     t_id,
     t_assetcontrol,
@@ -38,7 +42,9 @@ router.get("/load", (req, res) => {
     transfer
     INNER JOIN 
     employee as emptransfer on emptransfer.e_id = transfer.t_transferby
-    inner join employee as empreceive on empreceive.e_id = transfer.t_receiveby`;
+    inner join employee as empreceive on empreceive.e_id = transfer.t_receiveby
+    LIMIT ${itemsPerPage} OFFSET ${offset}`;
+    
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
@@ -154,7 +160,7 @@ router.post("/upload", (req, res) => {
 
             Update(update_product, update_product_data, (err, result) => {
               if (err) console.error("Error: ", err);
-              console.log(result);
+              // console.log(result);
             });
           } else {
             noentry.push(item.serial);

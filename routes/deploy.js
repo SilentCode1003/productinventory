@@ -32,6 +32,7 @@ router.get("/load", (req, res) => {
     const page = req.query.page || 1;
     const itemsPerPage = 50;
     const offset = (page - 1) * itemsPerPage;
+
     let sql = `select 
       d_id,
       d_assetcontrol,
@@ -43,7 +44,7 @@ router.get("/load", (req, res) => {
       from deploy
       inner join employee on e_id = d_deployby
       LIMIT ${itemsPerPage} OFFSET ${offset}`;
-      
+
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
@@ -117,100 +118,119 @@ router.post("/upload", (req, res) => {
     let counter = 0;
     let noentry = [];
     let dupentry = [];
+
     dataJson.forEach((item) => {
+      
       // console.log(item.serial);
       Check_Product(item.serial)
         .then((result) => {
           // console.log(item.serial, "Result: ", result);
           let product = Product(result);
+
           Check_Employee(item.deployby)
             .then((result) => {
               let employee = Employee(result);
-              let deployby = employee[0].id;
+              // console.log(employee[0].fullname);
+              if (employee.length != 0) {
+                let deployby = employee[0].id;
 
-              Check_Deploy(
-                product[0].assetcontrol,
-                convertExcelDate(item.date),
-                item.deployto
-              )
-                .then((result) => {
-                  counter += 1;
-                  let deploydup = Deploy(result);
-                  // console.log(deploydup[0].assetcontrol);
-                  if (deploydup.length != 0) {
-                    dupentry.push(item.serial);
-                  } else {
-                    if (product.length != 0) {
-                      let assetcontrol = product[0].assetcontrol;
-                      let status = GetValue(DLY());
-                      let update_product =
-                        "update product set p_status=? where p_assetcontrol=?";
-                      let update_product_data = [status, assetcontrol];
+                Check_Deploy(
+                  product[0].assetcontrol,
+                  convertExcelDate(item.date),
+                  item.deployto
+                )
+                  .then((result) => {
+                    let deploydup = Deploy(result);
+                    // console.log(deploydup[0].assetcontrol);
 
-                      deploy.push([
-                        assetcontrol,
-                        item.serial,
-                        convertExcelDate(item.date),
-                        deployby,
-                        item.deployto,
-                        item.referenceno,
-                      ]);
-
-                      Update(update_product, update_product_data, (err, result) => {
-                        if (err) console.error("Error: ", err);
-                        console.log(result);
-                      });
+                    counter += 1;
+                    if (deploydup.length != 0) {
+                      dupentry.push(item.serial);
                     } else {
-                      noentry.push(item.serial);
+                      if (product.length != 0) {
+                        let assetcontrol = product[0].assetcontrol;
+                        let status = GetValue(DLY());
+                        let update_product =
+                          "update product set p_status=? where p_assetcontrol=?";
+                        let update_product_data = [status, assetcontrol];
+
+                        deploy.push([
+                          assetcontrol,
+                          item.serial,
+                          convertExcelDate(item.date),
+                          deployby,
+                          item.deployto,
+                          item.referenceno,
+                        ]);
+
+                        Update(
+                          update_product,
+                          update_product_data,
+                          (err, result) => {
+                            if (err) console.error("Error: ", err);
+                            // console.log(result);
+                          }
+                        );
+                      } else {
+                        noentry.push(item.serial);
+                      }
                     }
 
-                    // console.log("Counter: ", counter, "Current: ", dataJson.length);
-                  }
+                    console.log(
+                      "Counter: ",
+                      counter,
+                      "Current: ",
+                      dataJson.length
+                    );
+                    // console.log("No Entry: ", noentry);
+                    // console.log("Deploy: ", item.deployby);
+                    // console.log("Employee: ", employee);
+                    if (counter == dataJson.length) {
+                      if (deploy.length != 0) {
+                        InsertTable("deploy", deploy, (err, result) => {
+                          if (err) console.error("Error: ", err);
 
-                  if (counter == dataJson.length) {
-                    console.log(noentry);
+                          console.log(result);
+                        });
+                      }
 
-                    if (deploy.length != 0) {
-                      InsertTable("deploy", deploy, (err, result) => {
-                        if (err) console.error("Error: ", err);
+                      let message = "";
 
-                        console.log(result);
-                      });
+                      if (noentry != 0) {
+                        message += "noentry";
+                      }
+                      if (dupentry != 0) {
+                        message += "dupentry";
+                      }
+
+                      console.log(message);
+                      if (message != "") {
+                        return res.json({
+                          msg: message,
+                          data: {
+                            noentry: noentry,
+                            dupentry: dupentry,
+                          },
+                        });
+                      } else {
+                        return res.json({
+                          msg: "success",
+                        });
+                      }
                     }
-
-                    let message = "";
-
-                    if (noentry != 0) {
-                      message += "noentry";
-                    }
-                    if (dupentry != 0) {
-                      message += "dupentry";
-                    }
-
-                    if (message != "") {
-                      return res.json({
-                        msg: message,
-                        data: {
-                          noentry: noentry,
-                          dupentry: dupentry,
-                        },
-                      });
-                    } else {
-                      res.json({
-                        msg: "success",
-                      });
-                    }
-                  }
-                })
-                .catch((error) => {
-                  console.error("Error: ", error);
-                  return res.json({
-                    msg: error,
+                  })
+                  .catch((error) => {
+                    console.error("Error: ", error, item.deployby, deploy);
+                    return res.json({
+                      msg: error,
+                    });
                   });
-                });
+              } else {
+                console.log(item.deployby);
+              }
             })
             .catch((error) => {
-              console.error("Error: ", error);
+              console.error("Error: ", error, "Name:", item.deployby);
               return res.json({
                 msg: error,
               });
@@ -245,8 +265,8 @@ function Check_Product(serial) {
 
 function Check_Employee(fullname) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from employee where e_fullname=?";
-    SelectParameter(sql, [fullname], (err, result) => {
+    let sql = "select * from employee where e_fullname like ?";
+    SelectParameter(sql, [`%${fullname}%`], (err, result) => {
       if (err) reject(err);
       // console.log(result);
 

@@ -50,6 +50,9 @@ var roleacess = [
       {
         layout: "search",
       },
+      {
+        layout: "itemprice",
+      },
     ],
   },
   {
@@ -84,6 +87,9 @@ var roleacess = [
       },
       {
         layout: "search",
+      },
+      {
+        layout: "itemprice",
       },
     ],
   },
