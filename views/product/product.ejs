@@ -9,7 +9,7 @@
             <div class="card-body">
 
                 <div class="row d-flex justify-content-center">
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <div class="customdropdown">
                             <div class="select selectcategory">
                                 <span id="selectedcategory">Select Category</span>
@@ -19,6 +19,16 @@
                             <ul class="customdropdown-menu categorylist">
                             </ul>
                         </div>
+                    </div> -->
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select Category" name="category" id="category"/>
+                          <input type="hidden" id="hiddenValue" name="hiddenValue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Category</span>
+                          </div>
+                        </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="categoryDropdown"></div>
                     </div>
                 </div>
 
@@ -33,15 +43,14 @@
                         </div>
                     </div>
                     <div class="col-md-6 mb-2">
-                        <div class="customdropdown">
-                            <div class="select selectproduct">
-                                <span id="selectedproduct">Select Product</span>
-                                <i class="fa fa-chevron-left"></i>
-                            </div>
-                            <input type="hidden" name="productid" id="productid">
-                            <ul class="customdropdown-menu productlist">
-                            </ul>
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select Product/Item" name="item" id="item"/>
+                          <input type="hidden" id="hiddenValue2" name="hiddenValue2" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Item</span>
+                          </div>
                         </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="itemDropdown"></div>
                     </div>
                 </div>
 

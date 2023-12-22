@@ -17,12 +17,25 @@
             assetcontrol = dataRow[0];
         })
 
+        $(document).on("input", "#location", function () {
+            $("#hiddenValue").val("");
+        });
+
+        $(document).on("input", "#employee", function () {
+            $("#hiddenemmployeevalue").val("");
+        });
+
+        $(document).on("input", "#serialname", function () {
+            $("#hiddenSerialValue").val("");
+        });
 
         $(document).on('click', '#addBtn', function () {
             // const actualValue = $('#hiddenSerialValue').val();
 
             let data = $('#serialname').val();
-            let repairby = $('#repairbyid').val();
+            let serialasset = $("#hiddenSerialValue").val();
+            let employee = $("#employee").val();
+            let repairby = $('#hiddenemmployeevalue').val();
             let referenceno = $('#referenceno').val();
             let date = $('#date').val();
             let splitData = data.split(' ');
@@ -31,16 +44,16 @@
             let assetControl = splitData[1].replace('(', '').replace(')', '');
 
             var message = "";
-            if (data == '') { message += 'Serial and Asset Control, ' }
-            if (repairby == '') { message += 'Deploy By, ' }
+            if (serialasset == '') { message += "Serial and Asset Control does not Exist " + `${data}, ` }
+            if (repairby == '') { message += "Employee does not Exist " + `${employee}, `}
             if (referenceno == '') { message += 'referenceno, ' }
             if (date == '') { message += 'Date, ' }
 
             if (message != '') {
-                warning('Required', `Please fill up ${message}`);
+                warning('Required', `${message}`);
             }
             else {
-                console.log(assetControl, serial, date, repairby, referenceno,)
+                // console.log(assetControl, serial, date, repairby, referenceno,)
                 $.ajax({
                     type: 'POST',
                     url: '/repair/save',
@@ -55,11 +68,12 @@
                         if (result.msg == 'success') {
                             resettable()
                             success('Saved', 'Successfully')
-                            $('#serial').val('');
-                            $('#deployto').val('');
                             $('#referenceno').val('');
                             $("#serialname").val('');
                             $("#hiddenSerialValue").val('');
+                            $("#hiddenemmployeevalue").val("");
+                            $("#employee").val("");
+                            $("#date").val("");
                         }
 
                         if (result.msg == 'exist') {
@@ -177,6 +191,7 @@
         }
         //#region CUSTOM DROPDOWN INPUT
         let activeSerial = [];
+        let activeEmployee = [];
 
         function LoadList() {
             // console.log("triggered");
@@ -204,25 +219,17 @@
                 url: "/employee/load",
                 success: function (result) {
                     let container = result.data;
+                    // console.log(container)
                     $.each(container, (key, item) => {
                         let displayname = item.fullname;
                         let dataid = item.id;
-                        // console.log(displayname);
-
-                        var listItem = $("<li></li>")
-                            .text(displayname)
-                            .data("dataid", dataid);
-
-                        $(".repairbylist").append(listItem);
+                        activeEmployee.push({
+                            display: displayname,
+                            value: dataid,
+                        });
                     });
+                    populateCustomDropdown2()
 
-                    $(".repairbylist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selectedrepairbyId = $(this).data("dataid");
-
-                        $("#selectedrepairby").text(selectedOption);
-                        $("#repairbyid").val(selectedrepairbyId).change();
-                    });
                 },
                 error: function (err) {
                     errormsg(err);
@@ -234,6 +241,12 @@
         function populateCustomDropdown1() {
             for (const serial of activeSerial) {
                 addOption2("serialDropdown", serial.display, serial.value);
+            }
+        }
+
+        function populateCustomDropdown2() {
+            for (const employee of activeEmployee) {
+                addOption3("employeeDropdown", employee.display, employee.value);
             }
         }
 
@@ -275,6 +288,25 @@
             });
         }
 
+        function addOption3(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenemmployeevalue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("employee");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
         function addOption2(dropdownId, displayText, actualValue) {
             const dropdownElement = document.getElementById(dropdownId);
             const hiddenInput = document.getElementById("hiddenSerialValue");
@@ -282,12 +314,12 @@
             const newOption = document.createElement("div");
             newOption.className = "dropdown-option";
             newOption.textContent = displayText;
-            newOption.setAttribute("data-value", actualValue); // Store the actual value in a data attribute
+            newOption.setAttribute("data-value", actualValue); 
 
             newOption.addEventListener("click", function () {
                 const inputElement = document.getElementById("serialname");
-                inputElement.value = displayText; // Display the text in the input field
-                hiddenInput.value = actualValue; // Update the hidden input field with the actual value
+                inputElement.value = displayText; 
+                hiddenInput.value = actualValue; 
                 dropdownElement.style.display = "none";
             });
 
@@ -295,6 +327,7 @@
         }
 
         setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
+        setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
         LoadList()
         //#endregion
 

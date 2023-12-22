@@ -53,15 +53,15 @@
           </div>
 
           <div class="col-md-6 mb-2">
-            <div class="customdropdown">
-              <div class="select selectemployee">
-                <span id="selectedemployee">Transfer By</span>
-                <i class="fa fa-chevron-left"></i>
+            <div class="input-group">
+              <input class="form-control text-center custom-input" placeholder="Select Employee for Transfering" name="employee" id="employee"/>
+              <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+              <div class="input-group-append">
+                <span class="input-group-text">Transfer By</span>
               </div>
-              <input type="hidden" name="employeeid" id="employeeid" />
-              <ul class="customdropdown-menu employeelist"></ul>
             </div>
-          </div>
+            <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
+        </div>
         </div>
 
         <div class="row mt-2">
@@ -85,15 +85,15 @@
           </div>
 
           <div class="col-md-6 mb-2">
-            <div class="customdropdown">
-              <div class="select selectemployee2">
-                <span id="selectedemployee2">Receive By</span>
-                <i class="fa fa-chevron-left"></i>
+            <div class="input-group">
+              <input class="form-control text-center custom-input" placeholder="Select Employee for Receiving" name="employee2" id="employee2"/>
+              <input type="hidden" id="hiddenemmployeevalue2" name="hiddenemmployeevalue2" />
+              <div class="input-group-append">
+                <span class="input-group-text">Receive By</span>
               </div>
-              <input type="hidden" name="employee2id" id="employee2id" />
-              <ul class="customdropdown-menu employee2list"></ul>
             </div>
-          </div>
+            <div class="custom-dropdown custom-dropdown-margin-left" id="employee2Dropdown"></div>
+        </div>
         </div>
 
         <div class="row d-flex mt-2">
