@@ -503,12 +503,12 @@ exports.MasterItemPrice = (data) => {
 
   data.forEach((key, item) => {
     dataResult.push({
-      id: key.id,
-      itemid: key.itemid,
-      fobprice: key.fobprice,
-      status: key.status,
-      createdby: key.createdby,
-      createddate: key.createddate,
+      id: key.mip_id,
+      itemid: key.mip_itemid,
+      fobprice: key.mip_fobprice,
+      status: key.mip_status,
+      createdby: key.mip_createdby,
+      createddate: key.mip_createddate,
     });
   });
 
@@ -530,12 +530,12 @@ exports.PriceHistory = (data) => {
 
   data.forEach((key, item) => {
     dataResult.push({
-      id: key.id,
-      itempriceid: key.itempriceid,
-      fobprice: key.fobprice,
-      status: key.status,
-      createdby: key.createdby,
-      createddate: key.createddate,
+      id: key.ph_id,
+      itempriceid: key.ph_itempriceid,
+      fobprice: key.ph_fobprice,
+      status: key.ph_status,
+      createdby: key.ph_createdby,
+      createddate: key.ph_createddate,
     });
   });
 

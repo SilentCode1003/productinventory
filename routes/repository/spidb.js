@@ -395,4 +395,36 @@ exports.InsertTable = (tablename, data, callback) => {
       callback(null, result);
     });
   }
+
+  if (tablename == "master_item_price") {
+    let sql = `INSERT INTO master_item_price(
+    mip_itemid,
+    mip_fobprice,
+    mip_status,
+    mip_createdby,
+    mip_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "price_history") {
+    let sql = `INSERT INTO price_history(
+      ph_itempriceid,
+      ph_fobprice,
+      ph_status,
+      ph_createdby,
+      ph_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
 };
