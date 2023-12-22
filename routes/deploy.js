@@ -120,117 +120,127 @@ router.post("/upload", (req, res) => {
     let dupentry = [];
 
     dataJson.forEach((item) => {
-      
       // console.log(item.serial);
       Check_Product(item.serial)
         .then((result) => {
-          // console.log(item.serial, "Result: ", result);
           let product = Product(result);
+          // console.log(product[0].assetcontrol);
 
           Check_Employee(item.deployby)
             .then((result) => {
               let employee = Employee(result);
               // console.log(employee[0].fullname);
-              if (employee.length != 0) {
-                let deployby = employee[0].id;
+              let deployby = employee[0].id;
 
-                Check_Deploy(
-                  product[0].assetcontrol,
-                  convertExcelDate(item.date),
-                  item.deployto
-                )
-                  .then((result) => {
-                    let deploydup = Deploy(result);
-                    // console.log(deploydup[0].assetcontrol);
+              Check_Deploy(
+                product[0].assetcontrol,
+                convertExcelDate(item.date),
+                item.deployto
+              )
+                .then((result) => {
+                  let deploydup = Deploy(result);
+                  counter += 1;
 
-                    counter += 1;
-                    if (deploydup.length != 0) {
-                      dupentry.push(item.serial);
-                    } else {
-                      if (product.length != 0) {
-                        let assetcontrol = product[0].assetcontrol;
-                        let status = GetValue(DLY());
-                        let update_product =
-                          "update product set p_status=? where p_assetcontrol=?";
-                        let update_product_data = [status, assetcontrol];
+                  // console.log(deploydup.length);
 
-                        deploy.push([
-                          assetcontrol,
-                          item.serial,
-                          convertExcelDate(item.date),
-                          deployby,
-                          item.deployto,
-                          item.referenceno,
-                        ]);
+                  if (deploydup.length != 0) {
+                    // console.log("Duplicate: ", item.serial);
+                    dupentry.push(item.serial);
+                  } else {
+                    if (product.length != 0) {
+                      let assetcontrol = product[0].assetcontrol;
+                      let status = GetValue(DLY());
+                      let update_product =
+                        "update product set p_status=? where p_assetcontrol=?";
+                      let update_product_data = [status, assetcontrol];
 
-                        Update(
-                          update_product,
-                          update_product_data,
-                          (err, result) => {
-                            if (err) console.error("Error: ", err);
-                            // console.log(result);
-                          }
-                        );
-                      } else {
-                        noentry.push(item.serial);
-                      }
-                    }
+                      deploy.push([
+                        assetcontrol,
+                        item.serial,
+                        convertExcelDate(item.date),
+                        deployby,
+                        item.deployto,
+                        item.referenceno,
+                      ]);
 
-                    console.log(
-                      "Counter: ",
-                      counter,
-                      "Current: ",
-                      dataJson.length
-                    );
-                    // console.log("No Entry: ", noentry);
-                    // console.log("Deploy: ", item.deployby);
-                    // console.log("Employee: ", employee);
-                    if (counter == dataJson.length) {
-                      if (deploy.length != 0) {
-                        InsertTable("deploy", deploy, (err, result) => {
+                      Update(
+                        update_product,
+                        update_product_data,
+                        (err, result) => {
                           if (err) console.error("Error: ", err);
-
-                          console.log(result);
-                        });
-                      }
-
-                      let message = "";
-
-                      if (noentry != 0) {
-                        message += "noentry";
-                      }
-                      if (dupentry != 0) {
-                        message += "dupentry";
-                      }
-
-                      console.log(message);
-                      if (message != "") {
-                        return res.json({
-                          msg: message,
-                          data: {
-                            noentry: noentry,
-                            dupentry: dupentry,
-                          },
-                        });
-                      } else {
-                        return res.json({
-                          msg: "success",
-                        });
-                      }
+                          // console.log(result);
+                        }
+                      );
+                    } else {
+                      noentry.push(item.serial);
                     }
-                  })
-                  .catch((error) => {
-                    console.error("Error: ", error, item.deployby, deploy);
-                    return res.json({
-                      msg: error,
-                    });
+                  }
+
+                  // console.log(
+                  //   "Counter: ",
+                  //   counter,
+                  //   "Current: ",
+                  //   dataJson.length
+                  // );
+                  // console.log("No Entry: ", noentry);
+                  // console.log("Dup Entry: ", dupentry);
+                  // console.log("Deploy: ", item.deployby);
+                  // console.log("Employee: ", employee);
+                  if (counter == dataJson.length) {
+                    if (deploy.length != 0) {
+                      InsertTable("deploy", deploy, (err, result) => {
+                        if (err) console.error("Error: ", err);
+                        console.log(result);
+                      });
+                    }
+
+                    let message = "";
+
+                    if (noentry != 0) {
+                      message += "noentry";
+                    }
+                    if (dupentry != 0) {
+                      message += "dupentry";
+                    }
+
+                    console.log(message);
+                    if (message != "") {
+                      return res.json({
+                        msg: message,
+                        data: {
+                          noentry: noentry,
+                          dupentry: dupentry,
+                        },
+                      });
+                    } else {
+                      res.json({
+                        msg: "success",
+                      });
+                    }
+                  }
+                })
+                .catch((error) => {
+                  console.error(
+                    "Error: ",
+                    error,
+                    item.deployby,
+                    item.serial,
+                    product[0].assetcontrol,
+                    "Check Deploy"
+                  );
+                  return res.json({
+                    msg: error,
                   });
-              } else {
-                console.log(item.deployby);
-              }
+                });
             })
             .catch((error) => {
-              console.error("Error: ", error, "Name:", item.deployby);
+              console.error(
+                "Error: ",
+                error,
+                "Name:",
+                item.deployby,
+                item.serial
+              );
               return res.json({
                 msg: error,
               });

@@ -290,6 +290,8 @@ router.post("/upload", (req, res) => {
     let duplicate = "";
     let product = [];
 
+    console.log(dataJSon);
+
     Product_Count()
       .then((result) => {
         // console.log(result);
@@ -298,6 +300,7 @@ router.post("/upload", (req, res) => {
           Product_Check(item.serial)
             .then((result) => {
               // console.log(result);
+             
               if (result[0].total != 0) {
                 duplicate += item.serial;
               } else {
@@ -314,13 +317,16 @@ router.post("/upload", (req, res) => {
 
                         counter += 1;
                         sequence += 1;
+
                         console.log(
                           "sequence: ",
                           sequence,
                           "counter: ",
                           counter,
                           "item serial: ",
-                          item.serial
+                          item.serial,
+                          "Data Length: ",
+                          dataJSon.length
                         );
 
                         product.push([
@@ -371,7 +377,7 @@ router.post("/upload", (req, res) => {
               }
 
               if (counter == dataJSon.length) {
-                console.log("DUplicate!");
+                console.log("Duplicate!");
                 if (duplicate != "") {
                   return res.json({
                     msg: "exist",

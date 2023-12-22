@@ -211,13 +211,14 @@ router.post("/upload", (req, res) => {
                   });
               })
               .catch((error) => {
-                console.log(error);
+                console.log(error, employee.position);
                 return res.json({
                   msg: error,
                 });
               });
           })
           .catch((error) => {
+            console.log(employee.department);
             console.log(error);
             return res.json({
               msg: error,
