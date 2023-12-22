@@ -91,6 +91,9 @@ var roleacess = [
       {
         layout: "itemprice",
       },
+      {
+        layout: "employee",
+      },
     ],
   },
 ];
