@@ -20,40 +20,54 @@
       assetcontrol = dataRow[0];
     });
 
+    $(document).on("input", "#location", function () {
+      $("#hiddenValue").val("");
+    });
+
+    $(document).on("input", "#employee", function () {
+      $("#hiddenemmployeevalue").val("");
+    });
+
+    $(document).on("input", "#employee2", function () {
+      $("#hiddenemmployeevalue2").val("");
+    });
+
+    $(document).on("input", "#serialname", function () {
+      $("#hiddenSerialValue").val("");
+    });
+
     $(document).on("click", "#addBtn", function () {
       // const actualValue = $('#hiddenSerialValue').val();
-
+      let serialasset = $("#hiddenSerialValue").val();
       let data = $("#serialname").val();
 
+      let employee = $("#employee").val();
       let transferfrom = $("#location").val();
-      let transferby = $("#employeeid").val();
+      let transferby = $("#hiddenemmployeevalue").val();
 
+      let employee2 = $("#employee2").val();
       let to = $("#location2").val();
-      let receiveby = $("#employee2id").val();
+      let receiveby = $("#hiddenemmployeevalue2").val();
 
       let referenceno = $("#referenceno").val();
       let date = $("#date").val();
-      let splitData = data.split(" ");
-
-      let serial = splitData[0];
-      let assetControl = splitData[1].replace("(", "").replace(")", "");
-
+      console.log("Receive By: ", receiveby)
       var message = "";
-      if (data == "") {
-        message += "Serial and Asset Control, ";
+      if (serialasset == "") {
+        message += "Serial and Asset Control does not Exist " + `${data}, `;
       }
       if (transferfrom == "") {
-        message += "Transfer From, ";
+        message += "Empty Transfer From, ";
       }
       if (transferby == "") {
-        message += "Transfer By, ";
+        message += "Employee does not Exist for Transfer By " + `${employee}, `;
       }
 
       if (to == "") {
-        message += "Transfer To, ";
+        message += "Empty Transfer To, ";
       }
       if (receiveby == "") {
-        message += "Receive By, ";
+        message += "Employee does not Exist for Transfer By " + `${employee2}, `;
       }
 
       if (referenceno == "") {
@@ -66,6 +80,10 @@
       if (message != "") {
         warning("Required", `Please fill up ${message}`);
       } else {
+        let splitData = data.split(" ");
+        let serial = splitData[0];
+        let assetControl = splitData[1].replace("(", "").replace(")", "");
+
         console.log(
           assetControl,
           serial,
@@ -73,8 +91,11 @@
           transferby,
           transferfrom,
           to,
+          "receive by: "+ receiveby,
           referenceno
         );
+
+
         $.ajax({
           type: "POST",
           url: "/transfer/save",
@@ -92,12 +113,17 @@
             if (result.msg == "success") {
               resettable();
               success("Saved", "Successfully");
-              $("#serial").val("");
               $("#deployto").val("");
               $("#referenceno").val("");
               $("#serialname").val("");
               $("#hiddenSerialValue").val("");
               $("#date").val("");
+              $("#employee").val('');
+              $("#hiddenemmployeevalue").val('');
+              $("#employee2").val('');
+              $("#hiddenemmployeevalue2").val('');
+              $("#location").val('');
+              $("#location2").val('');
             }
 
             if (result.msg == "exist") {
@@ -258,6 +284,8 @@
     let activeSerial = [];
     let activeDeployLocation = [];
     let activeReceiveLocation = [];
+    let activeEmployee = [];
+    let activeEmployee2 = [];
 
     function LoadList() {
       // console.log("triggered");
@@ -291,26 +319,12 @@
               display: displayname,
               value: displayname,
             });
-          });
-          populateCustomDropdown();
-        },
-        error: function (err) {
-          errormsg(err);
-        },
-      });
-
-      $.ajax({
-        type: "GET",
-        url: "/client/load",
-        success: function (result) {
-          let container = result.data;
-          $.each(container, (key, item) => {
-            let displayname = item.company + " - " + item.branch;
             activeReceiveLocation.push({
               display: displayname,
               value: displayname,
             });
           });
+          populateCustomDropdown();
           populateCustomDropdown2();
         },
         error: function (err) {
@@ -328,55 +342,42 @@
             let dataid = item.id;
             // console.log(displayname);
 
-            var listItem = $("<li></li>")
-              .text(displayname)
-              .data("dataid", dataid);
+            activeEmployee.push({
+              display: displayname,
+              value: dataid,
+            });
 
-            $(".employeelist").append(listItem);
+            activeEmployee2.push({
+              display: displayname,
+              value: dataid,
+            });
           });
-
-          $(".employeelist").on("click", "li", function () {
-            var selectedOption = $(this).text();
-            var selectedemployeeId = $(this).data("dataid");
-
-            $("#selectedemployee").text(selectedOption);
-            $("#employeeid").val(selectedemployeeId).change();
-          });
+          populateCustomDropdown3();
+          populateCustomDropdown4()
         },
         error: function (err) {
           errormsg(err);
         },
       });
 
-      $.ajax({
-        type: "GET",
-        url: "/employee/load",
-        success: function (result) {
-          let container = result.data;
-          $.each(container, (key, item) => {
-            let displayname = item.fullname;
-            let dataid = item.id;
-            // console.log(displayname);
+    }
 
-            var listItem = $("<li></li>")
-              .text(displayname)
-              .data("dataid", dataid);
+    function populateCustomDropdown4() {
+      for (const employee of activeEmployee) {
+        addOption5("employee2Dropdown", employee.display, employee.value);
+      }
+    }
 
-            $(".employee2list").append(listItem);
-          });
+    function populateCustomDropdown3() {
+      for (const employee of activeEmployee) {
+        addOption4("employeeDropdown", employee.display, employee.value);
+      }
+    }
 
-          $(".employee2list").on("click", "li", function () {
-            var selectedOption = $(this).text();
-            var selectedemployee2Id = $(this).data("dataid");
-
-            $("#selectedemployee2").text(selectedOption);
-            $("#employee2id").val(selectedemployee2Id).change();
-          });
-        },
-        error: function (err) {
-          errormsg(err);
-        },
-      });
+    function populateCustomDropdown2() {
+      for (const deploy of activeReceiveLocation) {
+        addOption3("location2Dropdown", deploy.display, deploy.value);
+      }
     }
 
     function populateCustomDropdown1() {
@@ -391,11 +392,6 @@
       }
     }
 
-    function populateCustomDropdown2() {
-      for (const deploy of activeReceiveLocation) {
-        addOption3("location2Dropdown", deploy.display, deploy.value);
-      }
-    }
 
     function setupCustomDropdown(inputId, dropdownId, optionClass) {
       const inputElement = document.getElementById(inputId);
@@ -433,6 +429,63 @@
           dropdownElement.style.display = "none";
         }
       });
+    }
+
+    function addOption5(dropdownId, displayText, actualValue) {
+      const dropdownElement = document.getElementById(dropdownId);
+      const hiddenInput = document.getElementById("hiddenemmployeevalue2");
+
+      const newOption = document.createElement("div");
+      newOption.className = "dropdown-option";
+      newOption.textContent = displayText;
+      newOption.setAttribute("data-value", actualValue);
+
+      newOption.addEventListener("click", function () {
+        const inputElement = document.getElementById("employee2");
+        inputElement.value = displayText;
+        hiddenInput.value = actualValue;
+        dropdownElement.style.display = "none";
+      });
+
+      dropdownElement.appendChild(newOption);
+    }
+
+    function addOption4(dropdownId, displayText, actualValue) {
+      const dropdownElement = document.getElementById(dropdownId);
+      const hiddenInput = document.getElementById("hiddenemmployeevalue");
+
+      const newOption = document.createElement("div");
+      newOption.className = "dropdown-option";
+      newOption.textContent = displayText;
+      newOption.setAttribute("data-value", actualValue);
+
+      newOption.addEventListener("click", function () {
+        const inputElement = document.getElementById("employee");
+        inputElement.value = displayText;
+        hiddenInput.value = actualValue;
+        dropdownElement.style.display = "none";
+      });
+
+      dropdownElement.appendChild(newOption);
+    }
+
+    function addOption3(dropdownId, displayText, actualValue) {
+      const dropdownElement = document.getElementById(dropdownId);
+      const hiddenInput = document.getElementById("hiddenValue2");
+
+      const newOption = document.createElement("div");
+      newOption.className = "dropdown-option";
+      newOption.textContent = displayText;
+      newOption.setAttribute("data-value", actualValue);
+
+      newOption.addEventListener("click", function () {
+        const inputElement = document.getElementById("location2");
+        inputElement.value = displayText;
+        hiddenInput.value = actualValue;
+        dropdownElement.style.display = "none";
+      });
+
+      dropdownElement.appendChild(newOption);
     }
 
     function addOption2(dropdownId, displayText, actualValue) {
@@ -473,28 +526,11 @@
       dropdownElement.appendChild(newOption);
     }
 
-    function addOption3(dropdownId, displayText, actualValue) {
-      const dropdownElement = document.getElementById(dropdownId);
-      const hiddenInput = document.getElementById("hiddenValue2");
-
-      const newOption = document.createElement("div");
-      newOption.className = "dropdown-option";
-      newOption.textContent = displayText;
-      newOption.setAttribute("data-value", actualValue);
-
-      newOption.addEventListener("click", function () {
-        const inputElement = document.getElementById("location2");
-        inputElement.value = displayText;
-        hiddenInput.value = actualValue;
-        dropdownElement.style.display = "none";
-      });
-
-      dropdownElement.appendChild(newOption);
-    }
-
     setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
     setupCustomDropdown("location", "locationDropdown", "dropdown-option");
     setupCustomDropdown("location2", "location2Dropdown", "dropdown-option");
+    setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
+    setupCustomDropdown("employee2", "employee2Dropdown", "dropdown-option");
     LoadList();
     //#endregion
 

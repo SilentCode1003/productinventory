@@ -11,7 +11,7 @@
                 <div class="row d-flex justify-content-center">
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
-                          <input class="form-control text-center custom-input" placeholder="Select/Input Asset Control or Serial" name="serialname" id="serialname"/>
+                          <input class="form-control text-center custom-input" placeholder="Select Asset Control or Serial" name="serialname" id="serialname"/>
                           <input type="hidden" id="hiddenSerialValue" name="hiddenSerialValue" />
                           <div class="input-group-append">
                             <span class="input-group-text">Asset Control/Serial</span>
@@ -34,14 +34,14 @@
                     </div>
 
                     <div class="col-md-6 mb-2">
-                        <div class="customdropdown">
-                            <div class="select selectemployee">
-                              <span id="selectedemployee">Deploy By</span>
-                              <i class="fa fa-chevron-left"></i>
-                            </div>
-                            <input type="hidden" name="employeeid" id="employeeid">
-                            <ul class="customdropdown-menu employeelist"></ul>
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee"/>
+                          <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Deploy By</span>
+                          </div>
                         </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
                     </div>
                 </div>
 

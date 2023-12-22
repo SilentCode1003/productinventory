@@ -1,14 +1,6 @@
 <!-- Modal -->
-<div
-  class="modal fade bd-example-modal-lg"
-  id="editModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="exampleModalLabel"
-  aria-hidden="true"
-  data-keyboard="false"
-  data-backdrop="static"
->
+<div class="modal fade bd-example-modal-lg" id="editModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -21,30 +13,13 @@
               <div class="row mb-2 justify-content-center">
                 <div class="col-md-6">
                   <label class="form-label" for="id">Employee ID</label>
-                  <input
-                    id="employeeidmodal"
-                    name="employeeidmodal"
-                    type="text"
-                    class="form-control"
-                    placeholder=""
-                    aria-label="employeeid"
-                    aria-describedby="basic-addon1"
-                    disabled
-                  />
+                  <input id="employeeidmodal" name="employeeidmodal" type="text" class="form-control" placeholder=""
+                    aria-label="employeeid" aria-describedby="basic-addon1" disabled />
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="fullnamemodal"
-                    >Full Name</label
-                  >
-                  <input
-                    id="fullnamemodal"
-                    name="fullnamemodal"
-                    type="text"
-                    class="form-control"
-                    placeholder="Enter New full Name"
-                    aria-label="fullnamemodal"
-                    aria-describedby="basic-addon1"
-                  />
+                  <label class="form-label" for="fullnamemodal">Full Name</label>
+                  <input id="fullnamemodal" name="fullnamemodal" type="text" class="form-control"
+                    placeholder="Enter New full Name" aria-label="fullnamemodal" aria-describedby="basic-addon1" />
                 </div>
               </div>
 
@@ -55,11 +30,7 @@
                       <span id="selectedpositionmodal">Select Position</span>
                       <i class="fa fa-chevron-left"></i>
                     </div>
-                    <input
-                      type="hidden"
-                      name="positionmodal"
-                      id="positionmodal"
-                    />
+                    <input type="hidden" name="positionmodal" id="positionmodal" />
                     <ul class="customdropdown-menu positionlistmodal"></ul>
                   </div>
                 </div>
@@ -80,16 +51,10 @@
                 <div class="col-md-6 mb-2">
                   <div class="customdropdown">
                     <div class="select selectdepartmentmodal">
-                      <span id="selecteddepartmentmodal"
-                        >Select Department</span
-                      >
+                      <span id="selecteddepartmentmodal">Select Department</span>
                       <i class="fa fa-chevron-left"></i>
                     </div>
-                    <input
-                      type="hidden"
-                      name="departmentmodal"
-                      id="departmentmodal"
-                    />
+                    <input type="hidden" name="departmentmodal" id="departmentmodal" />
                     <ul class="customdropdown-menu departmentlistmodal"></ul>
                   </div>
                 </div>
@@ -99,18 +64,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button
-          type="button"
-          class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
-          data-dismiss="modal"
-        >
+        <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+          data-dismiss="modal">
           <i class="fa fa-times" aria-hidden="true"></i> Close
         </button>
-        <button
-          type="button"
-          id="updateBtn"
-          class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
-        >
+        <button type="button" id="updateBtn" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
           <i class="fa fa-check" aria-hidden="true"></i> Save
         </button>
       </div>
@@ -131,19 +89,10 @@
           <div class="col-md-6 mb-2">
             <div class="input-group">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon2"
-                  >Full Name</span
-                >
+                <span class="input-group-text" id="basic-addon2">Full Name</span>
               </div>
-              <input
-                id="fullname"
-                name="fullname"
-                type="text"
-                class="form-control"
-                placeholder="Enter Full Name"
-                aria-label="fullname"
-                aria-describedby="basic-addon1"
-              />
+              <input id="fullname" name="fullname" type="text" class="form-control" placeholder="Enter Full Name"
+                aria-label="fullname" aria-describedby="basic-addon1" />
             </div>
           </div>
         </div>
@@ -152,19 +101,10 @@
           <div class="col-md-6 mb-2">
             <div class="input-group">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon2"
-                  >User Name</span
-                >
+                <span class="input-group-text" id="basic-addon2">User Name</span>
               </div>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                class="form-control"
-                placeholder="Enter User Name"
-                aria-label="username"
-                aria-describedby="basic-addon1"
-              />
+              <input id="username" name="username" type="text" class="form-control" placeholder="Enter User Name"
+                aria-label="username" aria-describedby="basic-addon1" />
             </div>
           </div>
           <div class="col-md-6 mb-2">
@@ -172,15 +112,8 @@
               <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon2">Password</span>
               </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                class="form-control"
-                placeholder="Enter Password"
-                aria-label="password"
-                aria-describedby="basic-addon1"
-              />
+              <input id="password" name="password" type="password" class="form-control" placeholder="Enter Password"
+                aria-label="password" aria-describedby="basic-addon1" />
             </div>
           </div>
         </div>
@@ -224,11 +157,7 @@
 
         <div class="row justify-content-end">
           <div class="col-md-4 align mt-1">
-            <button
-              id="addBtn"
-              name="addBtn"
-              class="btn btn-sm btn-outline-cyberpower shadow-sm w-100"
-            >
+            <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-100">
               <i class="fa fa-plus" aria-hidden="true"></i>
               Add
             </button>
@@ -242,14 +171,8 @@
 <!-- DataTales Example -->
 <div class="card shadow mb-4 table-size">
   <div class="progress progress-sm mb-2">
-    <div
-      class="progress-bar"
-      role="progressbar"
-      style="width: 0%"
-      aria-valuenow="0"
-      aria-valuemin="0"
-      aria-valuemax="100"
-    ></div>
+    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+      aria-valuemax="100"></div>
   </div>
   <div class="card-header card-bg align-content-center">
     <div class="row">
@@ -257,33 +180,17 @@
         <h5 class="m-0 font-weight-bold cyber-title mt-2">Employee Table</h5>
       </div>
       <div class="col-md-5 mt-1">
-        <input
-          id="search"
-          name="search"
-          type="text"
-          class="form-control"
-          placeholder="Search Category Name"
-          aria-label="search"
-          aria-describedby="basic-addon1"
-        />
+        <input id="search" name="search" type="text" class="form-control" placeholder="Search Category Name"
+          aria-label="search" aria-describedby="basic-addon1" />
       </div>
       <div class="col-md-3 mt-2">
         <div class="input-group mb-3">
-          <input
-            class="btn btn-outline-cyberpower w-100"
-            type="file"
-            id="fileinput"
-            accept=".xlsx, .xls"
-            placeholder="Select Excel File"
-          />
+          <input class="btn btn-outline-cyberpower w-100" type="file" id="fileinput" accept=".xlsx, .xls"
+            placeholder="Select Excel File" />
         </div>
       </div>
       <div class="col-md-2 mt-2">
-        <button
-          class="btn btn-outline-cyberpower"
-          id="uploadButton"
-          type="button"
-        >
+        <button class="btn btn-outline-cyberpower" id="uploadButton" type="button">
           <i class="fas fa-upload"></i>
         </button>
       </div>
@@ -292,12 +199,7 @@
 
   <div class="card-body">
     <div class="table-responsive scrollable-table-container">
-      <table
-        class="table custom-mobile-table"
-        id="datatable"
-        width="100%"
-        cellspacing="10"
-      >
+      <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
         <thead class="table-dark table-header">
           <tr>
             <th>ID</th>
