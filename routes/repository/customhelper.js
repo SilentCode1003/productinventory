@@ -1,7 +1,7 @@
 const fs = require("fs");
 const moment = require("moment");
 const LINQ = require("node-linq").LINQ;
-const { format } = require('date-fns');
+const { format } = require("date-fns");
 
 //#region READ & WRITE JSON FILES
 exports.ReadJSONFile = function (filepath) {
@@ -476,5 +476,11 @@ exports.convertExcelDate = (serialDate) => {
   const offsetInMilliseconds = serialDate * 24 * 60 * 60 * 1000;
   const resultDate = new Date(baseDate.getTime() + offsetInMilliseconds);
   return format(resultDate, "yyyy-MM-dd");
+};
+//#endregion
+
+//#region  Remove Special Characters on string
+exports.RemoveSpecialCharacters = (inputString) => {
+  return inputString.replace(/[^\w\s]/gi, "");
 };
 //#endregion

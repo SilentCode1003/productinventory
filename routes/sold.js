@@ -1,9 +1,30 @@
 var express = require("express");
-const { Sold } = require("./model/spimodel");
-const { InsertTable, Select, Update } = require("./repository/spidb");
-const { SLD, GetValue } = require("./repository/dictionary");
+const {
+  Sold,
+  SoldProduct,
+  MasterClient,
+  Product,
+} = require("./model/spimodel");
+const {
+  InsertTable,
+  Select,
+  Update,
+  SelectParameter,
+} = require("./repository/spidb");
+const { SLD, GetValue, ACT } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
-const { SelectStatement } = require("./repository/customhelper");
+const {
+  SelectStatement,
+  RemoveSpecialCharacters,
+  GetCurrentDatetime,
+  convertExcelDate,
+} = require("./repository/customhelper");
+const {
+  JsonErrorResponse,
+  JsonSuccess,
+  JsonWarningResponse,
+  MessageStatus,
+} = require("./repository/responce");
 var router = express.Router();
 
 /* GET home page. */
@@ -105,14 +126,19 @@ router.post("/getsold", (req, res) => {
   try {
     let daterange = req.body.daterange;
     let category = req.body.category;
-    let [startDate, endDate] = daterange.split(' - ');
+    let [startDate, endDate] = daterange.split(" - ");
 
-    let formattedStartDate = startDate.split('/').reverse().join('-');
-    let formattedEndDate = endDate.split('/').reverse().join('-');
+    let formattedStartDate = startDate.split("/").reverse().join("-");
+    let formattedEndDate = endDate.split("/").reverse().join("-");
 
-    formattedStartDate = formattedStartDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1-$3-$2');
-    formattedEndDate = formattedEndDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1-$3-$2');
-    
+    formattedStartDate = formattedStartDate.replace(
+      /(\d{4})-(\d{2})-(\d{2})/,
+      "$1-$3-$2"
+    );
+    formattedEndDate = formattedEndDate.replace(
+      /(\d{4})-(\d{2})-(\d{2})/,
+      "$1-$3-$2"
+    );
 
     let sql = `SELECT s_id as id, s_assetcontrol as assetcontrol, s_serial as serial, mi_name as productname, 
               mc_name as category, p_status as status, e_fullname as soldby, s_date as date
@@ -142,7 +168,95 @@ router.post("/getsold", (req, res) => {
     res.json({
       msg: error,
     });
-  }          
+  }
+});
+
+router.post("/upload", (req, res) => {
+  try {
+    const { data } = req.body;
+    let dataJson = SoldProduct(JSON.parse(data));
+    let sold = [];
+    let counter = 0;
+    let noentry = [];
+    let dupentry = [];
+
+    dataJson.forEach((item) => {
+      Check_MasterClient(item.company, item.branch, req)
+        .then((result) => {
+          let soldto = result;
+
+          Check_Product(item.serial)
+            .then((result) => {
+              let product = Product(result);
+
+              if (product.length != 0) {
+                let assetcontrol = product[0].assetcontrol;
+
+                Check_Sold(assetcontrol, item.date, soldto)
+                  .then((result) => {
+                    let check_sold = Sold(result);
+                    counter += 1;
+
+                    if (check_sold.length != 0) {
+                      dupentry.push(item.serial);
+                    } else {
+                      sold.push([
+                        assetcontrol,
+                        item.serial,
+                        convertExcelDate(item.date),
+                        item.soldby,
+                        soldto,
+                        item.referenceno,
+                      ]);
+                    }
+
+                    if (counter == dataJson.length) {
+                      // console.log(sold);
+                      if (sold.length != 0) {
+                        InsertTable("sold", sold, (err, result) => {
+                          if (err) console.error("Error: ", err);
+                          console.log(result);
+                        });
+                      }
+
+                      let message = "";
+                      if (dupentry.length != 0) {
+                        message += MessageStatus.DUPENTRY;
+                      }
+                      if (noentry.length != 0) {
+                        message += MessageStatus.NOENTRY;
+                      }
+
+                      if (message != "") {
+                        res.json(JsonWarningResponse(message, dupentry));
+                      } else {
+                        res.json(JsonSuccess());
+                      }
+                    }
+                  })
+                  .catch((error) => {
+                    console.error(error, item.serial);
+                    res.json(JsonErrorResponse(error));
+                  });
+              } else {
+                noentry.push(item.serial);
+                console.log("No Entry: ", item.serial);
+              }
+            })
+            .catch((error) => {
+              console.error(error, item.serial);
+              res.json(JsonErrorResponse(error));
+            });
+        })
+        .catch((error) => {
+          console.error(error, item.company, item.branch);
+          res.json(JsonErrorResponse(error));
+        });
+    });
+  } catch (error) {
+    console.error(error);
+    res.json(JsonErrorResponse(error));
+  }
 });
 
 //#region Function
@@ -172,6 +286,63 @@ function Sold_Product(assetcontrol) {
       if (err) reject(err);
 
       console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+
+function Check_MasterClient(company, branch, req) {
+  return new Promise((resolve, reject) => {
+    let _company = RemoveSpecialCharacters(company);
+    let _branch = RemoveSpecialCharacters(branch);
+    let status = GetValue(ACT());
+    let createdby =
+      req.session.fullname == null ? "dev42" : req.session.fullname;
+    let createddate = GetCurrentDatetime();
+
+    let sql = "select * from master_client where mc_company=? and mc_branch=?";
+    let command = SelectStatement(sql, [_company, _branch]);
+
+    Select(command, (err, result) => {
+      if (err) reject(err);
+      let data = MasterClient(result);
+
+      if (data.length != 0) {
+        let master_client = [
+          [_company, _branch, status, createdby, createddate],
+        ];
+        InsertTable("master_client", master_client, (err, result) => {
+          if (err) reject(err);
+
+          resolve(`${_company}-${_branch}`);
+        });
+      } else {
+        resolve(`${data[0].company}-${data[0].branch}`);
+      }
+    });
+  });
+}
+
+function Check_Product(serial) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from product where p_serial=?";
+    // console.log(serial);
+    SelectParameter(sql, [serial], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+
+function Check_Employee(fullname) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from employee where e_fullname like ?";
+    SelectParameter(sql, [`%${fullname}%`], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
 
       resolve(result);
     });
