@@ -187,6 +187,28 @@ class MasterClientModel {
   }
 }
 
+class MasterItemPriceModel {
+  constructor(id, itemid, fobprice, status, createdby, createddate) {
+    this.id = id;
+    this.itemid = itemid;
+    this.fobprice = fobprice;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
+
+class PriceHistoryModel {
+  constructor(id, itempriceid, fobprice, status, createdby, createddate) {
+    this.id = id;
+    this.itempriceid = itempriceid;
+    this.fobprice = fobprice;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
+
 //#region Excel Model
 class ProductUploadModel {
   constructor(category, itemname, serial, podate, ponumber, warrantydate) {
@@ -232,27 +254,17 @@ class EmployeeUploadModel {
   }
 }
 
-class MasterItemPriceModel {
-  constructor(id, itemid, fobprice, status, createdby, createddate) {
-    this.id = id;
-    this.itemid = itemid;
-    this.fobprice = fobprice;
-    this.status = status;
-    this.createdby = createdby;
-    this.createddate = createddate;
+class SoldProductModel {
+  constructor(serial, date, company, branch, soldby, referenceno) {
+    this.serial = serial;
+    this.date = date;
+    this.company = company;
+    this.branch = branch;
+    this.soldby = soldby;
+    this.referenceno = referenceno;
   }
 }
 
-class PriceHistoryModel {
-  constructor(id, itempriceid, fobprice, status, createdby, createddate) {
-    this.id = id;
-    this.itempriceid = itempriceid;
-    this.fobprice = fobprice;
-    this.status = status;
-    this.createdby = createdby;
-    this.createddate = createddate;
-  }
-}
 //#endregion
 
 //#region Search
@@ -339,4 +351,5 @@ module.exports = {
   EmployeeUploadModel,
   MasterItemPriceModel,
   PriceHistoryModel,
+  SoldProductModel,
 };

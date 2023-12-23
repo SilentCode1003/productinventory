@@ -5,6 +5,7 @@ const MessageStatus = {
   NOTEXIST: "notexist",
   DUPENTRY: "dupentry",
   EXIST: "exist",
+  NOENTRY: "noentry",
 };
 
 function JsonSuccess() {
