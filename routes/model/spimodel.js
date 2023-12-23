@@ -19,6 +19,7 @@ const {
   EmployeeUploadModel,
   MasterItemPriceModel,
   PriceHistoryModel,
+  SoldProductModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -388,6 +389,60 @@ exports.Repair = (data) => {
   );
 };
 
+exports.MasterItemPrice = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.mip_id,
+      itemid: key.mip_itemid,
+      fobprice: key.mip_fobprice,
+      status: key.mip_status,
+      createdby: key.mip_createdby,
+      createddate: key.mip_createddate,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new MasterItemPriceModel(
+        key["id"],
+        key["itemid"],
+        key["fobprice"],
+        key["status"],
+        key["createdby"],
+        key["createddate"]
+      )
+  );
+};
+
+exports.PriceHistory = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.ph_id,
+      itempriceid: key.ph_itempriceid,
+      fobprice: key.ph_fobprice,
+      status: key.ph_status,
+      createdby: key.ph_createdby,
+      createddate: key.ph_createddate,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new PriceHistoryModel(
+        key["id"],
+        key["itempriceid"],
+        key["fobprice"],
+        key["status"],
+        key["createdby"],
+        key["createddate"]
+      )
+  );
+};
+
 //#region Upload Models
 
 exports.UploadProduct = (data) => {
@@ -498,59 +553,33 @@ exports.EmployeeUpload = (data) => {
   );
 };
 
-exports.MasterItemPrice = (data) => {
+exports.SoldProduct = (data) => {
   let dataResult = [];
 
   data.forEach((key, item) => {
     dataResult.push({
-      id: key.mip_id,
-      itemid: key.mip_itemid,
-      fobprice: key.mip_fobprice,
-      status: key.mip_status,
-      createdby: key.mip_createdby,
-      createddate: key.mip_createddate,
+      serial: key.serial,
+      date: key.date,
+      company: key.company,
+      branch: key.branch,
+      soldby: key.soldby,
+      referenceno: key.referenceno,
     });
   });
 
   return dataResult.map(
     (key) =>
-      new MasterItemPriceModel(
-        key["id"],
-        key["itemid"],
-        key["fobprice"],
-        key["status"],
-        key["createdby"],
-        key["createddate"]
+      new SoldProductModel(
+        key["serial"],
+        key["date"],
+        key["company"],
+        key["branch"],
+        key["soldby"],
+        key["referenceno"]
       )
   );
 };
 
-exports.PriceHistory = (data) => {
-  let dataResult = [];
-
-  data.forEach((key, item) => {
-    dataResult.push({
-      id: key.ph_id,
-      itempriceid: key.ph_itempriceid,
-      fobprice: key.ph_fobprice,
-      status: key.ph_status,
-      createdby: key.ph_createdby,
-      createddate: key.ph_createddate,
-    });
-  });
-
-  return dataResult.map(
-    (key) =>
-      new PriceHistoryModel(
-        key["id"],
-        key["itempriceid"],
-        key["fobprice"],
-        key["status"],
-        key["createdby"],
-        key["createddate"]
-      )
-  );
-};
 //#endregion
 
 //#region Search

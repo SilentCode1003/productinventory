@@ -260,31 +260,6 @@ router.post("/upload", (req, res) => {
   }
 });
 
-function Check_Product(serial) {
-  return new Promise((resolve, reject) => {
-    let sql = "select * from product where p_serial=?";
-    // console.log(serial);
-    SelectParameter(sql, [serial], (err, result) => {
-      if (err) reject(err);
-      // console.log(result);
-
-      resolve(result);
-    });
-  });
-}
-
-function Check_Employee(fullname) {
-  return new Promise((resolve, reject) => {
-    let sql = "select * from employee where e_fullname like ?";
-    SelectParameter(sql, [`%${fullname}%`], (err, result) => {
-      if (err) reject(err);
-      // console.log(result);
-
-      resolve(result);
-    });
-  });
-}
-
 //#region
 function Check_Deploy(assetcontrol, date, deployto) {
   return new Promise((resolve, reject) => {
@@ -314,6 +289,31 @@ function Deploy_Product(assetcontrol) {
       }
 
       console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+
+function Check_Product(serial) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from product where p_serial=?";
+    // console.log(serial);
+    SelectParameter(sql, [serial], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+
+function Check_Employee(fullname) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from employee where e_fullname like ?";
+    SelectParameter(sql, [`%${fullname}%`], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
 
       resolve(result);
     });
