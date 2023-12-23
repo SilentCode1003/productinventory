@@ -33,11 +33,11 @@ router.get("/load", (req, res) => {
     mi_name as mip_itemid,
     mip_fobprice,
     mip_status,
-    e_fullname as mip_createdby,
+    mip_createdby,
     mip_createddate
     from master_item_price
     inner join master_item on mi_id = mip_itemid
-    inner join employee on mip_createdby = e_id`;
+   `;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -59,6 +59,8 @@ router.post("/save", function (req, res) {
     let master_item_price = [
       [itemid, fobprice, status, createdby, createddate],
     ];
+
+    console.log(master_item_price);
 
     Check_ItemPrice(itemid, (err, result) => {
       if (err) console.error("Error: ", err);
