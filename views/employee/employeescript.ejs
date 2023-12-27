@@ -21,20 +21,14 @@
         });
       console.log(dataRow);
       employeeid = dataRow[0];
-      firstname = dataRow[1];
-      middlename = dataRow[2];
-      lastname = dataRow[3];
-      contactnumber = dataRow[6];
-      status = dataRow[8];
+      fullname = dataRow[1];
     });
 
     $(document).on("click", "#editBtn", function () {
       $("#employeeidmodal").val(employeeid);
-      $("#firstnamemodal").val(firstname);
-      $("#middlenamemodal").val(middlename);
-      $("#lastnamemodal").val(lastname);
-      $("#contactnomodal").val(contactnumber);
+      $("#fullnamemodal").val(fullname);
       $("#employeesModal").modal("show");
+      loadlistmodal();
     });
 
     $(document).on("click", "#editBtn", function () {
@@ -323,6 +317,98 @@
       });
     }
 
+    function loadlistmodal(){
+      console.log("TRIGGERED ONCE")
+      $.ajax({
+        type: "GET",
+        url: "/access/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let accessmodalname = item.name;
+            let accessmodalid = item.id;
+            // console.log(accessmodalname);
+
+            var listItem = $("<li></li>")
+              .text(accessmodalname)
+              .data("accessmodal", accessmodalid);
+
+            $(".accesslistmodal").append(listItem);
+          });
+
+          $(".accesslistmodal").on("click", "li", function () {
+            var selectedOption = $(this).text();
+            var selectedaccessmodalid = $(this).data("accessmodal");
+
+            $("#selectedaccessmodal").text(selectedOption);
+            $("#accessmodal").val(selectedaccessmodalid).change();
+          });
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "/position/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let positionmodalname = item.name;
+            let positionmodalid = item.id;
+            // console.log(positionmodalname);
+
+            var listItem = $("<li></li>")
+              .text(positionmodalname)
+              .data("positionmodal", positionmodalid);
+
+            $(".positionlistmodal").append(listItem);
+          });
+
+          $(".positionlistmodal").on("click", "li", function () {
+            var selectedOption = $(this).text();
+            var selectedpositionmodalid = $(this).data("positionmodal");
+
+            $("#selectedpositionmodal").text(selectedOption);
+            $("#positionmodal").val(selectedpositionmodalid).change();
+          });
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "/department/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let departmentmodalname = item.name;
+            let departmentmodalid = item.id;
+
+            var listItem = $("<li></li>")
+              .text(departmentmodalname)
+              .data("departmentmodal", departmentmodalid);
+
+            $(".departmentlistmodal").append(listItem);
+          });
+
+          $(".departmentlistmodal").on("click", "li", function () {
+            var selectedOption = $(this).text();
+            var selecteddepartmentmodalid = $(this).data("departmentmodal");
+
+            $("#selecteddepartmentmodal").text(selectedOption);
+            $("#departmentmodal").val(selecteddepartmentmodalid).change();
+          });
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    }
+
     $(document).on("click", "#activeBtn", function () {
       console.log(employeeid);
       console.log(status);
@@ -377,12 +463,10 @@
 
     $(document).on("click", "#updateBtn", function () {
       let employeeid = $("#employeeidmodal").val();
-      let firstname = $("#firstnamemodal").val();
-      let middlename = $("#middlenamemodal").val();
-      let lastname = $("#lastnamemodal").val();
-      let position = $("#positionlistmodal").val();
-      let accesstype = $("#accesslistmodal").val();
-      let contactno = $("#contactnomodal").val();
+      let fullname = $("#firstnamemodal").val();
+      let access = $("#firstnamemodal").val();
+      let position = $("#firstnamemodal").val();
+      let department = $("#firstnamemodal").val();
 
       var message = "";
 
