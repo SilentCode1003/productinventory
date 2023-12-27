@@ -47,6 +47,7 @@
             }
             else {
                 let refineFobPrice = fobprice.replace(/,|₱/g, "");
+                // console.log(itemid, itemname, refineFobPrice)
                 $.ajax({
                     type: "POST",
                     url: "/itemprice/save",
