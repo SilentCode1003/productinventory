@@ -116,6 +116,15 @@
   padding: 2rem !important;
 }
 
+.dashboard-size{
+  height: 435px !important;
+}
+
+.scrollable-dashboard-size{
+  height: 320px !important;
+  overflow-y: auto !important;
+}
+
 .scrollable-table-container-lg{
   max-height: 670px !important; 
   overflow-y: auto !important;
