@@ -127,101 +127,47 @@
   <div class="col-lg-12">
     <div class="card">
       <div class="card-body">
-        <div class="row d-flex justify-content-center">
-          <div class="col-md-6 mb-2">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon2"
-                  >Full Name</span
-                >
-              </div>
-              <input
-                id="fullname"
-                name="fullname"
-                type="text"
-                class="form-control"
-                placeholder="Enter Full Name"
-                aria-label="fullname"
-                aria-describedby="basic-addon1"
-              />
-            </div>
-          </div>
-        </div>
-
         <div class="row d-flex">
           <div class="col-md-6 mb-2">
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon2"
-                  >User Name</span
+                  >FOB Price</span
                 >
               </div>
               <input
-                id="username"
-                name="username"
+                id="fobprice"
+                name="fobprice"
                 type="text"
                 class="form-control"
-                placeholder="Enter User Name"
-                aria-label="username"
+                placeholder="Enter FOB Price"
+                aria-label="fobprice"
                 aria-describedby="basic-addon1"
               />
             </div>
           </div>
+        </div>
+
+        <div class="row d-flex mt-4">
           <div class="col-md-6 mb-2">
             <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon2">Password</span>
-              </div>
               <input
-                id="password"
-                name="password"
-                type="password"
-                class="form-control"
-                placeholder="Enter Password"
-                aria-label="password"
-                aria-describedby="basic-addon1"
+                class="form-control text-center custom-input"
+                placeholder="Select Item"
+                name="item"
+                id="item"
               />
+              <input type="hidden" id="hiddenValue" name="hiddenValue" />
+              <div class="input-group-append">
+                <span class="input-group-text">Item</span>
+              </div>
             </div>
+            <div
+              class="custom-dropdown custom-dropdown-margin-left"
+              id="itemDropdown"
+            ></div>
           </div>
         </div>
-
-        <div class="row d-flex">
-          <div class="col-md-6 mb-2">
-            <div class="customdropdown">
-              <div class="select selectposition">
-                <span id="selectedposition">Select Position</span>
-                <i class="fa fa-chevron-left"></i>
-              </div>
-              <input type="hidden" name="position" id="position" />
-              <ul class="customdropdown-menu positionlist"></ul>
-            </div>
-          </div>
-
-          <div class="col-md-6 mb-2">
-            <div class="customdropdown">
-              <div class="select selectaccess">
-                <span id="selectedaccess">Select Access</span>
-                <i class="fa fa-chevron-left"></i>
-              </div>
-              <input type="hidden" name="access" id="access" />
-              <ul class="customdropdown-menu accesslist"></ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="row d-flex justify-content-center mb-2">
-          <div class="col-md-6 mb-2">
-            <div class="customdropdown">
-              <div class="select selectdepartment">
-                <span id="selecteddepartment">Select Department</span>
-                <i class="fa fa-chevron-left"></i>
-              </div>
-              <input type="hidden" name="department" id="department" />
-              <ul class="customdropdown-menu departmentlist"></ul>
-            </div>
-          </div>
-        </div>
-
         <div class="row justify-content-end">
           <div class="col-md-4 align mt-1">
             <button
@@ -254,7 +200,7 @@
   <div class="card-header card-bg align-content-center">
     <div class="row">
       <div class="col-md-2">
-        <h5 class="m-0 font-weight-bold cyber-title mt-2">Employee Table</h5>
+        <h5 class="m-0 font-weight-bold cyber-title mt-2">Price Table</h5>
       </div>
       <div class="col-md-5 mt-1">
         <input
@@ -262,7 +208,7 @@
           name="search"
           type="text"
           class="form-control"
-          placeholder="Search Category Name"
+          placeholder="Search Item Name"
           aria-label="search"
           aria-describedby="basic-addon1"
         />
@@ -301,12 +247,8 @@
         <thead class="table-dark table-header">
           <tr>
             <th>ID</th>
-            <th>Full Name</th>
-            <th>Position</th>
-            <th>Department</th>
-            <th>User Name</th>
-            <th>Password</th>
-            <th>Access</th>
+            <th>Item ID</th>
+            <th>FOB Price</th>
             <th>Status</th>
             <th>Created By</th>
             <th>Created Date</th>
