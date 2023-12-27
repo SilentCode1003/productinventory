@@ -51,8 +51,9 @@
 
       let referenceno = $("#referenceno").val();
       let date = $("#date").val();
-      console.log("Receive By: ", receiveby)
+      // console.log("Receive By: ", receiveby, "Transfer By: ", transferby);
       var message = "";
+
       if (serialasset == "") {
         message += "Serial and Asset Control does not Exist " + `${data}, `;
       }
@@ -62,39 +63,32 @@
       if (transferby == "") {
         message += "Employee does not Exist for Transfer By " + `${employee}, `;
       }
-
       if (to == "") {
         message += "Empty Transfer To, ";
       }
       if (receiveby == "") {
         message += "Employee does not Exist for Transfer By " + `${employee2}, `;
       }
-
       if (referenceno == "") {
-        message += "referenceno, ";
+        message += "Empty Reference No., ";
       }
       if (date == "") {
-        message += "Date, ";
+        message += "Empty Date, ";
+      }
+      if(receiveby === transferby){
+        message += "Transfer by and Receive by cannot be identical! "
+      }
+      if(to === transferfrom){
+        message += "Transfer to and Transfer from cannot be identical! "
       }
 
       if (message != "") {
-        warning("Required", `Please fill up ${message}`);
+        warning("Required", `${message}`);
       } else {
         let splitData = data.split(" ");
         let serial = splitData[0];
         let assetControl = splitData[1].replace("(", "").replace(")", "");
-
-        console.log(
-          assetControl,
-          serial,
-          date,
-          transferby,
-          transferfrom,
-          to,
-          "receive by: "+ receiveby,
-          referenceno
-        );
-
+        // console.log( assetControl, serial, date, transferby, transferfrom, to, receiveby, referenceno );
 
         $.ajax({
           type: "POST",
