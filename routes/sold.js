@@ -141,12 +141,13 @@ router.post("/getsold", (req, res) => {
     );
 
     let sql = `SELECT s_id as id, s_assetcontrol as assetcontrol, s_serial as serial, mi_name as productname, 
-              mc_name as category, p_status as status, e_fullname as soldby, s_date as date
+              mc_name as category, p_status as status, e_fullname as soldby, s_date as date, mip_fobprice as price
               FROM sold 
               INNER JOIN product on p_assetcontrol = s_assetcontrol and p_serial = s_serial 
               INNER JOIN master_item on mi_id = p_itemname
               INNER JOIN master_category on mc_id = p_category
               INNER JOIN employee on e_id = s_soldby
+              INNER JOIN master_item_price on mi_id = mip_id
               WHERE mc_name = '${category}' AND s_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`;
 
     Select(sql, (err, result) => {
