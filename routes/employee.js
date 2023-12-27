@@ -283,7 +283,7 @@ router.post("/changepassword", (req, res) => {
       if (err) console.error("Error: ", err);
       let employee = [encrypted, employeeid];
       let sql = "update employee set e_password=? where e_id=?";
-      
+
       Update(sql, employee, (err, result) => {
         if (err) console.error("Error: ", err);
         res.json(JsonSuccess());
@@ -291,6 +291,33 @@ router.post("/changepassword", (req, res) => {
     });
   } catch (error) {
     res.json(JsonErrorResponse(error));
+  }
+});
+
+router.post("/status", (req, res) => {
+  try {
+    let id = req.body.id;
+    let status =
+      req.body.status == GetValue(ACT()) ? GetValue(INACT()) : GetValue(ACT());
+    let data = [status, id];
+    console.log(data);
+    let sql_Update = `UPDATE employee 
+                     SET e_status = ?
+                     WHERE e_id = ?`;
+
+    console.log(data);
+
+    Update(sql_Update, data, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      res.json({
+        msg: "success",
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
   }
 });
 
