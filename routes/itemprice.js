@@ -139,11 +139,12 @@ router.post("/update", (req, res) => {
 
 router.post("/status", (req, res) => {
   try {
+    
     let id = req.body.id;
     let status =
       req.body.status == GetValue(ACT()) ? GetValue(INACT()) : GetValue(ACT());
     let data = [status, id];
-
+    console.log(data)
     let sql_Update = `UPDATE master_item_price 
                      SET mip_status = ?
                      WHERE mip_id = ?`;
