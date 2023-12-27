@@ -28,8 +28,20 @@
       loadlistmodal();
     });
 
+    $(document).on("click", "#changePassBtn", function () {
+      $("#employeeidmodal2").val(employeeid);
+    });
+
+    $(document).on("click", "#closeBtn2", function () {
+      $("#password").val("");
+      $("#employeeidmodal2").val("");
+    });
+
     $(document).on("click", "#editBtn", function () {
       $("#editModal").modal("show");
+      $('.customdropdown-menu.departmentlistmodal').empty();
+      $('.customdropdown-menu.accesslistmodal').empty();
+      $('.customdropdown-menu.positionlistmodal').empty();
     });
 
     $(document).on("click", "#closeBtn", function () {
@@ -134,12 +146,13 @@
         data.forEach((item) => {
           let action = "";
           if (item.status === "ACTIVE") {
-            action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                      <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+            action = `<span class="editbutton" id="editBtn" name="editBtn" ><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+                      <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>
+                      <span class="editbutton" id="changePassBtn" data-toggle="modal" data-target="#changePassModal"><i class="fas fa-key" style="color: #45edf2;"></i></span>`;
           } else if (item.status === "INACTIVE") {
-            action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#accessModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+            action = `<span class="editbutton" id="editBtn" name="editBtn" ><i class="fas fa-edit" style="color: #45edf2;"></i></span>
                       <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>
-                      <span class="editbutton" id="change"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                      <span class="editbutton" id="changePassBtn" data-toggle="modal" data-target="#changePassModal"><i class="fas fa-key" style="color: #45edf2;"></i></span>`;
           }
 
           const tr = $("<tr>").append(
@@ -193,7 +206,7 @@
               "data-label": "Created Date",
               class: "custom-mobile-align no-wrap",
             }),
-            $("<td>", { html: action, "data-label": "Action", class: "" })
+            $("<td>", { html: action, "data-label": "Action", class: "no-wrap" })
           );
           tableBody.append(tr);
         });
@@ -326,7 +339,6 @@
     }
 
     function loadlistmodal(){
-      console.log("TRIGGERED ONCE")
       $.ajax({
         type: "GET",
         url: "/access/load",
@@ -511,6 +523,44 @@
               $("#selectedpositionmodal").text('Select Position');
               $("#selectedaccessmodal").text('Select Access');
               $("#selecteddepartmentmodal").text('Select Department');
+              success("Saved", "Successfully");
+            }
+          },
+          error: function (err) {
+            errormsg(err);
+          },
+        });
+      }
+    });
+
+    $(document).on("click", "#updatePassword", function () {
+      let employeeid = $("#employeeidmodal2").val();
+      let password = $("#newpassword").val();
+
+      var message = "";
+
+      if (
+        password == ""
+      ) {
+        message += "Password";
+      }
+
+      if (message != "") {
+        warning("Required", `${message}`);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/employee/changepassword",
+          data: {
+            employeeid: employeeid,
+            password: password,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              $("#changePassModal").modal("hide");
+              $("#password").val("");
+              $("#employeeidmodal2").val("");
               success("Saved", "Successfully");
             }
           },
