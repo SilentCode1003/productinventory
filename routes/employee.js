@@ -1,5 +1,10 @@
 var express = require("express");
-const { SelectParameter, Select, InsertTable } = require("./repository/spidb");
+const {
+  SelectParameter,
+  Select,
+  InsertTable,
+  Update,
+} = require("./repository/spidb");
 const {
   Employee,
   EmployeeUpload,
@@ -11,6 +16,7 @@ const { GetValue, ACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
 const { Encrypter } = require("./repository/cryptography");
 const { Validator } = require("./controller/middleware");
+const { JsonErrorResponse, JsonSuccess } = require("./repository/responce");
 var router = express.Router();
 
 /* GET home page. */
@@ -230,6 +236,42 @@ router.post("/upload", (req, res) => {
     res.json({
       msg: error,
     });
+  }
+});
+
+router.post("/edit", (req, res) => {
+  try {
+    const { employeeid, position, access, department } = req.body;
+
+    let data = [];
+    let sql_update = "update employee set";
+
+    if (position) {
+      sql_update += " e_position=?,";
+      data.push(position);
+    }
+    if (department) {
+      sql_update += " e_department=?,";
+      data.push(department);
+    }
+    if (access) {
+      sql_update += " e_access=?,";
+      data.push(access);
+    }
+
+    sql_update = sql_update.slice(0, -1);
+    sql_update += " where e_id=?";
+
+    Update(sql_update, data, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      console.log(result);
+      res.json(JsonSuccess());
+    });
+
+    data.push(employeeid);
+  } catch (error) {
+    res.json(JsonErrorResponse(error));
   }
 });
 
