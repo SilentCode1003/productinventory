@@ -440,4 +440,34 @@
       isOpen = !isOpen;
     });
   }
+
+  function formatPrice(event, input) {
+      event.preventDefault();
+
+      const cursorPosition = input.selectionStart;
+      const originalValue = input.value;
+      const defaultValue = '₱0.00';
+      const currentValue = originalValue || defaultValue;
+
+      let value = currentValue.replace(/[^0-9.]/g, '');
+      let number = parseFloat(value);
+
+      if (!isNaN(number)) {
+          const formattedValue = number.toLocaleString('en-PH', {
+              style: 'currency',
+              currency: 'PHP',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+          });
+
+          input.value = formattedValue;
+
+          let newPosition = cursorPosition + (formattedValue.indexOf('.') > currentValue.indexOf('.') ? 1 : 0);
+
+          // Set the new cursor position
+          input.setSelectionRange(newPosition, newPosition);
+      } else {
+          input.value = defaultValue;
+      }
+  }
 </script>
