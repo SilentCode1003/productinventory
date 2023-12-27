@@ -1,0 +1,319 @@
+<script>
+    $(document).ready(function () {
+        //Functionality
+        let isFetchingData = false;
+        let hasMoreData = true;
+        let currentPage = 1;
+        let assetcontrol = "";
+
+        LoadTable();
+
+        $("#data-table tbody").on("click", "tr", function () {
+            var dataRow = [];
+            $(this)
+                .closest("tr")
+                .find("td")
+                .each(function () {
+                    dataRow.push($(this).text());
+                });
+            // console.log(dataRow);
+            assetcontrol = dataRow[0];
+        });
+
+
+        $(document).on("input", "#itemname", function () {
+            $("#hiddenValue").val("");
+        });
+
+        $(document).on("click", "#addBtn", function () {
+            let itemid = $("#hiddenValue").val();
+            let itemname = $("#itemname").val();
+            let fobprice = $("#fobprice").val();
+
+            var message = "";
+
+            if (itemid == "") {
+                message += "Item does not Exist " + `${itemname}, `;
+            }
+            if (fobprice == "") {
+                message += "Empty FOB Price";
+            }
+
+            if (message != "") {
+                warning("Required", `${message}`);
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/itemprice/save",
+                    data: {
+                        itemid: itemid,
+                        fobprice: fobprice,
+                    },
+                    success: function (result) {
+                        if (result.msg == "success") {
+                            LoadTable();
+                            $("#itemname").val('');
+                            $("#hiddenValue").val('');
+                            $("#fobprice").val('');
+                            success("Saved", "Successfully");
+                        }
+
+                        if (result.msg == "exist") {
+                            warning("Exist", `${itemname} is already registered!`);
+                        }
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    },
+                });
+            }
+        });
+
+        function populatedatatable(data) {
+            console.log(data);
+            const tableBody = $('#datatable tbody');
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 7,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                tableBody.append(tr);
+            } else {
+                data.forEach((item) => {
+                    const tr = $("<tr>").append(
+                        $("<td>", {
+                            text: item.itemid,
+                            "data-label": "ID",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: formatCurrency(item.fobprice),
+                            "data-label": "FOB Price",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.status,
+                            "data-label": "Status",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.createdby,
+                            "data-label": "Created By",
+                            class: "custom-mobile-align no-wrap",
+                        }),
+                        $("<td>", {
+                            text: item.createddate,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align no-wrap",
+                        })
+                    );
+                    tableBody.append(tr);
+                });
+            }
+        }
+
+        function LoadTable() {
+            $(".progress").hide();
+            $(".progress").slideDown();
+
+            $.ajax({
+                url: '/itemprice/load',
+                method: 'GET',
+                dataType: 'json',
+                xhrFields: {
+                    onprogress: function (e) {
+                        if (e.lengthComputable) {
+                            var percentComplete = (e.loaded / e.total) * 100;
+                            $(".progress-bar").css("width", percentComplete + "%");
+                        }
+                    }
+                },
+                success: function (data) {
+                    setTimeout(function () {
+                        $(".progress").slideUp(function () {
+                            if (data.msg === 'success') {
+                                console.log(data.data)
+                                populatedatatable(data.data);
+                            } else {
+                                console.error(data.msg);
+                            }
+                        });
+                    }, 1000);
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        $(".scrollable-table-container").scroll(function () {
+            const container = $(this);
+            if (isFetchingData) {
+                return;
+            }
+            if (
+                container.scrollTop() + container.innerHeight() >=
+                container[0].scrollHeight - 10
+            ) {
+                //console.log("Append Triggered!");
+                isFetchingData = true;
+                LoadTable();
+            }
+        });
+
+        function resettable() {
+            const tableBody = $("#datatable tbody");
+            tableBody.empty();
+            currentPage = 1;
+            hasMoreData = true;
+            LoadTable();
+        }
+
+        //#region CUSTOM DROPDOWN INPUT
+        let activeItems = [];
+
+        function LoadList() {
+            // console.log("triggered");
+            $.ajax({
+                type: "GET",
+                url: "/items/load",
+                success: function (result) {
+                    let container = result.data;
+                    // console.log("data: ", container);
+                    $.each(container, (key, item) => {
+                        activeItems.push({ display: item.name, value: item.id });
+                    });
+                    populateCustomDropdown();
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+
+        }
+
+        function populateCustomDropdown() {
+            for (const serial of activeItems) {
+                addOption("itemDropdown", serial.display, serial.value);
+            }
+        }
+
+        function setupCustomDropdown(inputId, dropdownId, optionClass) {
+            const inputElement = document.getElementById(inputId);
+            const dropdownElement = document.getElementById(dropdownId);
+            const options = dropdownElement.getElementsByClassName(optionClass);
+
+            inputElement.addEventListener("click", function () {
+                dropdownElement.style.display = "block";
+            });
+
+            for (const option of options) {
+                option.addEventListener("click", function () {
+                    inputElement.value = option.textContent;
+                    const actualValue = option.getAttribute("data-value");
+                    inputElement.setAttribute("data-actual-value", actualValue);
+                    dropdownElement.style.display = "none";
+                });
+            }
+
+            inputElement.addEventListener("input", function () {
+                const value = inputElement.value.toUpperCase();
+                for (const option of options) {
+                    if (option.textContent.toUpperCase().includes(value)) {
+                        option.style.display = "block";
+                    } else {
+                        option.style.display = "none";
+                    }
+                }
+                dropdownElement.style.display = "block";
+            });
+
+            document.addEventListener("click", function (event) {
+                const target = event.target;
+                if (!dropdownElement.contains(target) && target !== inputElement) {
+                    dropdownElement.style.display = "none";
+                }
+            });
+        }
+
+        function addOption(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenValue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("itemname");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        function addOption2(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenSerialValue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("serialname");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        setupCustomDropdown("itemname", "itemDropdown", "dropdown-option");
+        LoadList();
+        //#endregion
+
+        function filterTableRows() {
+            const searchQuery = $("#search").val().trim().toLowerCase();
+            let foundMatches = false;
+
+            $("#no-match-row").remove();
+
+            $("#datatable tbody tr").each(function () {
+                const rowData = $(this).text().toLowerCase();
+                if (rowData.includes(searchQuery)) {
+                    $(this).show();
+                    foundMatches = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (!foundMatches) {
+                const noMatchRow = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 7,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                $("#datatable tbody").append(noMatchRow);
+                noMatchRow.attr("id", "no-match-row");
+            }
+        }
+
+        $("#search").on("input", filterTableRows);
+
+    });
+</script>
