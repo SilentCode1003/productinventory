@@ -262,6 +262,8 @@ router.post("/edit", (req, res) => {
     sql_update = sql_update.slice(0, -1);
     sql_update += " where e_id=?";
 
+    data.push(employeeid);
+    
     Update(sql_update, data, (err, result) => {
       if (err) console.error("Error: ", err);
 
@@ -269,7 +271,6 @@ router.post("/edit", (req, res) => {
       res.json(JsonSuccess());
     });
 
-    data.push(employeeid);
   } catch (error) {
     res.json(JsonErrorResponse(error));
   }

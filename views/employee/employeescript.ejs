@@ -3,10 +3,6 @@
     //Functionality
     var activePositions = [];
     let employeeid = "";
-    let firstname;
-    let middlename;
-    let lastname;
-    let contactnumber;
     let status = "";
 
     LoadTable();
@@ -22,6 +18,7 @@
       console.log(dataRow);
       employeeid = dataRow[0];
       fullname = dataRow[1];
+      status = dataRow[6];
     });
 
     $(document).on("click", "#editBtn", function () {
@@ -33,6 +30,16 @@
 
     $(document).on("click", "#editBtn", function () {
       $("#editModal").modal("show");
+    });
+
+    $(document).on("click", "#closeBtn", function () {
+      $("#fullname").val("");
+      $("#department").val("");
+      $("#position").val("");
+      $("#access").val("");
+      $("#selectedpositionmodal").text('Select Position');
+      $("#selectedaccessmodal").text('Select Access');
+      $("#selecteddepartmentmodal").text('Select Department');
     });
 
     $(document).on("change", "#department", function () {
@@ -160,11 +167,11 @@
               "data-label": "username",
               class: "custom-mobile-align",
             }),
-            $("<td>", {
-              text: item.password,
-              "data-label": "password",
-              class: "custom-mobile-align",
-            }),
+            // $("<td>", {
+            //   text: item.password,
+            //   "data-label": "password",
+            //   class: "custom-mobile-align",
+            // }),
             $("<td>", {
               text: item.access,
               "data-label": "Access Type",
@@ -417,7 +424,7 @@
         url: "/employee/status",
         data: {
           status: status,
-          employeeid: employeeid,
+          id: employeeid,
         },
         success: function (result) {
           if (result.msg == "success") {
@@ -443,7 +450,7 @@
         url: "/employee/status",
         data: {
           status: status,
-          employeeid: employeeid,
+          id: employeeid,
         },
         success: function (result) {
           if (result.msg == "success") {
@@ -463,20 +470,18 @@
 
     $(document).on("click", "#updateBtn", function () {
       let employeeid = $("#employeeidmodal").val();
-      let fullname = $("#firstnamemodal").val();
-      let access = $("#firstnamemodal").val();
-      let position = $("#firstnamemodal").val();
-      let department = $("#firstnamemodal").val();
+      let fullname = $("#fullnamemodal").val();
+      let access = $("#accessmodal").val();
+      let position = $("#positionmodal").val();
+      let department = $("#departmentmodal").val();
 
       var message = "";
 
       if (
+        fullname == "" &&
         position == "" &&
-        contactno == "" &&
-        middlename == "0" &&
-        firstname == "" &&
-        lastname == "" &&
-        access == "0"
+        department == "" &&
+        access == ""
       ) {
         message += "Fill up atleast 1 input field before updating";
       }
@@ -486,27 +491,25 @@
       } else {
         $.ajax({
           type: "POST",
-          url: "/mastermeployee/edit",
+          url: "/employee/edit",
           data: {
             employeeid: employeeid,
-            firstname: firstname,
-            middlename: middlename,
-            lastname: lastname,
+            fullname: fullname,
             position: position,
-            accesstype: accesstype,
-            contactno: contactno,
+            access: access,
+            department: department,
           },
           success: function (result) {
             if (result.msg == "success") {
               LoadTable();
-              $("#employeesModal").modal("hide");
-              $("#employeeidmodal").val("");
-              $("#firstnamemodal").val("");
-              $("#middlenamemodal").val("");
-              $("#lastnamemodal").val("");
-              $("#positionlistmodal").val("");
-              $("#accesslistmodal").val("");
-              $("#contactnomodal").val("");
+              $("#editModal").modal("hide");
+              $("#fullname").val("");
+              $("#department").val("");
+              $("#position").val("");
+              $("#access").val("");
+              $("#selectedpositionmodal").text('Select Position');
+              $("#selectedaccessmodal").text('Select Access');
+              $("#selecteddepartmentmodal").text('Select Department');
               success("Saved", "Successfully");
             }
           },
