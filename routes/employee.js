@@ -12,7 +12,7 @@ const {
   MasterPosition,
   MasterAccess,
 } = require("./model/spimodel");
-const { GetValue, ACT } = require("./repository/dictionary");
+const { GetValue, ACT, INACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
 const { Encrypter } = require("./repository/cryptography");
 const { Validator } = require("./controller/middleware");
