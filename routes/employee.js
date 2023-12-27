@@ -12,7 +12,7 @@ const {
   MasterPosition,
   MasterAccess,
 } = require("./model/spimodel");
-const { GetValue, ACT } = require("./repository/dictionary");
+const { GetValue, ACT, INACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
 const { Encrypter } = require("./repository/cryptography");
 const { Validator } = require("./controller/middleware");
@@ -262,6 +262,8 @@ router.post("/edit", (req, res) => {
     sql_update = sql_update.slice(0, -1);
     sql_update += " where e_id=?";
 
+    data.push(employeeid);
+    
     Update(sql_update, data, (err, result) => {
       if (err) console.error("Error: ", err);
 
@@ -269,9 +271,54 @@ router.post("/edit", (req, res) => {
       res.json(JsonSuccess());
     });
 
-    data.push(employeeid);
   } catch (error) {
     res.json(JsonErrorResponse(error));
+  }
+});
+
+router.post("/changepassword", (req, res) => {
+  try {
+    const { password, employeeid } = req.body;
+
+    Encrypter(password, (err, encrypted) => {
+      if (err) console.error("Error: ", err);
+      let employee = [encrypted, employeeid];
+      let sql = "update employee set e_password=? where e_id=?";
+
+      Update(sql, employee, (err, result) => {
+        if (err) console.error("Error: ", err);
+        res.json(JsonSuccess());
+      });
+    });
+  } catch (error) {
+    res.json(JsonErrorResponse(error));
+  }
+});
+
+router.post("/status", (req, res) => {
+  try {
+    let id = req.body.id;
+    let status =
+      req.body.status == GetValue(ACT()) ? GetValue(INACT()) : GetValue(ACT());
+    let data = [status, id];
+    console.log(data);
+    let sql_Update = `UPDATE employee 
+                     SET e_status = ?
+                     WHERE e_id = ?`;
+
+    console.log(data);
+
+    Update(sql_Update, data, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      res.json({
+        msg: "success",
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
   }
 });
 

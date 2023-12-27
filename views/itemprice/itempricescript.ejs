@@ -1,14 +1,12 @@
 <script>
     $(document).ready(function () {
         //Functionality
-        let isFetchingData = false;
-        let hasMoreData = true;
-        let currentPage = 1;
-        let assetcontrol = "";
+        let itemid = "";
+        let status = "";
 
         LoadTable();
 
-        $("#data-table tbody").on("click", "tr", function () {
+        $("#datatable tbody").on("click", "tr", function () {
             var dataRow = [];
             $(this)
                 .closest("tr")
@@ -17,9 +15,14 @@
                     dataRow.push($(this).text());
                 });
             // console.log(dataRow);
-            assetcontrol = dataRow[0];
+            itemid = dataRow[0];
+            status = dataRow[3];
         });
 
+
+        $(document).on("click", "#editBtn", function () {
+            $("#itemidmodal").val(itemid);
+        });
 
         $(document).on("input", "#itemname", function () {
             $("#hiddenValue").val("");
@@ -72,7 +75,7 @@
         });
 
         function populatedatatable(data) {
-            console.log(data);
+            // console.log(data);
             const tableBody = $('#datatable tbody');
             tableBody.empty();
 
@@ -86,11 +89,27 @@
                 );
                 tableBody.append(tr);
             } else {
+                let action = '';
+
                 data.forEach((item) => {
+                    if (item.status === 'ACTIVE') {
+                        action = `
+                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+                            <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                    } else if (item.status === 'INACTIVE') {
+                        action = `
+                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
+                            <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                    }
                     const tr = $("<tr>").append(
                         $("<td>", {
-                            text: item.itemid,
+                            text: item.id,
                             "data-label": "ID",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.itemid,
+                            "data-label": "Item ID",
                             class: "custom-mobile-align",
                         }),
                         $("<td>", {
@@ -112,6 +131,11 @@
                             text: item.createddate,
                             "data-label": "Created Date",
                             class: "custom-mobile-align no-wrap",
+                        }),
+                        $("<td>", {
+                            html: action,
+                            // "data-label": "Created Date",
+                            // class: "custom-mobile-align no-wrap",
                         })
                     );
                     tableBody.append(tr);
@@ -139,7 +163,6 @@
                     setTimeout(function () {
                         $(".progress").slideUp(function () {
                             if (data.msg === 'success') {
-                                console.log(data.data)
                                 populatedatatable(data.data);
                             } else {
                                 console.error(data.msg);
@@ -152,6 +175,100 @@
                 }
             });
         }
+
+        //#region EDIT SCRIPTS
+        $(document).on("click", "#updateBtn", function () {
+            let itemid = $("#itemidmodal").val();
+            let fobprice = $("#fobpricemodal").val();
+
+            var message = "";
+
+            if (fobprice == "") {
+                message += "FOB Price ";
+            }
+
+            if (message != "") {
+                warning("Required", `Please fill up ${message}`);
+            } else {
+                let refineFobPrice = fobprice.replace(/,|₱/g, "");
+                $.ajax({
+                    type: "POST",
+                    url: "/itemprice/edit",
+                    data: {
+                        itempriceid: itemid,
+                        fobprice: refineFobPrice,
+                    },
+                    success: function (result) {
+                        if (result.msg == "success") {
+                            LoadTable();
+                            success("Saved", "Successfully");
+                            $("#fobpricemodal").val('');
+                            $("#editModal").modal("hide");
+                        }
+
+                        if (result.msg == "exist") {
+                            warning("Exist", `${categorynamemodal} already exist!`);
+                        }
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    },
+                });
+            }
+        });
+
+        $(document).on("click", "#activeBtn", function () {
+            console.log(itemid);
+            console.log(status);
+            $.ajax({
+                type: "POST",
+                url: "/itemprice/status",
+                data: {
+                    status: status,
+                    id: itemid,
+                },
+                success: function (result) {
+                    if (result.msg == "success") {
+                        LoadTable();
+                        success("Saved", "Successfully");
+                    }
+
+                    if (result.msg == "notexist") {
+                        warning(`${itemid} does not exist!`);
+                    }
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        });
+
+        $(document).on("click", "#inactiveBtn", function () {
+            console.log(itemid);
+            console.log(status);
+            $.ajax({
+                type: "POST",
+                url: "/itemprice/status",
+                data: {
+                    status: status,
+                    id: itemid,
+                },
+                success: function (result) {
+                    if (result.msg == "success") {
+                        LoadTable();
+                        success("Saved", "Successfully");
+                    }
+
+                    if (result.msg == "notexist") {
+                        warning(`${itemid} does not exist!`);
+                    }
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        });
+        //#endregion
 
         //#region CUSTOM DROPDOWN INPUT
         let activeItems = [];

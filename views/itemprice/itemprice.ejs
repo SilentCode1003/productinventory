@@ -4,7 +4,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit Employee</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Edit Item Price</h5>
       </div>
       <div class="modal-body">
         <div class="row mb-2">
@@ -12,51 +12,14 @@
             <div class="card-body">
               <div class="row mb-2 justify-content-center">
                 <div class="col-md-6">
-                  <label class="form-label" for="id">Employee ID</label>
-                  <input id="employeeidmodal" name="employeeidmodal" type="text" class="form-control" placeholder=""
-                    aria-label="employeeid" aria-describedby="basic-addon1" disabled />
+                  <label class="form-label" for="id">Item ID</label>
+                  <input id="itemidmodal" name="itemidmodal" type="text" class="form-control" placeholder=""
+                    aria-label="itemidmodal" aria-describedby="basic-addon1" disabled />
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="fullnamemodal">Full Name</label>
-                  <input id="fullnamemodal" name="fullnamemodal" type="text" class="form-control"
-                    placeholder="Enter New full Name" aria-label="fullnamemodal" aria-describedby="basic-addon1" />
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <div class="customdropdown">
-                    <div class="select selectpositionmodal">
-                      <span id="selectedpositionmodal">Select Position</span>
-                      <i class="fa fa-chevron-left"></i>
-                    </div>
-                    <input type="hidden" name="positionmodal" id="positionmodal" />
-                    <ul class="customdropdown-menu positionlistmodal"></ul>
-                  </div>
-                </div>
-
-                <div class="col-md-6 mb-2">
-                  <div class="customdropdown">
-                    <div class="select selectaccessmodal">
-                      <span id="selectedaccessmodal">Select Access</span>
-                      <i class="fa fa-chevron-left"></i>
-                    </div>
-                    <input type="hidden" name="accessmodal" id="accessmodal" />
-                    <ul class="customdropdown-menu accesslistmodal"></ul>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row mb-2 justify-content-center">
-                <div class="col-md-6 mb-2">
-                  <div class="customdropdown">
-                    <div class="select selectdepartmentmodal">
-                      <span id="selecteddepartmentmodal">Select Department</span>
-                      <i class="fa fa-chevron-left"></i>
-                    </div>
-                    <input type="hidden" name="departmentmodal" id="departmentmodal" />
-                    <ul class="customdropdown-menu departmentlistmodal"></ul>
-                  </div>
+                  <label class="form-label" for="fobpricemodal">FOB Price</label>
+                  <input id="fobpricemodal" name="fobpricemodal" type="text" class="form-control"
+                    placeholder="Enter New FOB Price" aria-label="fobpricemodal" aria-describedby="basic-addon1" oninput="formatPrice(event, this)"/>
                 </div>
               </div>
             </div>
@@ -156,6 +119,7 @@
       <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
         <thead class="table-dark table-header">
           <tr>
+            <th>ID</th>
             <th>Item ID</th>
             <th>Price (FOB)</th>
             <th>Status</th>

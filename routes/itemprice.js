@@ -44,7 +44,7 @@ router.get("/load", (req, res) => {
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
       let data = MasterItemPrice(result);
-      console.log(data)
+      console.log(data);
       res.json(JsonDataResponse(data));
     });
   } catch (error) {
@@ -143,7 +143,7 @@ router.post("/status", (req, res) => {
     let status =
       req.body.status == GetValue(ACT()) ? GetValue(INACT()) : GetValue(ACT());
     let data = [status, id];
-
+    console.log(data);
     let sql_Update = `UPDATE master_item_price 
                      SET mip_status = ?
                      WHERE mip_id = ?`;
@@ -187,6 +187,18 @@ router.post("/edit", (req, res) => {
         res.json(JsonSuccess());
       });
     });
+  } catch (error) {
+    res.json(JsonErrorResponse(error));
+  }
+});
+
+router.post("/upload", (req, res) => {
+  try {
+    const { data } = req.body;
+    let dataJson = TransferProduct(JSON.parse(data));
+    let transfer = [];
+    let counter = 0;
+    let noentry = [];
   } catch (error) {
     res.json(JsonErrorResponse(error));
   }
