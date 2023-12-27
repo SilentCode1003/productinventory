@@ -114,7 +114,7 @@
                 },
                 success: function (data) {
                     if (data.msg === 'success') {
-                        console.log("Data: ", data.data)
+                        // console.log("Data: ", data.data)
                         if (data.data.length != 0) {
                             let filteredData = data.data.filter(function (item) {
                                 let itemDate = moment(item.date, 'YYYY-MM-DD');
@@ -136,11 +136,11 @@
                             });
 
                             let tableHtml = '<thead class="table-dark table-header"><tr>' +
-                                            '<th class="text-center">Date</th>' +
-                                            '<th class="text-center">Product Name</th>' +
-                                            '<th class="text-center">Quantity</th>' +
-                                            '<th class="text-center">Total Price</th>' +
-                                            '</tr></thead><tbody>';
+                                '<th class="text-center">Date</th>' +
+                                '<th class="text-center">Product Name</th>' +
+                                '<th class="text-center">Quantity</th>' +
+                                '<th class="text-center">Total Price</th>' +
+                                '</tr></thead><tbody>';
 
                             Object.keys(producByDateTable).forEach(function (date) {
                                 Object.keys(producByDateTable[date]).forEach(function (productName) {
@@ -306,58 +306,94 @@
             url: "/product/getstocks",
             success: function (result) {
                 let container = result.data;
-                // console.log("stocks: ",container)
+                console.log("stocks: ", container);
 
-                let allCategories = [...new Set(container.map(item => item.category.toUpperCase()))];
+                let groupedData = groupDataByItemName(container);
 
-                let counts = getCategoryCounts(container);
+                displayDataInTable(groupedData);
 
-                let stocks = [];
-
-                allCategories.forEach(category => {
-                    let count = counts[category] || 0;
-                    stocks.push({ category, count });
-                });
-                let labels = stocks.map(entry => entry.category);
-                let data = stocks.map(entry => entry.count);
-
-                let ctx = document.getElementById('myChart1').getContext('2d');
-                let myChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Stock Counts',
-                            data: data,
-                            backgroundColor: 'rgb(69, 237, 242, 0.2)',
-                            borderColor: 'rgb(69, 237, 242)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
+                createChart(container);
             },
             error: function (err) {
                 errormsg(err);
             },
         });
 
-        function getCategoryCounts(data) {
-            const categoryCounts = {};
+        function groupDataByItemName(data) {
+            const groupedData = {};
 
             data.forEach(item => {
-                const category = item.category.toUpperCase();
-                categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+                const itemName = item.itemname;
+                groupedData[itemName] = groupedData[itemName] || {
+                    category: item.category,
+                    stocks: 0,
+                    totalPrice: 0,
+                };
+                groupedData[itemName].stocks += 1;
+                groupedData[itemName].totalPrice += item.price;
             });
 
-            return categoryCounts;
+            return groupedData;
+        }
+
+        function displayDataInTable(groupedData) {
+            var tableHtml = '<thead class="table-dark table-header"><tr>' +
+                '<th class="text-center">Item Name</th>' +
+                '<th class="text-center">Category</th>' +
+                '<th class="text-center">Stocks</th>' +
+                '<th class="text-center">Total Price</th>' +
+                '</tr></thead><tbody class="no-border">';
+
+            Object.keys(groupedData).forEach(itemName => {
+                const { category, stocks, totalPrice } = groupedData[itemName];
+                tableHtml += '<tr>' +
+                    '<td class="text-center">' + itemName + '</td>' +
+                    '<td class="text-center">' + category + '</td>' +
+                    '<td class="text-center">' + stocks + '</td>' +
+                    '<td class="text-center">' + formatCurrency(totalPrice) + '</td>' +
+                    '</tr>';
+            });
+
+            tableHtml += '</tbody>';
+
+            $('#datatable2').empty().html(tableHtml);
+        }
+
+        function createChart(data) {
+            let allCategories = [...new Set(data.map(item => item.category.toUpperCase()))];
+
+            let stocks = [];
+
+            allCategories.forEach(category => {
+                let count = data.filter(item => item.category.toUpperCase() === category).length;
+                stocks.push({ category, count });
+            });
+
+            let labels = stocks.map(entry => entry.category);
+            let chartData = stocks.map(entry => entry.count);
+
+            let ctx = document.getElementById('myChart1').getContext('2d');
+            let myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock Counts',
+                        data: chartData,
+                        backgroundColor: 'rgb(69, 237, 242, 0.2)',
+                        borderColor: 'rgb(69, 237, 242)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
         }
 
     });
