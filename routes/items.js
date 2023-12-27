@@ -34,7 +34,7 @@ router.get("/load", (req, res) => {
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
-      console.log(result);
+      // console.log(result);
 
       if (result.length != 0) {
         let data = MasterItem(result);

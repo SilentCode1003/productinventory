@@ -16,6 +16,7 @@ const {
 const { MasterItemPrice, PriceHistory } = require("./model/spimodel");
 const { GetValue, ACT, INACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
+const { route } = require("./employee");
 var router = express.Router();
 
 /* GET home page. */
@@ -28,6 +29,7 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
+    // console.log("Item Price Load Triggered")
     let sql = `select 
     mip_id,
     mi_name as mip_itemid,
@@ -42,6 +44,7 @@ router.get("/load", (req, res) => {
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
       let data = MasterItemPrice(result);
+      console.log(data)
       res.json(JsonDataResponse(data));
     });
   } catch (error) {
@@ -158,6 +161,34 @@ router.post("/status", (req, res) => {
     res.json({
       msg: error,
     });
+  }
+});
+
+router.post("/edit", (req, res) => {
+  try {
+    const { fobprice, itempriceid } = req.body;
+    let status = GetValue(ACT());
+    let createdby = req.session.fullname;
+    let createddate = GetCurrentDatetime();
+    let master_item_price = [fobprice, itempriceid];
+    let price_history = [
+      [itempriceid, fobprice, status, createdby, createddate],
+    ];
+
+    let sql = "update master_item_price set mip_fobprice=? where mip_id=?";
+    Update(sql, master_item_price, (err, result) => {
+      if (err) console.error("Error: ", err);
+      console.log(result);
+
+      InsertTable("price_history", price_history, (err, result) => {
+        if (err) console.error("Error: ", err);
+        console.log(result);
+
+        res.json(JsonSuccess());
+      });
+    });
+  } catch (error) {
+    res.json(JsonErrorResponse(error));
   }
 });
 
