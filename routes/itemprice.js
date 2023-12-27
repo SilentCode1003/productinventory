@@ -29,6 +29,7 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
+    // console.log("Item Price Load Triggered")
     let sql = `select 
     mip_id,
     mi_name as mip_itemid,
@@ -43,6 +44,7 @@ router.get("/load", (req, res) => {
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
       let data = MasterItemPrice(result);
+      console.log(data)
       res.json(JsonDataResponse(data));
     });
   } catch (error) {
@@ -162,7 +164,7 @@ router.post("/status", (req, res) => {
   }
 });
 
-route.post("/edit", (req, res) => {
+router.post("/edit", (req, res) => {
   try {
     const { fobprice, itempriceid } = req.body;
     let status = GetValue(ACT());
