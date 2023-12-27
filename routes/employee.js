@@ -275,6 +275,25 @@ router.post("/edit", (req, res) => {
   }
 });
 
+router.post("/changepassword", (req, res) => {
+  try {
+    const { password, employeeid } = req.body;
+
+    Encrypter(password, (err, encrypted) => {
+      if (err) console.error("Error: ", err);
+      let employee = [encrypted, employeeid];
+      let sql = "update employee set e_password=? where e_id=?";
+      
+      Update(sql, employee, (err, result) => {
+        if (err) console.error("Error: ", err);
+        res.json(JsonSuccess());
+      });
+    });
+  } catch (error) {
+    res.json(JsonErrorResponse(error));
+  }
+});
+
 //#region Function
 function Check_Employee(fullname) {
   return new Promise((resolve, reject) => {
