@@ -16,6 +16,7 @@ const {
 const { MasterItemPrice, PriceHistory } = require("./model/spimodel");
 const { GetValue, ACT, INACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
+const { route } = require("./employee");
 var router = express.Router();
 
 /* GET home page. */
@@ -158,6 +159,34 @@ router.post("/status", (req, res) => {
     res.json({
       msg: error,
     });
+  }
+});
+
+route.post("/edit", (req, res) => {
+  try {
+    const { fobprice, itempriceid } = req.body;
+    let status = GetValue(ACT());
+    let createdby = req.session.fullname;
+    let createddate = GetCurrentDatetime();
+    let master_item_price = [fobprice, itempriceid];
+    let price_history = [
+      [itempriceid, fobprice, status, createdby, createddate],
+    ];
+
+    let sql = "update master_item_price set mip_fobprice=? where mip_id=?";
+    Update(sql, master_item_price, (err, result) => {
+      if (err) console.error("Error: ", err);
+      console.log(result);
+
+      InsertTable("price_history", price_history, (err, result) => {
+        if (err) console.error("Error: ", err);
+        console.log(result);
+
+        res.json(JsonSuccess());
+      });
+    });
+  } catch (error) {
+    res.json(JsonErrorResponse(error));
   }
 });
 
