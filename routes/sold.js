@@ -147,7 +147,7 @@ router.post("/getsold", (req, res) => {
               INNER JOIN master_item on mi_id = p_itemname
               INNER JOIN master_category on mc_id = p_category
               INNER JOIN employee on e_id = s_soldby
-              INNER JOIN master_item_price on mi_id = mip_id
+              INNER JOIN master_item_price on mip_itemid = mi_id 
               WHERE mc_name = '${category}' AND s_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`;
 
     Select(sql, (err, result) => {
