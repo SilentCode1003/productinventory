@@ -1,6 +1,6 @@
 <!-- PCreated by Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-3">
-    <h1 class="cyber-title">Replace</h1>
+    <h1 class="cyber-title">Deffective Items</h1>
 </div>
 <!-- Content Row -->
 <div class="row mb-2">
@@ -19,29 +19,17 @@
                         </div>
                         <div class="custom-dropdown custom-dropdown-margin-left" id="serialDropdown"></div>
                     </div>
-                      
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                          <input class="form-control text-center custom-input" placeholder="Select/Input Asset Control or Serial" name="replaceserial" id="replaceserial"/>
-                          <input type="hidden" id="hiddenReplaceSerialValue" name="hiddenReplaceSerialValue" />
-                          <div class="input-group-append">
-                            <span class="input-group-text">Replace Serial</span>
-                          </div>
-                        </div>
-                        <div class="custom-dropdown custom-dropdown-margin-left" id="replaceserialDropdown"></div>
-                    </div>
                 </div>
 
                 <div class="row d-flex mt-2">
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
-                          <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee"/>
-                          <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
-                          <div class="input-group-append">
-                            <span class="input-group-text">Replace By</span>
-                          </div>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Reference Number</span>
+                            </div>
+                            <input id="referenceno" name="referenceno" type="text" class="form-control"
+                                placeholder="Enter Reference Number" aria-label="referenceno" aria-describedby="basic-addon1" />
                         </div>
-                        <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
                     </div>
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
@@ -50,18 +38,6 @@
                             </div>
                             <input id="date" name="date" type="date" class="form-control"
                                 placeholder="Enter Date" aria-label="date" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row d-flex mt-2 justify-content-center">
-                    <div class="col-md-6 mb-2">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon2">Reference Number</span>
-                            </div>
-                            <input id="referenceno" name="referenceno" type="text" class="form-control"
-                                placeholder="Enter Reference Number" aria-label="referenceno" aria-describedby="basic-addon1" />
                         </div>
                     </div>
                 </div>
@@ -98,7 +74,7 @@
     <div class="card-header card-bg align-content-center">
         <div class="row">
             <div class="col-md-2 mt-2">
-                <h5 class="m-0 font-weight-bold cyber-title mt-2">Replaced Product Table</h5>
+                <h5 class="m-0 font-weight-bold cyber-title mt-2">Deffective Items Table</h5>
             </div>
             <div class="col-md-5 mt-2">
                 <input id="search" name="search" type="text" class="form-control" placeholder="Search Serial"
@@ -131,11 +107,9 @@
                         <th>ID</th>
                         <th>Asset Control</th>
                         <th>Serial</th>
-                        <th>Replaced Serial</th>
                         <th>Date</th>
-                        <th>Replaced By</th>
                         <th>Ref. No.</th>
-                        <th>Remarks.</th>
+                        <th>Remarks</th>
                     </tr>
                 </thead>
 
