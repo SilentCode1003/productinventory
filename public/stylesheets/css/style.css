@@ -98,7 +98,7 @@
   border-right: transparent !important; 
   border-top: transparent !important;
   border-bottom: 1px solid var(--clr-text) !important;
-
+  color: white !important;
 }
 
 .cbi-link{
@@ -112,8 +112,13 @@
 
 /* TABLE */
 
+
 .table td{
   padding: 2rem !important;
+}
+
+.table tr{
+  color: white !important;
 }
 
 .dashboard-size{
@@ -346,6 +351,7 @@ td {
 }
 
 body {
+  color: white !important;
   margin: 0;
   padding: 0;
   background-color: #17a2b8;
