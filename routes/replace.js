@@ -72,7 +72,7 @@ router.post("/save", (req, res) => {
       referenceno,
     } = req.body;
 
-    Check_ReplaceItem(assetcontrol)
+    Check_ReplaceItem(assetcontrol, date)
       .then((result) => {
         let data = ReplaceItem(result);
 
@@ -98,17 +98,21 @@ router.post("/save", (req, res) => {
           });
         }
       })
-      .catch((error) => {});
+      .catch((error) => {
+        res.json(JsonErrorResponse(error));
+      });
   } catch (error) {
     res.json(JsonErrorResponse(error));
   }
 });
 
 //#region Function
-function Check_ReplaceItem(assetcontrol) {
+function Check_ReplaceItem(assetcontrol, date) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from replaceitem where r_assetcontrol=?";
-    SelectParameter(sql, [assetcontrol], (err, result) => {
+    let sql = "select * from replaceitem where r_assetcontrol=? and r_date=?";
+    let commad = SelectStatement(sql, [assetcontrol, date]);
+
+    Select(commad, (err, result) => {
       if (err) reject(err);
 
       resolve(result);
