@@ -1,6 +1,7 @@
 <script>
     $(document).ready(function () {
         LoadList();
+        Loadtable();
         let myChart;
         $('#dateRange').daterangepicker({
             opens: 'right',
@@ -390,11 +391,106 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            color: '#ffffff'
+                        },
+                        x: {
+                            color: '#ffffff'
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
                         }
                     }
                 }
             });
+        }
+
+        function Loadtable () {
+            $.ajax({
+                url: '/index/deployedtoday',
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.msg === 'success') {
+                        populatedeploytable(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+
+            $.ajax({
+                url: '/index/soldtoday',
+                method: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.msg === 'success') {
+                        populatesoldtable(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        function populatedeploytable(data) {
+            console.log(data);
+            const tableBody = $('#deploytable tbody');
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $('<tr>').append($('<td>', {
+                    colspan: 3,
+                    class: 'text-center',
+                    text: 'No Data'
+                }));
+                tableBody.append(tr);
+            } else {
+                data.forEach(item => {
+                    const tr = $('<tr>').append(
+                        $('<td>', { text: item.assetcontrol, 'data-label': 'ID', class: 'custom-mobile-align cbi-link' }),
+                        $('<td>', { text: item.date, 'data-label': 'Item', class: 'custom-mobile-align text-white' }),
+                        $('<td>', { text: item.referenceno, 'data-label': 'Category', class: 'custom-mobile-align text-white' }),
+                    );
+
+                    tableBody.append(tr);
+                });
+            }
+        }
+
+        function populatesoldtable(data) {
+            console.log(data);
+            const tableBody = $('#soldtable tbody');
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $('<tr>').append($('<td>', {
+                    colspan: 3,
+                    class: 'text-center',
+                    text: 'No Data'
+                }));
+                tableBody.append(tr);
+            } else {
+                data.forEach(item => {
+                    const tr = $('<tr>').append(
+                        $('<td>', { text: item.assetcontrol, 'data-label': 'ID', class: 'custom-mobile-align cbi-link' }),
+                        $('<td>', { text: item.date, 'data-label': 'Item', class: 'custom-mobile-align  text-white' }),
+                        $('<td>', { text: item.referenceno, 'data-label': 'Category', class: 'custom-mobile-align  text-white' }),
+                    );
+
+                    tableBody.append(tr);
+                });
+            }
         }
 
     });
