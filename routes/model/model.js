@@ -209,6 +209,39 @@ class PriceHistoryModel {
   }
 }
 
+class ReplaceItemModel {
+  constructor(
+    id,
+    assetcontrol,
+    itemserial,
+    replacedserial,
+    remarks,
+    date,
+    replacedby,
+    referenceno
+  ) {
+    this.id = id;
+    this.assetcontrol = assetcontrol;
+    this.itemserial = itemserial;
+    this.replacedserial = replacedserial;
+    this.remarks = remarks;
+    this.date = date;
+    this.replacedby = replacedby;
+    this.referenceno = referenceno;
+  }
+}
+
+class DeffectiveItemModel {
+  constructor(id, assetcontrol, itemserial, remarks, date, referenceno) {
+    this.id = id;
+    this.assetcontrol = assetcontrol;
+    this.itemserial = itemserial;
+    this.remarks = remarks;
+    this.date = date;
+    this.referenceno = referenceno;
+  }
+}
+
 //#region Excel Model
 class ProductUploadModel {
   constructor(category, itemname, serial, podate, ponumber, warrantydate) {
@@ -362,4 +395,6 @@ module.exports = {
   MasterItemPriceModel,
   PriceHistoryModel,
   SoldProductModel,
+  ReplaceItemModel,
+  DeffectiveItemModel
 };
