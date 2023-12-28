@@ -1,5 +1,5 @@
 var express = require("express");
-const {  } = require("./model/spimodel");
+const { ReplaceItem } = require("./model/spimodel");
 const {
   Select,
   InsertTable,
@@ -38,13 +38,14 @@ router.get("/load", (req, res) => {
     r_date,
     e_fullname as r_replacedby,
     r_referenceno
-    inner join employee on e_id = r_repairby
+    from replaceitem
+    inner join employee on e_id = r_replacedby
     LIMIT ${itemsPerPage} OFFSET ${offset}`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
-      let data = Repair(result);
+      let data = ReplaceItem(result);
       res.json({
         msg: "success",
         data: data,
