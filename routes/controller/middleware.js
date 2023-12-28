@@ -53,6 +53,12 @@ var roleacess = [
       {
         layout: "itemprice",
       },
+      {
+        layout: "replace",
+      },
+      {
+        layout: "deffective",
+      },
     ],
   },
   {
@@ -93,6 +99,12 @@ var roleacess = [
       },
       {
         layout: "employee",
+      },
+      {
+        layout: "replace",
+      },
+      {
+        layout: "deffective",
       },
     ],
   },

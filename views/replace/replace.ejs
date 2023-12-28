@@ -1,0 +1,146 @@
+<!-- PCreated by Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-3">
+    <h1 class="cyber-title">Replace</h1>
+</div>
+<!-- Content Row -->
+<div class="row mb-2">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select/Input Asset Control or Serial" name="serialname" id="serialname"/>
+                          <input type="hidden" id="hiddenSerialValue" name="hiddenSerialValue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Asset Control/Serial</span>
+                          </div>
+                        </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="serialDropdown"></div>
+                    </div>
+                      
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select/Input Asset Control or Serial" name="replaceserial" id="replaceserial"/>
+                          <input type="hidden" id="hiddenReplaceSerialValue" name="hiddenReplaceSerialValue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Replace Serial</span>
+                          </div>
+                        </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="replaceserialDropdown"></div>
+                    </div>
+                </div>
+
+                <div class="row d-flex mt-2">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee"/>
+                          <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Replace By</span>
+                          </div>
+                        </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Date</span>
+                            </div>
+                            <input id="date" name="date" type="date" class="form-control"
+                                placeholder="Enter Date" aria-label="date" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row d-flex mt-2 justify-content-center">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Reference Number</span>
+                            </div>
+                            <input id="referenceno" name="referenceno" type="text" class="form-control"
+                                placeholder="Enter Reference Number" aria-label="referenceno" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row d-flex mt-2 justify-content-center">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="remarks" style="color: var(--clr-glow) !important;">Remarks: </label>
+                            <textarea class="form-control" id="remarks" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-end">
+                    <div class="col-md-4 align mt-1">
+                        <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-100">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4 table-size">
+    <div class="progress progress-sm mb-2">
+        <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+            aria-valuemax="100"></div>
+    </div>
+    <div class="card-header card-bg align-content-center">
+        <div class="row">
+            <div class="col-md-2 mt-2">
+                <h5 class="m-0 font-weight-bold cyber-title mt-2">Replaced Product Table</h5>
+            </div>
+            <div class="col-md-5 mt-2">
+                <input id="search" name="search" type="text" class="form-control" placeholder="Search Serial"
+                    aria-label="search" aria-describedby="basic-addon1" />
+            </div>
+            <div class="col-md-3 mt-2">
+                <div class="input-group mb-3">
+                    <input
+                        class="btn btn-outline-cyberpower w-100"
+                        type="file"
+                        id="fileinput"
+                        accept=".xlsx, .xls"
+                        placeholder="Select Excel File"
+                    />
+                </div>                
+            </div>
+            <div class="col-md-2 mt-2">
+                <button class="btn btn-outline-cyberpower" id="uploadButton" type="button">
+                    <i class="fas fa-upload"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive scrollable-table-container">
+            <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+                <thead class="table-dark table-header">
+                    <tr>
+                        <th>ID</th>
+                        <th>Asset Control</th>
+                        <th>Serial</th>
+                        <th>Replaced Serial</th>
+                        <th>Date</th>
+                        <th>Replaced By</th>
+                        <th>Ref. No.</th>
+                        <th>Remarks.</th>
+                    </tr>
+                </thead>
+
+                <tbody class="no-border"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
