@@ -21,6 +21,8 @@ const {
   PriceHistoryModel,
   SoldProductModel,
   RepairProductModel,
+  ReplaceItemModel,
+  DeffectiveItemModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -440,6 +442,64 @@ exports.PriceHistory = (data) => {
         key["status"],
         key["createdby"],
         key["createddate"]
+      )
+  );
+};
+
+exports.ReplaceItem = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.r_id,
+      assetcontrol: key.r_assetcontrol,
+      itemserial: key.r_itemserial,
+      replacedserial: key.r_replacedserial,
+      remarks: key.r_remarks,
+      date: key.r_date,
+      replacedby: key.r_replacedby,
+      referenceno: key.r_referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new ReplaceItemModel(
+        key["id"],
+        key["assetcontrol"],
+        key["itemserial"],
+        key["replacedserial"],
+        key["remarks"],
+        key["date"],
+        key["replacedby"],
+        key["referenceno"]
+      )
+  );
+};
+
+exports.DeffectiveItem = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.d_id,
+      assetcontrol: key.d_assetcontrol,
+      itemserial: key.d_itemserial,
+      remarks: key.d_remarks,
+      date: key.d_date,
+      referenceno: key.d_referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new DeffectiveItemModel(
+        key["id"],
+        key["assetcontrol"],
+        key["itemserial"],
+        key["remarks"],
+        key["date"],
+        key["referenceno"]
       )
   );
 };
