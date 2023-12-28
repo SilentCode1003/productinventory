@@ -12,7 +12,11 @@ const {
 } = require("./repository/customhelper");
 const { GetValue, RPRD } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
-const { JsonErrorResponse } = require("./repository/responce");
+const {
+  JsonErrorResponse,
+  JsonWarningResponse,
+  JsonSuccess,
+} = require("./repository/responce");
 var router = express.Router();
 
 /* GET home page. */
@@ -55,3 +59,60 @@ router.get("/load", (req, res) => {
     res.json(JsonErrorResponse());
   }
 });
+
+router.post("/save", (req, res) => {
+  try {
+    const {
+      assetcontrol,
+      itemserial,
+      replacedserial,
+      remarks,
+      date,
+      replacedby,
+      referenceno,
+    } = req.body;
+
+    Check_ReplaceItem(assetcontrol)
+      .then((result) => {
+        let data = ReplaceItem(result);
+
+        if (data.length != 0) {
+          res.json(JsonWarningResponse("exist"));
+        } else {
+          let replaceitem = [
+            [
+              assetcontrol,
+              itemserial,
+              replacedserial,
+              remarks,
+              date,
+              replacedby,
+              referenceno,
+            ],
+          ];
+
+          InsertTable("replaceitem", replaceitem, (err, result) => {
+            if (err) console.error("Error: ", err);
+            console.log(result);
+            res.json(JsonSuccess());
+          });
+        }
+      })
+      .catch((error) => {});
+  } catch (error) {
+    res.json(JsonErrorResponse(error));
+  }
+});
+
+//#region Function
+function Check_ReplaceItem(assetcontrol) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from replaceitem where r_assetcontrol=?";
+    SelectParameter(sql, [assetcontrol], (err, result) => {
+      if (err) reject(err);
+
+      resolve(result);
+    });
+  });
+}
+//#endregion
