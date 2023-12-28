@@ -265,6 +265,15 @@ class SoldProductModel {
   }
 }
 
+class RepairProductModel {
+  constructor(serial, date, repairby, referenceno) {
+    this.serial = serial;
+    this.date = date;
+    this.repairby = repairby;
+    this.referenceno = referenceno;
+  }
+}
+
 //#endregion
 
 //#region Search
@@ -345,6 +354,7 @@ module.exports = {
   MasterPositionModel,
   MasterClientModel,
   ProductUploadModel,
+  RepairProductModel,
   TransferProductModel,
   SearchModel,
   DeployProductModel,

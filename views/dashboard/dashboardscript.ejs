@@ -306,6 +306,7 @@
             url: "/product/getstocks",
             success: function (result) {
                 let container = result.data;
+                $("#totalstocks").text(container.length);
                 console.log("stocks: ", container);
 
                 let groupedData = groupDataByItemName(container);

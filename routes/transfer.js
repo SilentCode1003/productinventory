@@ -129,6 +129,7 @@ router.post("/upload", (req, res) => {
   try {
     const { data } = req.body;
     let dataJson = TransferProduct(JSON.parse(data));
+    console.log(dataJson)
     let transfer = [];
     let counter = 0;
     let noentry = [];
