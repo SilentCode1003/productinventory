@@ -20,6 +20,7 @@ const {
   MasterItemPriceModel,
   PriceHistoryModel,
   SoldProductModel,
+  RepairProductModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -575,6 +576,29 @@ exports.SoldProduct = (data) => {
         key["company"],
         key["branch"],
         key["soldby"],
+        key["referenceno"]
+      )
+  );
+};
+
+exports.RepairProduct = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      serial: key.serial,
+      date: key.date,
+      repairby: key.repairby,
+      referenceno: key.referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new RepairProductModel(
+        key["serial"],
+        key["date"],
+        key["repairby"],
         key["referenceno"]
       )
   );

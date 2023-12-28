@@ -301,7 +301,7 @@ router.post("/upload", (req, res) => {
           Product_Check(item.serial)
             .then((result) => {
               // console.log(result);
-             
+
               if (result[0].total != 0) {
                 duplicate += item.serial;
               } else {

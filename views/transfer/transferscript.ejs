@@ -658,6 +658,7 @@
 
     function excelDataSave(data) {
       var dataraw = JSON.stringify(data, null, 2);
+      console.log(dataraw)
       $.ajax({
         type: "POST",
         url: "/transfer/upload",
