@@ -447,12 +447,10 @@
                     });
                 }
                 dataExcelArr.push({
-                    category: data[0].item,
-                    itemname: data[1].item,
-                    serial: data[2].item,
-                    podate: data[3].item,
-                    ponumber: data[4].item,
-                    warrantydate: data[5].item,
+                    serial: data[0].item,
+                    date: data[1].item,
+                    repairby: data[2].item,
+                    referenceno: data[3].item,
                 });
             }
             excelDataSave(dataExcelArr);
@@ -460,9 +458,10 @@
 
         function excelDataSave(data) {
             var dataraw = JSON.stringify(data, null, 2);
+            console.log(dataraw);
             $.ajax({
                 type: "POST",
-                url: "/product/upload",
+                url: "/repair/upload",
                 data: {
                     data: dataraw,
                 },

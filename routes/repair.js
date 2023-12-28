@@ -1,7 +1,7 @@
 var express = require("express");
-const { Repair } = require("./model/spimodel");
-const { Select, InsertTable, Update } = require("./repository/spidb");
-const { SelectStatement } = require("./repository/customhelper");
+const { Repair, Product, RepairProduct } = require("./model/spimodel");
+const { Select, InsertTable, Update, SelectParameter } = require("./repository/spidb");
+const { SelectStatement, convertExcelDate } = require("./repository/customhelper");
 const { GetValue, RPRD } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
 var router = express.Router();
@@ -91,6 +91,72 @@ router.post("/save", (req, res) => {
   }
 });
 
+router.post("/upload", (req, res) => {
+  try {
+    const { data } = req.body;
+    let dataJson = RepairProduct(JSON.parse(data));
+    console.log(dataJson)
+    let repair = [];
+    let counter = 0;
+    let noentry = [];
+
+    dataJson.forEach((item) => {
+      Check_Product(item.serial)
+        .then((result) => {
+          counter += 1;
+          let data = Product(result);
+          // console.log(data);
+
+          if (data.length != 0) {
+            let assetcontrol = data[0].assetcontrol;
+            let status = GetValue(RPRD());
+            let update_product =
+              "update product set p_status=? where p_assetcontrol=?";
+            let update_product_data = [status, assetcontrol];
+
+            repair.push([
+              assetcontrol,
+              item.serial,
+              convertExcelDate(item.date),
+              item.repairby,
+              item.referenceno,
+            ]);
+
+            Update(update_product, update_product_data, (err, result) => {
+              if (err) console.error("Error: ", err);
+              // console.log(result);
+            });
+          } else {
+            noentry.push(item.serial);
+          }
+
+          if (counter == dataJson.length) {
+            console.log("No Entry: ", noentry);
+            console.log("Done: ");
+            InsertTable("repair", repair, (err, result) => {
+              if (err) console.error("Error: ", err);
+              console.log(result);
+
+              return res.json({
+                msg: "success",
+              });
+            });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          return res.json({
+            msg: error,
+          });
+        });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 //#region
 function Check_Repair(assetcontrol, date) {
   return new Promise((resolve, reject) => {
@@ -121,4 +187,16 @@ function Repair_Product(assetcontrol) {
   });
 }
 
+function Check_Product(serial) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from product where p_serial=?";
+    // console.log(serial);
+    SelectParameter(sql, [serial], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
+
+      resolve(result);
+    });
+  });
+}
 //#endregion
