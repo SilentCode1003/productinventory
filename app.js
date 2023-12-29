@@ -24,7 +24,7 @@ var loginRouter = require("./routes/login");
 var searchRouter = require("./routes/search");
 var itempriceRouter = require("./routes/itemprice");
 var replaceRouter = require("./routes/replace");
-var deffectiveRouter = require("./routes/deffective");
+var defectiveRouter = require("./routes/defective");
 
 
 var app = express();
@@ -63,7 +63,7 @@ app.use("/login", loginRouter);
 app.use("/search", searchRouter);
 app.use("/itemprice", itempriceRouter);
 app.use("/replace", replaceRouter);
-app.use("/deffective", deffectiveRouter);
+app.use("/defective", defectiveRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
