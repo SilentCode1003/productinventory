@@ -24,6 +24,7 @@ const {
   ReplaceItemModel,
   DeffectiveItemModel,
   ReturnProductModel,
+  UploadItemPriceModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -686,6 +687,25 @@ exports.ReturnProduct = (data) => {
         key["returnby"],
         key["returnfrom"],
         key["referenceno"]
+      )
+  );
+};
+
+exports.UploadItemPrice = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      itemid: key.itemid,
+      fobprice: key.fobprice,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new UploadItemPriceModel(
+        key["itemid"],
+        key["fobprice"]
       )
   );
 };

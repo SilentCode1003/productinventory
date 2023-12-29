@@ -317,6 +317,13 @@ class ReturnProductModel {
   }
 }
 
+class UploadItemPriceModel {
+  constructor(itemid, fobprice) {
+    this.itemid = itemid;
+    this.fobprice = fobprice;
+  }
+}
+
 //#endregion
 
 //#region Search
@@ -408,4 +415,5 @@ module.exports = {
   ReplaceItemModel,
   DeffectiveItemModel,
   ReturnProductModel,
+  UploadItemPriceModel,
 };
