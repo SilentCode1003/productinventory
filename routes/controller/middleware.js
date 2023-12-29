@@ -57,7 +57,7 @@ var roleacess = [
         layout: "replace",
       },
       {
-        layout: "deffective",
+        layout: "defective",
       },
     ],
   },
@@ -104,7 +104,7 @@ var roleacess = [
         layout: "replace",
       },
       {
-        layout: "deffective",
+        layout: "defective",
       },
     ],
   },

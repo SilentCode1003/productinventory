@@ -27,7 +27,7 @@ var router = express.Router();
 /* GET home page. */
 router.get("/", function (req, res, next) {
   // res.render("repair", { title: "Express" });
-  Validator(req, res, "deffective");
+  Validator(req, res, "defective");
 });
 
 module.exports = router;
@@ -68,11 +68,10 @@ router.post("/save", (req, res) => {
 
     Check_DeffectiveItem(assetcontrol, date)
       .then((result) => {
-        let data = DeffectiveItem(result);
-
-        if (data.length != 0) {
+        if (result.length != 0) {
           res.json(JsonWarningResponse("exist"));
         } else {
+          let data = DeffectiveItem(result);
           let deffectiveitem = [
             [assetcontrol, itemserial, remarks, date, referenceno],
           ];

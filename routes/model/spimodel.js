@@ -23,6 +23,8 @@ const {
   RepairProductModel,
   ReplaceItemModel,
   DeffectiveItemModel,
+  ReturnProductModel,
+  UploadItemPriceModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -660,6 +662,50 @@ exports.RepairProduct = (data) => {
         key["date"],
         key["repairby"],
         key["referenceno"]
+      )
+  );
+};
+
+exports.ReturnProduct = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      serial: key.serial,
+      date: key.date,
+      returnby: key.returnby,
+      returnfrom: key.returnfrom,
+      referenceno: key.referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new ReturnProductModel(
+        key["serial"],
+        key["date"],
+        key["returnby"],
+        key["returnfrom"],
+        key["referenceno"]
+      )
+  );
+};
+
+exports.UploadItemPrice = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      itemid: key.itemid,
+      fobprice: key.fobprice,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new UploadItemPriceModel(
+        key["itemid"],
+        key["fobprice"]
       )
   );
 };

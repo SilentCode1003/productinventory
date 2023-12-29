@@ -1,12 +1,14 @@
 <script>
     $(document).ready(function () {
         //Functionality
-        let itemid = "";
-        let status = "";
+        let isFetchingData = false;
+        let hasMoreData = true;
+        let currentPage = 1;
+        let assetcontrol = "";
 
         LoadTable();
 
-        $("#datatable tbody").on("click", "tr", function () {
+        $("#data-table tbody").on("click", "tr", function () {
             var dataRow = [];
             $(this)
                 .closest("tr")
@@ -15,57 +17,66 @@
                     dataRow.push($(this).text());
                 });
             // console.log(dataRow);
-            itemid = dataRow[0];
-            status = dataRow[3];
+            assetcontrol = dataRow[0];
         });
 
-
-        $(document).on("click", "#editBtn", function () {
-            $("#itemidmodal").val(itemid);
-        });
-
-        $(document).on("input", "#itemname", function () {
-            $("#hiddenValue").val("");
+        $(document).on("input", "#serialname", function () {
+            $("#hiddenSerialValue").val("");
         });
 
         $(document).on("click", "#addBtn", function () {
-            let itemid = $("#hiddenValue").val();
-            let itemname = $("#itemname").val();
-            let fobprice = $("#fobprice").val();
+            let serialasset = $("#hiddenSerialValue").val();
+            let data = $("#serialname").val();
+            let referenceno = $("#referenceno").val();
+            let date = $("#date").val();
+            let remarks = $("#remarks").val();
 
             var message = "";
 
-            if (itemid == "") {
-                message += "Item does not Exist " + `${itemname}, `;
+            if (serialasset == "") {
+                message += "Serial and Asset Control does not Exist " + `${data}, `;
             }
-            if (fobprice == "") {
-                message += "Empty FOB Price";
+            if (remarks == "") {
+                message += "Empty Remarks, ";
+            }
+            if (referenceno == "") {
+                message += "Empty Reference Number, ";
+            }
+            if (date == "") {
+                message += "Empty Date, ";
             }
 
             if (message != "") {
                 warning("Required", `${message}`);
             }
             else {
-                let refineFobPrice = fobprice.replace(/,|₱/g, "");
-                // console.log(itemid, itemname, refineFobPrice)
+                let splitData = data.split(" ");
+                let serial = splitData[0];
+                let assetControl = splitData[1].replace("(", "").replace(")", "");
+                console.log(assetControl, serial, date, referenceno, remarks)
                 $.ajax({
                     type: "POST",
-                    url: "/itemprice/save",
+                    url: "/defective/save",
                     data: {
-                        itemid: itemid,
-                        fobprice: refineFobPrice,
+                        assetcontrol: assetControl,
+                        itemserial: serial,
+                        date: date,
+                        referenceno: referenceno,
+                        remarks: remarks,
                     },
                     success: function (result) {
                         if (result.msg == "success") {
-                            LoadTable();
-                            $("#itemname").val('');
-                            $("#hiddenValue").val('');
-                            $("#fobprice").val('');
+                            resettable();
                             success("Saved", "Successfully");
+                            $("#referenceno").val("");
+                            $("#serialname").val("");
+                            $("#hiddenSerialValue").val("");
+                            $("#date").val("");
+                            $("#remarks").val("");
                         }
 
                         if (result.msg == "exist") {
-                            warning("Exist", `${itemname} is already registered!`);
+                            warning("Exist", `${serial} already exist!`);
                         }
                     },
                     error: function (err) {
@@ -75,10 +86,8 @@
             }
         });
 
-        function populatedatatable(data) {
-            // console.log(data);
-            const tableBody = $('#datatable tbody');
-            tableBody.empty();
+        function populatetable(data) {
+            const tableBody = $("#datatable tbody");
 
             if (data.length === 0) {
                 const tr = $("<tr>").append(
@@ -90,18 +99,7 @@
                 );
                 tableBody.append(tr);
             } else {
-                let action = '';
-
                 data.forEach((item) => {
-                    if (item.status === 'ACTIVE') {
-                        action = `
-                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                            <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
-                    } else if (item.status === 'INACTIVE') {
-                        action = `
-                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                            <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
-                    }
                     const tr = $("<tr>").append(
                         $("<td>", {
                             text: item.id,
@@ -109,34 +107,29 @@
                             class: "custom-mobile-align",
                         }),
                         $("<td>", {
-                            text: item.itemid,
-                            "data-label": "Item ID",
+                            text: item.assetcontrol,
+                            "data-label": "Asset Control",
                             class: "custom-mobile-align",
                         }),
                         $("<td>", {
-                            text: formatCurrency(item.fobprice),
-                            "data-label": "FOB Price",
+                            text: item.serial,
+                            "data-label": "Serial",
                             class: "custom-mobile-align",
                         }),
                         $("<td>", {
-                            text: item.status,
-                            "data-label": "Status",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.createdby,
-                            "data-label": "Created By",
+                            text: item.remarks,
+                            "data-label": "Remarks",
                             class: "custom-mobile-align no-wrap",
                         }),
                         $("<td>", {
-                            text: item.createddate,
-                            "data-label": "Created Date",
+                            text: item.date,
+                            "data-label": "Date",
                             class: "custom-mobile-align no-wrap",
                         }),
                         $("<td>", {
-                            html: action,
-                            // "data-label": "Created Date",
-                            // class: "custom-mobile-align no-wrap",
+                            text: item.referenceno,
+                            "data-label": "Reference No.",
+                            class: "custom-mobile-align",
                         })
                     );
                     tableBody.append(tr);
@@ -145,158 +138,109 @@
         }
 
         function LoadTable() {
+            if (!hasMoreData) {
+                return;
+            }
             $(".progress").hide();
             $(".progress").slideDown();
-
             $.ajax({
-                url: '/itemprice/load',
-                method: 'GET',
-                dataType: 'json',
+                url: "/defective/load",
+                method: "GET",
+                dataType: "json",
+                data: { page: currentPage },
                 xhrFields: {
                     onprogress: function (e) {
                         if (e.lengthComputable) {
                             var percentComplete = (e.loaded / e.total) * 100;
                             $(".progress-bar").css("width", percentComplete + "%");
                         }
-                    }
+                    },
                 },
                 success: function (data) {
                     setTimeout(function () {
                         $(".progress").slideUp(function () {
-                            if (data.msg === 'success') {
-                                populatedatatable(data.data);
+                            hasMoreData = data.data.length > 0;
+                            if (!hasMoreData) {
+                                const tableBody = $("#datatable tbody");
+                                const tr = $("<tr>").append(
+                                    $("<td>", {
+                                        colspan: 9,
+                                        class: "text-center",
+                                        text: "No More Data",
+                                    })
+                                );
+                                tableBody.append(tr);
                             } else {
-                                console.error(data.msg);
+                                if (data.msg === "success") {
+                                    populatetable(data.data);
+                                    currentPage++;
+                                } else {
+                                    console.error(data.msg);
+                                }
                             }
+                            isFetchingData = false;
                         });
                     }, 1000);
                 },
                 error: function (error) {
                     console.error(error);
-                }
+                    isFetchingData = false;
+                    hasMoreData = false
+                },
             });
         }
 
-        //#region EDIT SCRIPTS
-        $(document).on("click", "#updateBtn", function () {
-            let itemid = $("#itemidmodal").val();
-            let fobprice = $("#fobpricemodal").val();
-
-            var message = "";
-
-            if (fobprice == "") {
-                message += "FOB Price ";
+        $(".scrollable-table-container").scroll(function () {
+            const container = $(this);
+            if (isFetchingData) {
+                return;
             }
-
-            if (message != "") {
-                warning("Required", `Please fill up ${message}`);
-            } else {
-                let refineFobPrice = fobprice.replace(/,|$/g, "");
-                $.ajax({
-                    type: "POST",
-                    url: "/itemprice/edit",
-                    data: {
-                        itempriceid: itemid,
-                        fobprice: refineFobPrice,
-                    },
-                    success: function (result) {
-                        if (result.msg == "success") {
-                            LoadTable();
-                            success("Saved", "Successfully");
-                            $("#fobpricemodal").val('');
-                            $("#editModal").modal("hide");
-                        }
-
-                        if (result.msg == "exist") {
-                            warning("Exist", `${categorynamemodal} already exist!`);
-                        }
-                    },
-                    error: function (err) {
-                        errormsg(err);
-                    },
-                });
+            if (
+                container.scrollTop() + container.innerHeight() >=
+                container[0].scrollHeight - 10
+            ) {
+                //console.log("Append Triggered!");
+                isFetchingData = true;
+                LoadTable();
             }
         });
 
-        $(document).on("click", "#activeBtn", function () {
-            console.log(itemid);
-            console.log(status);
-            $.ajax({
-                type: "POST",
-                url: "/itemprice/status",
-                data: {
-                    status: status,
-                    id: itemid,
-                },
-                success: function (result) {
-                    if (result.msg == "success") {
-                        LoadTable();
-                        success("Saved", "Successfully");
-                    }
-
-                    if (result.msg == "notexist") {
-                        warning(`${itemid} does not exist!`);
-                    }
-                },
-                error: function (err) {
-                    errormsg(err);
-                },
-            });
-        });
-
-        $(document).on("click", "#inactiveBtn", function () {
-            console.log(itemid);
-            console.log(status);
-            $.ajax({
-                type: "POST",
-                url: "/itemprice/status",
-                data: {
-                    status: status,
-                    id: itemid,
-                },
-                success: function (result) {
-                    if (result.msg == "success") {
-                        LoadTable();
-                        success("Saved", "Successfully");
-                    }
-
-                    if (result.msg == "notexist") {
-                        warning(`${itemid} does not exist!`);
-                    }
-                },
-                error: function (err) {
-                    errormsg(err);
-                },
-            });
-        });
-        //#endregion
+        function resettable() {
+            const tableBody = $("#datatable tbody");
+            tableBody.empty();
+            currentPage = 1;
+            hasMoreData = true;
+            LoadTable();
+        }
 
         //#region CUSTOM DROPDOWN INPUT
-        let activeItems = [];
+        let activeSerial = [];
 
         function LoadList() {
             // console.log("triggered");
             $.ajax({
                 type: "GET",
-                url: "/items/load",
+                url: "/product/load",
                 success: function (result) {
                     let container = result.data;
                     // console.log("data: ", container);
                     $.each(container, (key, item) => {
-                        activeItems.push({ display: item.name, value: item.id });
+                        // if (item.status != "DEPLOYED" && item.status != "SOLD") {
+                            let newname = item.serial + " (" + item.assetcontrol + ")";
+                            activeSerial.push({ display: newname, value: item.serial });
+                        // }
                     });
-                    populateCustomDropdown();
+                    populateCustomDropdown1();
                 },
                 error: function (err) {
                     errormsg(err);
                 },
             });
-
         }
 
-        function populateCustomDropdown() {
-            for (const serial of activeItems) {
-                addOption("itemDropdown", serial.display, serial.value);
+        function populateCustomDropdown1() {
+            for (const serial of activeSerial) {
+                addOption2("serialDropdown", serial.display, serial.value);
             }
         }
 
@@ -338,25 +282,6 @@
             });
         }
 
-        function addOption(dropdownId, displayText, actualValue) {
-            const dropdownElement = document.getElementById(dropdownId);
-            const hiddenInput = document.getElementById("hiddenValue");
-
-            const newOption = document.createElement("div");
-            newOption.className = "dropdown-option";
-            newOption.textContent = displayText;
-            newOption.setAttribute("data-value", actualValue);
-
-            newOption.addEventListener("click", function () {
-                const inputElement = document.getElementById("itemname");
-                inputElement.value = displayText;
-                hiddenInput.value = actualValue;
-                dropdownElement.style.display = "none";
-            });
-
-            dropdownElement.appendChild(newOption);
-        }
-
         function addOption2(dropdownId, displayText, actualValue) {
             const dropdownElement = document.getElementById(dropdownId);
             const hiddenInput = document.getElementById("hiddenSerialValue");
@@ -376,7 +301,7 @@
             dropdownElement.appendChild(newOption);
         }
 
-        setupCustomDropdown("itemname", "itemDropdown", "dropdown-option");
+        setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
         LoadList();
         //#endregion
 
@@ -399,7 +324,7 @@
             if (!foundMatches) {
                 const noMatchRow = $("<tr>").append(
                     $("<td>", {
-                        colspan: 7,
+                        colspan: 9,
                         class: "text-center",
                         text: "No Data Matched",
                     })
@@ -410,17 +335,17 @@
         }
 
         $("#search").on("input", filterTableRows);
+
         //#region Upload
         $(document).on("click", "#uploadButton", function () {
             //   console.log("clicked!");
             let uploaddata = $("#fileinput").val();
-            if (uploaddata != '') {
+            if (uploaddata != "") {
                 showspinner();
                 UploadProcess();
             } else {
-                warning('Warning!', "No File Chosen!")
+                warning("Warning!", "No File Chosen!");
             }
-
         });
 
         function UploadProcess() {
@@ -495,8 +420,11 @@
                     });
                 }
                 dataExcelArr.push({
-                    itemid: data[0].item,
-                    fobprice: data[1].item,
+                    serial: data[0].item,
+                    date: data[1].item,
+                    deployby: data[2].item,
+                    deployto: data[3].item,
+                    referenceno: data[4].item == null ? "N/A" : data[4].item,
                 });
             }
             excelDataSave(dataExcelArr);
@@ -504,19 +432,18 @@
 
         function excelDataSave(data) {
             var dataraw = JSON.stringify(data, null, 2);
-            console.log(dataraw);
             $.ajax({
                 type: "POST",
-                url: "/itemprice/upload",
+                url: "/deploy/upload",
                 data: {
                     data: dataraw,
                 },
                 success: function (result) {
                     hidespinner();
-                    if (result.msg != "success") {
-                        warning(
-                            "Duplicate",
-                            `Some data already exist on the database. ID[${result.data}]`
+                    if (result.msg == "noentry") {
+                        return warning(
+                            "Product Not Registered",
+                            `List of serials not yet registered [${result.data.noentry}]`
                         );
 
                         // swal({
@@ -525,16 +452,29 @@
                         //   icon: "warning",
                         //   button: "OK!",
                         // });
-                    } else {
-                        success("Saved!", "Data saved!");
-                        LoadTable();
-                        // swal({
-                        //   title: "Success",
-                        //   text: "Data saved!",
-                        //   icon: "success",
-                        //   button: "OK!",
-                        // });
                     }
+                    if (result.msg == "dupentry") {
+                        return warning(
+                            "Already Exist",
+                            `List of serials that already deployed [${result.data.dupentry}]`
+                        );
+                    }
+
+                    if (result.msg == "noentrydupentry") {
+                        return warning(
+                            "Warning",
+                            `List of serials that are not yet register [${result.data.noentry}]\nList of serials that already dployed [${result.data.dupentry}]`
+                        );
+                    }
+
+                    success("Saved!", "Data saved!");
+                    resettable();
+                    // swal({
+                    //   title: "Success",
+                    //   text: "Data saved!",
+                    //   icon: "success",
+                    //   button: "OK!",
+                    // });
 
                     // $('#item-tbl').DataTable().ajax.reload();
                 },
@@ -542,7 +482,6 @@
                     console.error(result);
                 },
             });
-
         }
         //#endregion
     });

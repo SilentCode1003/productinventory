@@ -427,4 +427,38 @@ exports.InsertTable = (tablename, data, callback) => {
       callback(null, result);
     });
   }
+
+  if (tablename == "deffectiveitem") {
+    let sql = `INSERT INTO deffectiveitem(
+      d_assetcontrol,
+      d_itemserial,
+      d_remarks,
+      d_date,
+      d_referenceno) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "replaceitem") {
+    let sql = `INSERT INTO replaceitem(
+      r_assetcontrol,
+      r_itemserial,
+      r_replacedserial,
+      r_remarks,
+      r_date,
+      r_replacedby,
+      r_referenceno) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
 };

@@ -13,7 +13,7 @@ const {
   JsonErrorResponse,
   JsonSuccess,
 } = require("./repository/responce");
-const { MasterItemPrice, PriceHistory } = require("./model/spimodel");
+const { MasterItemPrice, PriceHistory, UploadItemPrice } = require("./model/spimodel");
 const { GetValue, ACT, INACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
 const { route } = require("./employee");
@@ -192,15 +192,64 @@ router.post("/edit", (req, res) => {
   }
 });
 
+
 router.post("/upload", (req, res) => {
   try {
     const { data } = req.body;
-    let dataJson = TransferProduct(JSON.parse(data));
-    let transfer = [];
+    let dataJson = UploadItemPrice(JSON.parse(data));
+    console.log(dataJson)
+    let status = GetValue(ACT());
+    let createdby = req.session.fullname;
+    let createddate = GetCurrentDatetime();
+    let pricedata = [];
     let counter = 0;
     let noentry = [];
+
+    dataJson.forEach((item) => {
+      Check_Item(item.itemid)
+        .then((result) => {
+          counter += 1;
+          let data = UploadItemPrice(result);
+          // console.log(data);
+
+          if (data.length != 0) {
+
+            pricedata.push([
+              item.itemid,
+              item.fobprice,
+              status,
+              createdby,
+              createddate,
+            ]);
+
+          } else {
+            noentry.push(item.itemid);
+          }
+
+          if (counter == dataJson.length) {
+            console.log("No Entry: ", noentry);
+            console.log("Done: ");
+            InsertTable("master_item_price", pricedata, (err, result) => {
+              if (err) console.error("Error: ", err);
+              console.log(result);
+
+              return res.json({
+                msg: "success",
+              });
+            });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          return res.json({
+            msg: error,
+          });
+        });
+    });
   } catch (error) {
-    res.json(JsonErrorResponse(error));
+    res.json({
+      msg: error,
+    });
   }
 });
 
@@ -211,6 +260,20 @@ function Check_ItemPrice(itemid, callback) {
   SelectParameter(sql, [itemid], (err, result) => {
     if (err) callback(err, null);
     callback(null, result);
+  });
+}
+
+function Check_Item(itemid) {
+  let sql = "select * from master_item_price where mip_itemid=?";
+  return new Promise((resolve, reject) => {
+    let sql = "select * from master_item_price where mip_itemid=?";
+    // console.log(serial);
+    SelectParameter(sql, [itemid], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
+
+      resolve(result);
+    });
   });
 }
 
