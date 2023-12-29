@@ -27,7 +27,7 @@ var router = express.Router();
 /* GET home page. */
 router.get("/", function (req, res, next) {
   // res.render("repair", { title: "Express" });
-  Validator(req, res, "deffective");
+  Validator(req, res, "defective");
 });
 
 module.exports = router;
