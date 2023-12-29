@@ -307,6 +307,16 @@ class RepairProductModel {
   }
 }
 
+class ReturnProductModel {
+  constructor(serial, date, returnby, returnfrom, referenceno) {
+    this.serial = serial;
+    this.date = date;
+    this.returnby = returnby;
+    this.returnfrom = returnfrom;
+    this.referenceno = referenceno;
+  }
+}
+
 //#endregion
 
 //#region Search
@@ -396,5 +406,6 @@ module.exports = {
   PriceHistoryModel,
   SoldProductModel,
   ReplaceItemModel,
-  DeffectiveItemModel
+  DeffectiveItemModel,
+  ReturnProductModel,
 };

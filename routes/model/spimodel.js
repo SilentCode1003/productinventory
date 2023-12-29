@@ -23,6 +23,7 @@ const {
   RepairProductModel,
   ReplaceItemModel,
   DeffectiveItemModel,
+  ReturnProductModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -659,6 +660,31 @@ exports.RepairProduct = (data) => {
         key["serial"],
         key["date"],
         key["repairby"],
+        key["referenceno"]
+      )
+  );
+};
+
+exports.ReturnProduct = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      serial: key.serial,
+      date: key.date,
+      returnby: key.returnby,
+      returnfrom: key.returnfrom,
+      referenceno: key.referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new ReturnProductModel(
+        key["serial"],
+        key["date"],
+        key["returnby"],
+        key["returnfrom"],
         key["referenceno"]
       )
   );
