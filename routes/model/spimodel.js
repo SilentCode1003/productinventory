@@ -696,7 +696,8 @@ exports.UploadItemPrice = (data) => {
 
   data.forEach((key, item) => {
     dataResult.push({
-      itemid: key.itemid,
+      category: key.category,
+      itemname: key.itemname,
       fobprice: key.fobprice,
     });
   });
@@ -704,7 +705,8 @@ exports.UploadItemPrice = (data) => {
   return dataResult.map(
     (key) =>
       new UploadItemPriceModel(
-        key["itemid"],
+        key["category"],
+        key["itemname"],
         key["fobprice"]
       )
   );
