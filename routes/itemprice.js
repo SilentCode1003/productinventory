@@ -13,7 +13,11 @@ const {
   JsonErrorResponse,
   JsonSuccess,
 } = require("./repository/responce");
-const { MasterItemPrice, PriceHistory, UploadItemPrice } = require("./model/spimodel");
+const {
+  MasterItemPrice,
+  PriceHistory,
+  UploadItemPrice,
+} = require("./model/spimodel");
 const { GetValue, ACT, INACT } = require("./repository/dictionary");
 const { GetCurrentDatetime } = require("./repository/customhelper");
 const { route } = require("./employee");
@@ -192,12 +196,11 @@ router.post("/edit", (req, res) => {
   }
 });
 
-
 router.post("/upload", (req, res) => {
   try {
     const { data } = req.body;
     let dataJson = UploadItemPrice(JSON.parse(data));
-    console.log(dataJson)
+    console.log(dataJson);
     let status = GetValue(ACT());
     let createdby = req.session.fullname;
     let createddate = GetCurrentDatetime();
@@ -206,22 +209,20 @@ router.post("/upload", (req, res) => {
     let noentry = [];
 
     dataJson.forEach((item) => {
-      Check_Item(item.itemid)
+      Check_Item(item.itemname)
         .then((result) => {
           counter += 1;
-          let data = UploadItemPrice(result);
+          let itemprice = MasterItemPrice(result)[0];
           // console.log(data);
 
           if (data.length != 0) {
-
             pricedata.push([
-              item.itemid,
+              itemprice.id,
               item.fobprice,
               status,
               createdby,
               createddate,
             ]);
-
           } else {
             noentry.push(item.itemid);
           }
@@ -233,23 +234,17 @@ router.post("/upload", (req, res) => {
               if (err) console.error("Error: ", err);
               console.log(result);
 
-              return res.json({
-                msg: "success",
-              });
+              return res.json(JsonSuccess());
             });
           }
         })
         .catch((error) => {
           console.error(error);
-          return res.json({
-            msg: error,
-          });
+          return res.json(JsonErrorResponse(error));
         });
     });
   } catch (error) {
-    res.json({
-      msg: error,
-    });
+    res.json(JsonErrorResponse(error));
   }
 });
 
@@ -263,15 +258,13 @@ function Check_ItemPrice(itemid, callback) {
   });
 }
 
-function Check_Item(itemid) {
-  let sql = "select * from master_item_price where mip_itemid=?";
+function Check_Item(name) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from master_item_price where mip_itemid=?";
+    let sql = "select * from master_item where mi_name=?";
     // console.log(serial);
-    SelectParameter(sql, [itemid], (err, result) => {
+    SelectParameter(sql, [name], (err, result) => {
       if (err) reject(err);
       // console.log(result);
-
       resolve(result);
     });
   });
