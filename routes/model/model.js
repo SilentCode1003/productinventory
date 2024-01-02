@@ -318,8 +318,9 @@ class ReturnProductModel {
 }
 
 class UploadItemPriceModel {
-  constructor(itemid, fobprice) {
-    this.itemid = itemid;
+  constructor(category, itemname, fobprice) {
+    this.category = category;
+    this.itemname = itemname;
     this.fobprice = fobprice;
   }
 }
