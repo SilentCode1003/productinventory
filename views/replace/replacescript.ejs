@@ -269,7 +269,7 @@
             let container = result.data;
             // console.log(container);
             $.each(container, (key, item) => {
-              if (item.status != "DEPLOYED" && item.status != "SOLD") {
+              if (item.status != "DEPLOYED" && item.status != "SOLD" && item.status != "DEFECTIVE") {
                 let serial = item.serial;
                 let displayname = item.serial + " (" + item.assetcontrol + ")";
                 activeSerial.push({ display: displayname, value: item.serial });
@@ -541,12 +541,13 @@
             });
           }
           dataExcelArr.push({
-            serial: data[0].item,
-            date: data[1].item,
-            company: data[2].item,
-            branch: data[3].item,
-            soldby: data[4].item,
-            referenceno: data[5].item,
+            assetcontrol: data[0].item,
+            itemserial: data[1].item,
+            replacement: data[2].item,
+            replacedby: data[3].item,
+            remarks: data[4].item,
+            date: data[5].item,
+            referenceno: data[6].item,
           });
         }
         excelDataSave(dataExcelArr);
@@ -554,6 +555,7 @@
   
       function excelDataSave(data) {
         var dataraw = JSON.stringify(data, null, 2);
+        // console.log(dataraw);
         $.ajax({
           type: "POST",
           url: "/replace/upload",

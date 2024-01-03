@@ -25,6 +25,7 @@ const {
   DeffectiveItemModel,
   ReturnProductModel,
   UploadItemPriceModel,
+  UploadDefectiveItemModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -708,6 +709,31 @@ exports.UploadItemPrice = (data) => {
         key["category"],
         key["itemname"],
         key["fobprice"]
+      )
+  );
+};
+
+exports.UploadDefectiveItem = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      assetcontrol: key.assetcontrol,
+      itemserial: key.itemserial,
+      remarks: key.remarks,
+      date: key.date,
+      referenceno: key.referenceno,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new UploadDefectiveItemModel(
+        key["assetcontrol"],
+        key["itemserial"],
+        key["remarks"],
+        key["date"],
+        key["referenceno"],
       )
   );
 };

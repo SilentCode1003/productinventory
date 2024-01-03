@@ -112,7 +112,7 @@
                             class: "custom-mobile-align",
                         }),
                         $("<td>", {
-                            text: item.serial,
+                            text: item.itemserial,
                             "data-label": "Serial",
                             class: "custom-mobile-align",
                         }),
@@ -420,10 +420,10 @@
                     });
                 }
                 dataExcelArr.push({
-                    serial: data[0].item,
-                    date: data[1].item,
-                    deployby: data[2].item,
-                    deployto: data[3].item,
+                    assetcontrol: data[0].item,
+                    itemserial: data[1].item,
+                    remarks: data[2].item,
+                    date: data[3].item,
                     referenceno: data[4].item == null ? "N/A" : data[4].item,
                 });
             }
@@ -432,14 +432,16 @@
 
         function excelDataSave(data) {
             var dataraw = JSON.stringify(data, null, 2);
+            console.log(dataraw);
             $.ajax({
                 type: "POST",
-                url: "/deploy/upload",
+                url: "/defective/upload",
                 data: {
                     data: dataraw,
                 },
                 success: function (result) {
                     hidespinner();
+                    console.log(result.msg)
                     if (result.msg == "noentry") {
                         return warning(
                             "Product Not Registered",
@@ -453,10 +455,10 @@
                         //   button: "OK!",
                         // });
                     }
-                    if (result.msg == "dupentry") {
+                    if (result.msg == "exist") {
                         return warning(
                             "Already Exist",
-                            `List of serials that already deployed [${result.data.dupentry}]`
+                            `List of serials that already Exist: [${result.data}]`
                         );
                     }
 

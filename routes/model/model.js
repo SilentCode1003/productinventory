@@ -318,10 +318,19 @@ class ReturnProductModel {
 }
 
 class UploadItemPriceModel {
-  constructor(category, itemname, fobprice) {
-    this.category = category;
+  constructor(itemname, fobprice) {
     this.itemname = itemname;
     this.fobprice = fobprice;
+  }
+}
+
+class UploadDefectiveItemModel {
+  constructor(assetcontrol, itemserial, remarks, date, referenceno) {
+    this.assetcontrol = assetcontrol;
+    this.itemserial = itemserial;
+    this.remarks = remarks;
+    this.date = date;
+    this.referenceno = referenceno;
   }
 }
 
@@ -417,4 +426,5 @@ module.exports = {
   DeffectiveItemModel,
   ReturnProductModel,
   UploadItemPriceModel,
+  UploadDefectiveItemModel,
 };

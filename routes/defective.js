@@ -4,6 +4,7 @@ const {
   Product,
   RepairProduct,
   DeffectiveItem,
+  UploadDefectiveItem
 } = require("./model/spimodel");
 const {
   Select,
@@ -15,12 +16,14 @@ const {
   SelectStatement,
   convertExcelDate,
 } = require("./repository/customhelper");
-const { GetValue, RPRD } = require("./repository/dictionary");
+const { GetValue, DFCT } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
 const {
   JsonErrorResponse,
   JsonWarningResponse,
   JsonSuccess,
+  JsonNoEntryResponse,
+  MessageStatus,
 } = require("./repository/responce");
 var router = express.Router();
 
@@ -86,6 +89,67 @@ router.post("/save", (req, res) => {
       .catch((error) => {
         res.json(JsonErrorResponse(error));
       });
+  } catch (error) {
+    res.json(JsonErrorResponse(error));
+  }
+});
+
+
+router.post("/upload", (req, res) => {
+  try {
+    const { data } = req.body;
+    let dataJson = UploadDefectiveItem(JSON.parse(data));
+    console.log(dataJson);
+    let defective = [];
+    let counter = 0;
+    let existing = [];
+
+    dataJson.forEach((item) => {
+      Check_DeffectiveItem(item.assetcontrol, convertExcelDate(item.date))
+        .then((result) => {
+          counter += 1;
+          if(result.length == 0){
+            let status = GetValue(DFCT());
+            let update_product =
+              "update product set p_status=? where p_assetcontrol=?";
+            let update_product_data = [status, item.assetcontrol];
+
+            defective.push([
+              item.assetcontrol,
+              item.itemserial,
+              item.remarks,
+              convertExcelDate(item.date),
+              item.referenceno,
+            ]);
+
+            Update(update_product, update_product_data, (err, result) => {
+              if (err) console.error("Error: ", err);
+              // console.log(result);
+            });
+          }else {
+            existing.push(item.itemserial);
+          }
+          
+          if (counter == dataJson.length) {
+            console.log("Existing: ", existing);
+            console.log("Done: ");
+            if(defective.length != 0){
+              InsertTable("deffectiveitem", defective, (err, result) => {
+                if (err) console.error("Error: ", err);
+                console.log(result);
+  
+                return res.json(JsonSuccess());
+              });
+            }else{
+              return res.json(JsonWarningResponse(MessageStatus.EXIST, existing));
+            }
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          return res.json(JsonErrorResponse(error));
+        });
+    });
   } catch (error) {
     res.json(JsonErrorResponse(error));
   }

@@ -30,12 +30,18 @@ exports.GetValue = (abr) => {
   if (abr == "ASGN") return "ASSIGNED";
   if (abr == "RPRD") return "REPAIRED";
   if (abr == "TRFR") return "TRANSFER";
+  if (abr == "DFCT") return "DEFECTIVE";
 };
 
 //#region STATUS CODE
 exports.WH = () => {
   return "WH";
 };
+
+exports.DFCT = () => {
+  return "DFCT";
+};
+
 
 exports.DLV = () => {
   return "DLV";
