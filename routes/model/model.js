@@ -334,6 +334,18 @@ class UploadDefectiveItemModel {
   }
 }
 
+class UploadReplaceItemModel {
+  constructor(itemserial, replacedserial, remarks, date, replacedby, referenceno) {
+    this.itemserial = itemserial;
+    this.replacedserial = replacedserial;
+    this.remarks = remarks;
+    this.date = date;
+    this.replacedby = replacedby;
+    this.referenceno = referenceno;
+  }
+}
+
+
 //#endregion
 
 //#region Search
@@ -427,4 +439,5 @@ module.exports = {
   ReturnProductModel,
   UploadItemPriceModel,
   UploadDefectiveItemModel,
+  UploadReplaceItemModel,
 };

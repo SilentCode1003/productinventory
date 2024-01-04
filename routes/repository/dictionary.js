@@ -31,9 +31,18 @@ exports.GetValue = (abr) => {
   if (abr == "RPRD") return "REPAIRED";
   if (abr == "TRFR") return "TRANSFER";
   if (abr == "DFCT") return "DEFECTIVE";
+  if (abr == "RPLD") return "REPLACED";
+  if (abr == "RPMT") return "REPLACEMENT";
 };
 
 //#region STATUS CODE
+exports.RPLD = () => {
+  return "RPLD";
+};
+exports.RPMT = () => {
+  return "RPMT";
+};
+
 exports.WH = () => {
   return "WH";
 };

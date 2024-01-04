@@ -136,7 +136,7 @@ router.post("/upload", (req, res) => {
             if(defective.length != 0){
               InsertTable("deffectiveitem", defective, (err, result) => {
                 if (err) console.error("Error: ", err);
-                console.log(result);
+                console.log("success?", result);
   
                 return res.json(JsonSuccess());
               });

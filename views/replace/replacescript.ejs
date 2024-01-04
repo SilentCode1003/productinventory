@@ -541,13 +541,12 @@
             });
           }
           dataExcelArr.push({
-            assetcontrol: data[0].item,
-            itemserial: data[1].item,
-            replacement: data[2].item,
-            replacedby: data[3].item,
-            remarks: data[4].item,
-            date: data[5].item,
-            referenceno: data[6].item,
+            itemserial: data[0].item,
+            replacedserial: data[1].item,
+            replacedby: data[2].item,
+            remarks: data[3].item,
+            date: data[4].item,
+            referenceno: data[5].item,
           });
         }
         excelDataSave(dataExcelArr);
@@ -555,7 +554,7 @@
   
       function excelDataSave(data) {
         var dataraw = JSON.stringify(data, null, 2);
-        // console.log(dataraw);
+        console.log(dataraw);
         $.ajax({
           type: "POST",
           url: "/replace/upload",
@@ -567,9 +566,8 @@
             if (result.msg != "success") {
               warning(
                 "Duplicate",
-                `Some data already exist on the database. ID[${result.data}]`
+                `All already exist on the database. Asset Control: [${result.data}]`
               );
-  
               // swal({
               //   title: "Exist",
               //   text: "Some data already exist on the database. ID[${result.data}]",
