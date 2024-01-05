@@ -44,7 +44,7 @@
       if (message != "") {
         warning("Required", `${message}`);
       } else {
-        let refineFobPrice = fobprice.replace(/,|₱/g, "");
+        let refineFobPrice = fobprice.replace(/,|\$/g, "");
         // console.log(itemid, itemname, refineFobPrice)
         $.ajax({
           type: "POST",
