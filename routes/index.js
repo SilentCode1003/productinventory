@@ -12,33 +12,33 @@ router.get('/', function (req, res, next) {
 
 module.exports = router;
 
-router.post("/soldtoday", (req, res) => {
+router.post("/sold", (req, res) => {
   try {
     let sql = `SELECT 
-        s_id AS id, 
-        s_assetcontrol AS assetcontrol, 
-        s_serial AS serial, 
-        mi_name AS productname, 
-        mc_name AS category, 
-        p_status AS status, 
-        e_fullname AS soldby, 
-        s_date AS date, 
-        mip_fobprice AS price,
-        s_referenceno AS referenceno
+          s_id AS id, 
+          s_assetcontrol AS assetcontrol, 
+          s_serial AS serial, 
+          mi_name AS productname, 
+          mc_name AS category, 
+          p_status AS status, 
+          e_fullname AS soldby, 
+          s_date AS date, 
+          mip_fobprice AS price,
+          s_referenceno AS referenceno
       FROM 
-        sold
+          sold
       INNER JOIN 
-        product ON p_assetcontrol = s_assetcontrol AND p_serial = s_serial 
+          product ON p_assetcontrol = s_assetcontrol AND p_serial = s_serial 
       INNER JOIN 
-        master_item ON mi_id = p_itemname
+          master_item ON mi_id = p_itemname
       INNER JOIN 
-        master_category ON mc_id = p_category
+          master_category ON mc_id = p_category
       INNER JOIN 
-        employee ON e_id = s_soldby
+          employee ON e_id = s_soldby
       INNER JOIN 
-        master_item_price ON mip_itemid = mi_id 
+          master_item_price ON mip_itemid = mi_id 
       WHERE 
-        DATE(s_date) = CURDATE();`;
+          YEAR(s_date) = YEAR(CURDATE()) AND MONTH(s_date) = MONTH(CURDATE());`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -62,7 +62,7 @@ router.post("/soldtoday", (req, res) => {
   }
 });
 
-router.get("/deployedtoday", (req, res) => {
+router.get("/deployed", (req, res) => {
   try {
 
     let sql = `SELECT 
@@ -75,7 +75,8 @@ router.get("/deployedtoday", (req, res) => {
         d_referenceno
       FROM deploy
       INNER JOIN employee on e_id = d_deployby
-      WHERE DATE(d_date) = CURDATE()`;
+      WHERE 
+        YEAR(d_date) = YEAR(CURDATE()) AND MONTH(d_date) = MONTH(CURDATE());`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -85,6 +86,55 @@ router.get("/deployedtoday", (req, res) => {
         msg: "success",
         data: data,
       });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/getsoldcount", (req, res) => {
+  try {
+    let daterange = req.body.daterange;
+    let [startDate, endDate] = daterange.split(" - ");
+
+    let formattedStartDate = startDate.split("/").reverse().join("-");
+    let formattedEndDate = endDate.split("/").reverse().join("-");
+
+    formattedStartDate = formattedStartDate.replace(
+      /(\d{4})-(\d{2})-(\d{2})/,
+      "$1-$3-$2"
+    );
+    formattedEndDate = formattedEndDate.replace(
+      /(\d{4})-(\d{2})-(\d{2})/,
+      "$1-$3-$2"
+    );
+      console.log(formattedStartDate, formattedEndDate)
+    let sql = `SELECT s_id as id, s_assetcontrol as assetcontrol, s_serial as serial, mi_name as productname, 
+              mc_name as category, p_status as status, e_fullname as soldby, s_date as date, mip_fobprice as price
+              FROM sold 
+              INNER JOIN product on p_assetcontrol = s_assetcontrol and p_serial = s_serial 
+              INNER JOIN master_item on mi_id = p_itemname
+              INNER JOIN master_category on mc_id = p_category
+              INNER JOIN employee on e_id = s_soldby
+              INNER JOIN master_item_price on mip_itemid = mi_id 
+              WHERE s_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      if (result.length != 0) {
+        console.log(result);
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
     });
   } catch (error) {
     res.json({
