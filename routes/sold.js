@@ -200,6 +200,15 @@ router.post("/upload", (req, res) => {
 
                     if (check_sold.length != 0) {
                       dupentry.push(item.serial);
+
+                      let status = GetValue(SLD());
+                      let product_update =
+                        "update product set p_status=? where p_assetcontrol=?";
+                      let product = [status, assetcontrol];
+                      Update(product_update, product, (err, result) => {
+                        if (err) console.error("Error: ", err);
+                        // console.log(result);
+                      });
                     } else {
                       sold.push([
                         assetcontrol,
@@ -209,6 +218,15 @@ router.post("/upload", (req, res) => {
                         soldto,
                         item.referenceno,
                       ]);
+
+                      let status = GetValue(SLD());
+                      let product_update =
+                        "update product set p_status=? where p_assetcontrol=?";
+                      let product = [status, assetcontrol];
+                      Update(product_update, product, (err, result) => {
+                        if (err) console.error("Error: ", err);
+                        // console.log(result);
+                      });
                     }
 
                     if (counter == dataJson.length) {
@@ -229,7 +247,9 @@ router.post("/upload", (req, res) => {
                       }
 
                       if (message != "") {
-                        res.json(JsonWarningResponse(message, dupentry));
+                        res.json(
+                          JsonWarningResponse(message, [dupentry, noentry])
+                        );
                       } else {
                         res.json(JsonSuccess());
                       }
@@ -240,8 +260,9 @@ router.post("/upload", (req, res) => {
                     res.json(JsonErrorResponse(error));
                   });
               } else {
+                counter += 1;
                 noentry.push(item.serial);
-                console.log("No Entry: ", item.serial);
+                // console.log("No Entry: ", item.serial);
               }
             })
             .catch((error) => {
@@ -271,7 +292,7 @@ function Check_Sold(assetcontrol, date, soldto) {
     Select(command, (err, result) => {
       if (err) reject(err);
 
-      console.log(result);
+      // console.log(result);
 
       resolve(result);
     });
@@ -286,7 +307,7 @@ function Sold_Product(assetcontrol) {
     Update(sql, data, (err, result) => {
       if (err) reject(err);
 
-      console.log(result);
+      // console.log(result);
 
       resolve(result);
     });
@@ -319,7 +340,7 @@ function Check_MasterClient(company, branch, req) {
           resolve(`${_company}-${_branch}`);
         });
       } else {
-        resolve(`${data[0].company}-${data[0].branch}`);
+        resolve(`${_company}-${_branch}`);
       }
     });
   });
