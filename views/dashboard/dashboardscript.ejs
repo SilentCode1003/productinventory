@@ -531,6 +531,7 @@
                             totalprice += item.price;
                         });
                         $("#totalsold").text(formatCurrency(totalprice));
+                        $("#date").text(" ("+ date + ")");
                         
                     } else {
                         console.error(data.msg);
