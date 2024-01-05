@@ -269,7 +269,7 @@
             let container = result.data;
             // console.log(container);
             $.each(container, (key, item) => {
-              if (item.status != "DEPLOYED" && item.status != "SOLD") {
+              if (item.status != "DEPLOYED" && item.status != "SOLD" && item.status != "DEFECTIVE") {
                 let serial = item.serial;
                 let displayname = item.serial + " (" + item.assetcontrol + ")";
                 activeSerial.push({ display: displayname, value: item.serial });
@@ -541,11 +541,11 @@
             });
           }
           dataExcelArr.push({
-            serial: data[0].item,
-            date: data[1].item,
-            company: data[2].item,
-            branch: data[3].item,
-            soldby: data[4].item,
+            itemserial: data[0].item,
+            replacedserial: data[1].item,
+            replacedby: data[2].item,
+            remarks: data[3].item,
+            date: data[4].item,
             referenceno: data[5].item,
           });
         }
@@ -554,6 +554,7 @@
   
       function excelDataSave(data) {
         var dataraw = JSON.stringify(data, null, 2);
+        console.log(dataraw);
         $.ajax({
           type: "POST",
           url: "/replace/upload",
@@ -565,9 +566,8 @@
             if (result.msg != "success") {
               warning(
                 "Duplicate",
-                `Some data already exist on the database. ID[${result.data}]`
+                `All already exist on the database. Asset Control: [${result.data}]`
               );
-  
               // swal({
               //   title: "Exist",
               //   text: "Some data already exist on the database. ID[${result.data}]",
