@@ -22,6 +22,7 @@
     "mongoose": "^7.6.3",
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
-    "node-linq": "^0.0.5"
+    "node-linq": "^0.0.5",
+    "pdfmake": "^0.2.9"
   }
 }

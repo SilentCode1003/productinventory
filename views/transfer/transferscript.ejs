@@ -290,7 +290,7 @@
           let container = result.data;
           // console.log(container);
           $.each(container, (key, item) => {
-            if (item.status != "DEPLOYED" && item.status != "SOLD") {
+            if (item.status != "DEPLOYED" && item.status != "SOLD" && item.status != "DEFECTIVE") {
               let newname = item.serial + " (" + item.assetcontrol + ")";
               activeSerial.push({ display: newname, value: item.serial });
             }

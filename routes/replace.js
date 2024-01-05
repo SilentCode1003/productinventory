@@ -1,5 +1,5 @@
 var express = require("express");
-const { ReplaceItem } = require("./model/spimodel");
+const { ReplaceItem, Product, UploadReplaceItem } = require("./model/spimodel");
 const {
   Select,
   InsertTable,
@@ -10,12 +10,13 @@ const {
   SelectStatement,
   convertExcelDate,
 } = require("./repository/customhelper");
-const { GetValue, RPRD } = require("./repository/dictionary");
+const { GetValue, RPRD, RPMT, RPLD } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
 const {
   JsonErrorResponse,
   JsonWarningResponse,
   JsonSuccess,
+  MessageStatus,
 } = require("./repository/responce");
 var router = express.Router();
 
@@ -93,7 +94,7 @@ router.post("/save", (req, res) => {
 
           InsertTable("replaceitem", replaceitem, (err, result) => {
             if (err) console.error("Error: ", err);
-            console.log(result);
+            // console.log(result);
             res.json(JsonSuccess());
           });
         }
@@ -106,6 +107,128 @@ router.post("/save", (req, res) => {
   }
 });
 
+router.post("/upload", (req, res) => {
+  try {
+    const { data } = req.body;
+    let dataJson = UploadReplaceItem(JSON.parse(data));
+    console.log(dataJson)
+    let replacement = [];
+    let counter = 0;
+    let existing = [];
+    let notexist = [];
+
+    dataJson.forEach((item) => {
+      Check_Product(item.itemserial)
+        .then((result) => {
+          let data = Product(result);
+          // console.log(data);
+
+          if (data.length != 0) {
+            let assetcontrol = data[0].assetcontrol;
+            let replacement_status = GetValue(RPMT());
+            let status = GetValue(RPLD());
+            let update_product =
+              "update product set p_status=? where p_assetcontrol=?";
+            let update_product_data = [status, assetcontrol];
+
+            console.log("Loop: ", assetcontrol, item.itemserial, convertExcelDate(item.date))
+
+            Check_ReplaceItem(assetcontrol, convertExcelDate(item.date))
+              .then((checkresult) => {
+                counter += 1;
+
+                if (checkresult.length == 0) {
+                  replacement.push([
+                    assetcontrol,
+                    item.itemserial,
+                    item.replacedserial,
+                    item.remarks,
+                    convertExcelDate(item.date),
+                    item.replacedby,
+                    item.referenceno,
+                  ]);
+
+                  Check_Product(item.replacedserial)
+                    .then((productdata) => {
+
+                      if (productdata.length != 0) {
+                        let replacementdata = Product(productdata);
+                        let replacementassetcontrol = replacementdata[0].assetcontrol;
+
+                        let update_replacement_data = [replacement_status, replacementassetcontrol]
+                        Update(update_product, update_replacement_data, (err, result) => {
+                          if (err) console.error("Error: ", err);
+
+                        });
+                      }
+                      else {
+                        return res.json(JsonWarningResponse(MessageStatus.ERROR, replacementassetcontrol));
+                      }
+
+                      Update(update_product, update_product_data, (err, result) => {
+                        if (err) console.error("Error: ", err);
+                        // console.log(result);
+                      });
+
+                      console.log("Counter: ", counter)
+                      
+                      if (counter == dataJson.length) {
+                        console.log("Existing: ", existing);
+                        console.log("Done: ", replacement);
+                        if (replacement.length != 0) {
+                          InsertTable("replaceitem", replacement, (err, result) => {
+                            if (err) console.error("Error: ", err);
+                            console.log("success?", result);
+
+                            return res.json(JsonSuccess());
+                          });
+                        } else {
+                          return res.json(JsonWarningResponse(MessageStatus.EXIST, existing));
+                        }
+                      }
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return res.json({
+                        msg: error,
+                      });
+                    });
+                } else {
+                  console.log("Counter: ", counter)
+                  existing.push(item.itemserial);
+
+                  if(counter === dataJson.length && replacement.length === 0){
+                    console.log("Existing: ", existing)
+
+                    return res.json(JsonWarningResponse(MessageStatus.NOENTRY, existing));
+                  }
+                }
+              })
+              .catch((error) => {
+                console.error(error);
+                return res.json({
+                  msg: error,
+                });
+              });
+          } else {
+            notexist.push(item.itemserial);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          return res.json({
+            msg: error,
+          });
+        });
+    });
+
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 //#region Function
 function Check_ReplaceItem(assetcontrol, date) {
   return new Promise((resolve, reject) => {
@@ -114,6 +237,19 @@ function Check_ReplaceItem(assetcontrol, date) {
 
     Select(commad, (err, result) => {
       if (err) reject(err);
+
+      resolve(result);
+    });
+  });
+}
+
+function Check_Product(serial) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from product where p_serial=?";
+    // console.log(serial);
+    SelectParameter(sql, [serial], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
 
       resolve(result);
     });

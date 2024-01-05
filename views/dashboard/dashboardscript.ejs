@@ -3,9 +3,11 @@
         LoadList();
         Loadtable();
         let myChart;
+        let categorylist = [];
+
         $('#dateRange').daterangepicker({
             opens: 'right',
-            startDate: moment().subtract(7, 'days'),
+            startDate: moment().startOf('month'),
             endDate: moment(),
             maxDate: moment(),
             ranges: {
@@ -39,11 +41,13 @@
         });
 
         let initialdate = $('#dateRange').val();
-        // getData(initialdate);
+        getsoldcount(initialdate);
 
         $(document).on('change', '#categoryid', function () {
             let category = $(this).val();
+            console.log(category)
             let dateRange = $('#dateRange').val();
+
             if (myChart) {
                 myChart.destroy();
             }
@@ -54,6 +58,7 @@
         $(document).on('change', '#dateRange', function () {
             let dateRange = $(this).val();
             let category = $('#categoryid').val();
+            getsoldcount(dateRange)
             if (myChart) {
                 myChart.destroy();
             }
@@ -71,10 +76,18 @@
                 url: "/category/load",
                 success: function (result) {
                     let container = result.data;
+
+                    categorylist = container.map(item => item.name);
+                    let index = Math.floor(Math.random() * categorylist.length);
+                    let randomCategory = categorylist[index];
+                    if (myChart) {
+                        myChart.destroy();
+                    }
+                    getData(initialdate, randomCategory);
+
                     $.each(container, (key, item) => {
                         let categoryname = item.name;
                         let categoryid = item.id;
-                        // console.log(categoryname);
 
                         var listItem = $("<li></li>")
                             .text(categoryname)
@@ -411,7 +424,7 @@
 
         function Loadtable () {
             $.ajax({
-                url: '/index/deployedtoday',
+                url: '/index/deployed',
                 method: 'GET',
                 dataType: 'json',
                 success: function (data) {
@@ -427,7 +440,7 @@
             });
 
             $.ajax({
-                url: '/index/soldtoday',
+                url: '/index/sold',
                 method: 'POST',
                 dataType: 'json',
                 success: function (data) {
@@ -491,6 +504,43 @@
                     tableBody.append(tr);
                 });
             }
+        }
+
+        function getsoldcount(date){
+            let startDate = moment(date.split(' - ')[0], 'MMM D, YYYY');
+            let endDate = moment(date.split(' - ')[1], 'MMM D, YYYY');
+            let formattedStartDate = startDate.format('MM/DD/YYYY');
+            let formattedEndDate = endDate.format('MM/DD/YYYY');
+            let formattedDate = formattedStartDate + ' - ' + formattedEndDate;
+
+            $.ajax({
+                url: '/index/getsoldcount',
+                method: 'POST',
+                dataType: 'json',
+                data:{
+                    daterange: formattedDate
+                },
+                success: function (data) {
+                    if (data.msg === 'success') {
+                        let container = data.data;
+                        console.log("Data: ", container)
+                        let totalprice = 0;
+                        // console.log("sold total: ", container.length)
+                        container.forEach(item => {
+                            console.log("Price: ", item.price)
+                            totalprice += item.price;
+                        });
+                        $("#totalsold").text(formatCurrency(totalprice));
+                        $("#date").text(" ("+ date + ")");
+                        
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
         }
 
     });
