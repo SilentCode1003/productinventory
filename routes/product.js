@@ -303,6 +303,7 @@ router.post("/upload", (req, res) => {
               // console.log(result);
 
               if (result[0].total != 0) {
+                counter += 1;
                 duplicate += item.serial;
               } else {
                 Get_Category(item.category)

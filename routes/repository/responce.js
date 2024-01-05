@@ -33,7 +33,7 @@ function JsonWarningResponse(message, data) {
 function JsonErrorResponse(error) {
   //JsonErrorResponse
   return {
-    error: error,
+    msg: error,
   };
 }
 
