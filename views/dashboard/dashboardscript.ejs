@@ -149,7 +149,7 @@
                                 producByDateTable[date][productName].totalPrice += totalPrice;
                             });
 
-                            let tableHtml = '<thead class="table-dark table-header"><tr>' +
+                            let tableHtml = '<thead class="table-header" style="background-color: white;"><tr>' +
                                 '<th class="text-center">Date</th>' +
                                 '<th class="text-center">Product Name</th>' +
                                 '<th class="text-center">Quantity</th>' +
@@ -204,8 +204,8 @@
                                 datasets: allProducts.map(product => ({
                                     label: product,
                                     data: dates.map(date => productByDate[date][product] || 0),
-                                    backgroundColor: 'rgb(69, 237, 242)',
-                                    borderColor: 'rgb(87, 125, 134)',
+                                    backgroundColor: 'rgb(187, 37, 37, 0.2)',
+                                    borderColor: 'rgb(187, 37, 37)',
                                     borderWidth: 2,
                                     fill: false,
                                     lineTension: 0.4
@@ -321,11 +321,13 @@
             success: function (result) {
                 let container = result.data;
                 $("#totalstocks").text(container.length);
-                console.log("stocks: ", container);
+                // console.log("stocks: ", container);
 
                 let groupedData = groupDataByItemName(container);
 
                 displayDataInTable(groupedData);
+
+                // generatePDF();
 
                 createChart(container);
             },
@@ -333,6 +335,12 @@
                 errormsg(err);
             },
         });
+        // const mockData = {
+        //     item1: { category: 'Category1', stocks: 10, totalPrice: 100 },
+        //     item2: { category: 'Category2', stocks: 20, totalPrice: 200 },
+        // };
+
+    // displayDataInTable(mockData);
 
         function groupDataByItemName(data) {
             const groupedData = {};
@@ -352,7 +360,7 @@
         }
 
         function displayDataInTable(groupedData) {
-            var tableHtml = '<thead class="table-dark table-header"><tr>' +
+            var tableHtml = '<thead class="table-header"><tr>' +
                 '<th class="text-center">Item Name</th>' +
                 '<th class="text-center">Category</th>' +
                 '<th class="text-center">Stocks</th>' +
@@ -395,8 +403,8 @@
                     datasets: [{
                         label: 'Stock Counts',
                         data: chartData,
-                        backgroundColor: 'rgb(69, 237, 242, 0.2)',
-                        borderColor: 'rgb(69, 237, 242)',
+                        backgroundColor: 'rgb(187, 37, 37, 0.2)',
+                        borderColor: 'rgb(187, 37, 37)',
                         borderWidth: 1
                     }]
                 },
@@ -472,8 +480,8 @@
                 data.forEach(item => {
                     const tr = $('<tr>').append(
                         $('<td>', { text: item.assetcontrol, 'data-label': 'ID', class: 'custom-mobile-align cbi-link' }),
-                        $('<td>', { text: item.date, 'data-label': 'Item', class: 'custom-mobile-align text-white' }),
-                        $('<td>', { text: item.referenceno, 'data-label': 'Category', class: 'custom-mobile-align text-white' }),
+                        $('<td>', { text: item.date, 'data-label': 'Item', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.referenceno, 'data-label': 'Category', class: 'custom-mobile-align' }),
                     );
 
                     tableBody.append(tr);
@@ -497,8 +505,8 @@
                 data.forEach(item => {
                     const tr = $('<tr>').append(
                         $('<td>', { text: item.assetcontrol, 'data-label': 'ID', class: 'custom-mobile-align cbi-link' }),
-                        $('<td>', { text: item.date, 'data-label': 'Item', class: 'custom-mobile-align  text-white' }),
-                        $('<td>', { text: item.referenceno, 'data-label': 'Category', class: 'custom-mobile-align  text-white' }),
+                        $('<td>', { text: item.date, 'data-label': 'Item', class: 'custom-mobile-align ' }),
+                        $('<td>', { text: item.referenceno, 'data-label': 'Category', class: 'custom-mobile-align ' }),
                     );
 
                     tableBody.append(tr);
@@ -542,6 +550,54 @@
                 }
             });
         }
+
+        $('#convertopdf').on('click', function () {
+            $.ajax({
+                type: "GET",
+                url: "/product/getstocks",
+                success: function (result) {
+                    let container = result.data;
+                    $("#totalstocks").text(container.length);
+                    // console.log("stocks: ", container);
+
+                    let groupedData = groupDataByItemName(container);
+                    console.log("Current Stock: ", groupedData);
+                    if(groupedData.length != 0){
+                        $.ajax({
+                            type: "POST",
+                            url: "/index/processpdfdata",
+                            data: {
+                                processeddata: groupedData
+                            },
+                            success: function (result) {
+                                success("Success", "PDF generate successfully!");
+                                window.open(`/index/generatepdf`, "_blank");
+                            },
+                            error: function (err) {
+                                errormsg(err);
+                            },
+                        });
+                    }
+
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        });
+
+        // function generatePDF() {
+        //     const element = document.getElementById('datatable2');
+        //     const pdfOptions = {
+        //         margin: 10,
+        //         filename: 'table.pdf',
+        //         image: { type: 'jpeg', quality: 0.98 },
+        //         html2canvas: { scale: 2 },
+        //         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        //     };
+
+        //     html2pdf(element, pdfOptions);
+        // }
 
     });
 </script>

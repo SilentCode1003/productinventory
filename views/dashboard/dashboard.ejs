@@ -52,14 +52,14 @@
     <div class="row">
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-6 col-md-6 mb-3">
+        <div class="col-xl-6 col-md-6 mb-3 mt-3">
             <div class="card border-left-teal h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="font-weight-bold text-primary text-uppercase mb-1">
                                 Total Stocks</div>
-                            <div class="h5 mb-0 font-weight-bold text-white"><span id="totalstocks"></span></div>
+                            <div class="h5 mb-0 font-weight-bold "><span id="totalstocks"></span></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -70,15 +70,15 @@
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-6 col-md-6 mb-3">
+        <div class="col-xl-6 col-md-6 mb-3 mt-3">
             <div class="card border-left-teal h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="font-weight-bold text-success text-uppercase mb-1">
-                                Total Sold <span class="text-white" id="date"></span>
+                                Total Sold <span class="" id="date"></span>
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-white"><span id="totalsold"></span></div>
+                            <div class="h5 mb-0 font-weight-bold "><span id="totalsold"></span></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -93,11 +93,11 @@
     <div class="row mb-2 ml-1">
         <div class="responsive-col">
             <div class="input-group">
-                <button id="adjustDateBackward" class="btn btn-outline-cyberpower custom-br-left"><i
+                <button id="adjustDateBackward" class="btn btn-outline-primary custom-br-left"><i
                         class="fas fa-caret-left"></i></button>
                 <input id="dateRange" name="dateRange" type="text" class="form-control text-center"
                     placeholder="Select Date Range" aria-describedby="basic-addon1" readonly>
-                <button id="adjustDateForward" class="btn btn-outline-cyberpower custom-br-right"><i
+                <button id="adjustDateForward" class="btn btn-outline-primary custom-br-right"><i
                         class="fas fa-caret-right"></i></button>
             </div>
         </div>
@@ -170,12 +170,21 @@
         <div class="col-5">
             <div class="card dashboard-size">
                 <div class="card-header card-bg align-content-center">
-                    <h4 class="m-0 card-title">Current Stock Table</h4>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4 class="m-0 card-title">Current Stock Table</h4>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-primary" id="convertopdf" type="button">
+                                <i class="fas fa-file-export"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive scrollable-dashboard-size">
                         <table class="table custom-mobile-table" id="datatable2" width="100%" cellspacing="10">
-                            <thead class="table-dark table-header">
+                            <thead class="table-header">
                                 <tr>
                                     <th class="text-center">Item Name</th>
                                     <th class="text-center">Category</th>
@@ -199,7 +208,7 @@
                 <div class="card-header card-bg align-content-center">
                     <div class="row">
                         <div class="col-md-4 mt-2">
-                            <h5 class="m-0 font-weight-bold cyber-title mt-2">Sold This Month</h5>
+                            <h5 class="m-0 font-weight-bold card-title mt-2">Sold This Month</h5>
                         </div>
                         <div class="col-md-8 mt-2">
                             <input id="search" name="search" type="text" class="form-control" placeholder="Search Asset Control"
@@ -211,7 +220,7 @@
                 <div class="card-body">
                     <div class="table-responsive scrollable-table-container-sm">
                         <table class="table custom-mobile-table" id="soldtable" width="100%" cellspacing="10">
-                            <thead class="table-dark table-header">
+                            <thead class="table-header">
                                 <tr>
                                     <th>Asset Control</th>
                                     <th>Date</th>
@@ -231,7 +240,7 @@
                 <div class="card-header card-bg align-content-center">
                     <div class="row">
                         <div class="col-md-4 mt-2">
-                            <h5 class="m-0 font-weight-bold cyber-title mt-2">Deployed This Month</h5>
+                            <h5 class="m-0 font-weight-bold card-title mt-2">Deployed This Month</h5>
                         </div>
                         <div class="col-md-8 mt-2">
                             <input id="search" name="search" type="text" class="form-control" placeholder="Search Asset Control"
@@ -243,7 +252,7 @@
                 <div class="card-body">
                     <div class="table-responsive scrollable-table-container-sm">
                         <table class="table custom-mobile-table" id="deploytable" width="100%" cellspacing="10">
-                            <thead class="table-dark table-header">
+                            <thead class="table-header">
                                 <tr>
                                     <th>Asset Control</th>
                                     <th>Date</th>

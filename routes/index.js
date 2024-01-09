@@ -1,8 +1,13 @@
 var express = require('express');
+const pdfmake = require("pdfmake");
+const fs = require("fs");
+const path = require("path");
+
 const { Validator } = require('./controller/middleware');
 var router = express.Router();
 const { Select } = require("./repository/spidb");
 const { Deploy } = require("./model/spimodel");
+const { Generate } = require("./repository/pdf.js");
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -136,6 +141,52 @@ router.post("/getsoldcount", (req, res) => {
         });
       }
     });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+let pdfBuffer = "";
+router.post("/processpdfdata", (req, res) => {
+  try {
+    let data = req.body.processeddata;
+    if (data.length != 0) {
+      Generate(data)
+      .then((result) => {
+        console.log("PDF Generation Result: ", result);
+
+        pdfBuffer = result;
+
+        res.json({
+          msg: "success",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.json({
+          msg: error,
+        });
+      });
+    }
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.get("/generatepdf", (req, res) => {
+  try {
+    console.log("data: ", pdfBuffer)
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=Sales_Report.pdf"
+    );
+
+    res.send(pdfBuffer);
   } catch (error) {
     res.json({
       msg: error,
