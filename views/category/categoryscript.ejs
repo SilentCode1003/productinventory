@@ -218,12 +218,12 @@
                   $('<td>', { text: item.name, 'data-label': 'Category', class: 'custom-mobile-align' }),
                   $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align' }),
                   $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align' }),
-                  $('<td>', { class: 'custom-mobile-align' }).append(
+                  $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
                     $('<div>', { class: containerBackground }).append(
                       $('<span>', { text: item.status, class: statusBackground })
                     )
                   ),
-                  $('<td>', { html: action, 'data-label': 'Action', class: 'actionWidth' })
+                  $('<td>', { html: action, class: 'custom-mobile-align', 'data-label': 'Action' })
               );
 
               tableBody.append(tr);

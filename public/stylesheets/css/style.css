@@ -586,8 +586,8 @@ body {
   }
 
   .custom-mobile-table tbody tr:nth-child(even){
-      background-color: var(--clr-background-content) !important;
-      color: var(--clr-font-white);
+      background-color: var(--grey-50) !important;
+      /* color: var(--sidebar-text-active); */
   }
 }
 

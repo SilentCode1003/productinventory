@@ -65,7 +65,9 @@
     --sidebar-text-active: rgb(0, 167, 111);
     --hover-effect: rgb(0, 167, 111, 0.75);
     --sidebar-text-bg: rgb(0, 167, 111, 0.2);
+    --custom-mobile-bg: rgb(0, 167, 111, 0.10);
     --table-tr-hover: rgb(0, 167, 111, 0.10);
+
     --accent-clr: #9b9cab;
     --subheading: #9499a3;
 }

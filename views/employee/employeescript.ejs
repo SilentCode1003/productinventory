@@ -18,7 +18,7 @@
       console.log(dataRow);
       employeeid = dataRow[0];
       fullname = dataRow[1];
-      status = dataRow[6];
+      status = dataRow[8];
     });
 
     $(document).on("click", "#editBtn", function () {
@@ -146,14 +146,16 @@
         data.forEach((item) => {
           let action = "";
           if (item.status === "ACTIVE") {
-            action = `<span class="editbutton" id="editBtn" name="editBtn" ><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                      <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>
-                      <span class="editbutton" id="changePassBtn" data-toggle="modal" data-target="#changePassModal"><i class="fas fa-key" style="color: #45edf2;"></i></span>`;
+            action = `<span class="editbutton" id="editBtn" name="editBtn" ><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                      <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>
+                      <span class="editbutton" id="changePassBtn" data-toggle="modal" data-target="#changePassModal"><i class="fas fa-key" style="color: rgb(99, 115, 129);"></i></span>`;
           } else if (item.status === "INACTIVE") {
-            action = `<span class="editbutton" id="editBtn" name="editBtn" ><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                      <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>
-                      <span class="editbutton" id="changePassBtn" data-toggle="modal" data-target="#changePassModal"><i class="fas fa-key" style="color: #45edf2;"></i></span>`;
+            action = `<span class="editbutton" id="editBtn" name="editBtn" ><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                      <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>
+                      <span class="editbutton" id="changePassBtn" data-toggle="modal" data-target="#changePassModal"><i class="fas fa-key" style="color: rgb(99, 115, 129);"></i></span>`;
           }
+          const statusBackground = item.status === 'ACTIVE' ? 'status-success' : 'status-warning';
+          const containerBackground = item.status === 'ACTIVE' ? 'status-container-sc' : 'status-container-wr';
 
           const tr = $("<tr>").append(
             $("<td>", {
@@ -192,11 +194,6 @@
               class: "custom-mobile-align",
             }),
             $("<td>", {
-              text: item.status,
-              "data-label": "Status",
-              class: "custom-mobile-align",
-            }),
-            $("<td>", {
               text: item.createdby,
               "data-label": "Created By",
               class: "custom-mobile-align no-wrap",
@@ -206,6 +203,11 @@
               "data-label": "Created Date",
               class: "custom-mobile-align no-wrap",
             }),
+            $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+              $('<div>', { class: containerBackground }).append(
+                $('<span>', { text: item.status, class: statusBackground })
+              )
+            ),
             $("<td>", { html: action, "data-label": "Action", class: "no-wrap" })
           );
           tableBody.append(tr);
