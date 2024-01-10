@@ -3,6 +3,7 @@
 @import url(custom-sidebar.css);
 @import url(colors.css);
 @import url(custom-components.css);
+@import url(loading.css);
 
 :root{
   --txt-500: 2rem;
@@ -151,7 +152,7 @@ table, th, td {
 }
 
 .scrollable-table-container {
-  max-height: 480px !important; 
+  max-height: 545px !important; 
   overflow-y: auto !important;
 }
 
