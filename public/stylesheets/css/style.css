@@ -28,7 +28,7 @@
 
 .category-bg{
   background-image: url(/images/img/category-card.png);
-  background-size: auto; 
+  background-size: cover; 
   background-repeat: no-repeat;
 }
 
@@ -357,10 +357,6 @@ td {
   border-top: 1px solid var(--clr-card) !important;
 }
 
-.form-label{
-  color: var(--clr-glow) !important;
-}
-
 body {
   margin: 0;
   padding: 0;
@@ -491,7 +487,7 @@ body {
 
 .custom-dropdown {
   display: none;
-  width: 100%;
+  width: inherit;
   /* border: 1px solid var(--clr-card); */
   max-height: 250px;
   overflow-y: auto;
@@ -504,7 +500,7 @@ body {
 
 .custom-dropdown-modal {
   display: none;
-  width: 100%;
+  width: inherit;
   border: 1px solid #ccc;
   max-height: 250px;
   overflow-y: auto;
@@ -524,8 +520,8 @@ body {
 }
 
 .dropdown-option:hover {
-  background-color: var(--primary) !important;
-  color: var(--clr-background) !important;
+  background-color: var(--sidebar-text-bg) !important;
+  color: var(--sidebar-text-active) !important;
 }
 
 .daterangepicker th.month{
@@ -594,24 +590,6 @@ body {
       color: var(--clr-font-white);
   }
 }
-
-/* Scrollbar */
-
-::-webkit-scrollbar {
-  width: 8px; 
-  height: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--sidebar-text-active); 
-  border-radius: 6px; 
-}
-
-/* Track on hover */
-::-webkit-scrollbar-track:hover {
-  background: var(--clr-background-content); 
-}
-
 
 /* ::-webkit-scrollbar-thumb:hover {
   background: var(--sidebar-text-active); 

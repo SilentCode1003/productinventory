@@ -40,40 +40,36 @@
 </div>
 
 <!-- PCreated by Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-3">
-  <h1 class="cyber-title">Price</h1>
-</div>
 <!-- Content Row -->
-<div class="row mb-2">
+<div class="row mb-2 mt-3">
   <div class="col-lg-12">
     <div class="card">
       <div class="card-body">
-
+        <div class="row">
+          <label class="form-label cyber-title" for="itemsname">Item Price</label>
+        </div>
         <div class="row mb-2">
           <div class="col-md-6 mb-2">
             <div class="input-group">
               <input class="form-control text-center custom-input" placeholder="Select Item" name="itemname" id="itemname" />
               <input type="hidden" id="hiddenValue" name="hiddenValue" />
               <div class="input-group-append">
-                <span class="input-group-text">Deploy By</span>
+                <span class="input-group-text">Item Name</span>
               </div>
             </div>
             <div class="custom-dropdown custom-dropdown-margin-left" id="itemDropdown"></div>
           </div>
 
           <div class="col-md-6 mb-2">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon2">FOB Price</span>
-              </div>
-              <input id="fobprice" name="fobprice" type="text" class="form-control" placeholder="Enter FOB Price"
-                aria-label="fobprice" aria-describedby="basic-addon1" oninput="formatPrice(event, this)"/>
+            <div class="custom-input-group">
+              <input required="" id="fobprice" name="fobprice" type="text" name="text" autocomplete="off" class="custom-input">
+              <label class="custom-label">Input FOB Price</label>
             </div>
           </div>
         </div>
 
         <div class="row justify-content-end">
-          <div class="col-md-4 align mt-1">
+          <div class="col-md-2 align mt-1">
             <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-100">
               <i class="fa fa-plus" aria-hidden="true"></i>
               Add
@@ -93,44 +89,42 @@
   </div>
   <div class="card-header card-bg align-content-center">
     <div class="row">
-      <div class="col-md-2">
+      <div class="col-md-2 mt-2">
         <h5 class="m-0 font-weight-bold cyber-title mt-2">Item Price Table</h5>
       </div>
-      <div class="col-md-5 mt-1">
+      <div class="col-md-5 mt-2">
         <input id="search" name="search" type="text" class="form-control" placeholder="Search Category Name"
           aria-label="search" aria-describedby="basic-addon1" />
       </div>
       <div class="col-md-3 mt-2">
         <div class="input-group mb-3">
-          <input class="btn btn-outline-cyberpower w-100" type="file" id="fileinput" accept=".xlsx, .xls"
+          <input class="btn btn-outline-cyberpower btn-sm w-100" type="file" id="fileinput" accept=".xlsx, .xls"
             placeholder="Select Excel File" />
         </div>
       </div>
       <div class="col-md-2 mt-2">
-        <button class="btn btn-outline-cyberpower" id="uploadButton" type="button">
+        <button class="btn btn-outline-cyberpower btn-sm" id="uploadButton" type="button">
           <i class="fas fa-upload"></i>
         </button>
       </div>
     </div>
   </div>
 
-  <div class="card-body">
-    <div class="table-responsive scrollable-table-container">
-      <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
-        <thead class="table-dark table-header">
-          <tr>
-            <th>ID</th>
-            <th>Item ID</th>
-            <th>Price (FOB)</th>
-            <th>Status</th>
-            <th>Created By</th>
-            <th>Created Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+  <div class="table-responsive scrollable-table-container">
+    <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+      <thead class="header-style table-header">
+        <tr>
+          <th class="col-1">ID</th>
+          <th class="col-2">Item ID</th>
+          <th class="col-1">Price (FOB)</th>
+          <th class="col-3">Created By</th>
+          <th class="col-3">Created Date</th>
+          <th class="col-1">Status</th>
+          <th class="col-1"></th>
+        </tr>
+      </thead>
 
-        <tbody class="no-border"></tbody>
-      </table>
-    </div>
+      <tbody class="no-border"></tbody>
+    </table>
   </div>
 </div>

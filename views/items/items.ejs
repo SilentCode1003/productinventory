@@ -42,23 +42,22 @@
 </div>
 
 <!-- PCreated by Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-3">
-  <h1 class="cyber-title">Item</h1>
-</div>
 <!-- Content Row -->
-<div class="row mb-2">
+<div class="row mb-2 mt-3">
   <div class="col-lg-12">
     <div class="card">
       <div class="card-body">
         <div class="row">
-          <div class="col-md-6">
-            <label class="form-label" for="itemsname">Item Description</label>
-            <input id="itemsname" name="itemsname" type="text" class="form-control"
-              placeholder="Enter your item description" aria-label="itemsname" aria-describedby="basic-addon1" />
-          </div>
+          <label class="form-label cyber-title" for="itemsname">Item Description</label>
         </div>
-        <div class="row mt-4">
+        <div class="row mb-2">
           <div class="col-md-6">
+            <div class="custom-input-group">
+              <input required="" id="itemsname" name="itemsname" type="text" name="text" autocomplete="off" class="custom-input">
+              <label class="custom-label">Input Item Name</label>
+            </div>
+          </div>
+          <div class="col-md-6 mb-2">
             <div class="customdropdown">
               <div class="select selectcategory">
                 <span id="selectedcategory">Select Category</span>
@@ -71,10 +70,9 @@
           </div>
         </div>
 
-        <div class="row mt-4">
-          <div class="col-md-4 text-left mt-4">
-            <button id="addBtn" name="addBtn"
-              class="d-none d-sm-inline-block btn btn-sm btn-outline-cyberpower shadow-sm w-75">
+        <div class="row justify-content-end">
+          <div class="col-md-2 align mt-1">
+            <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-100">
               <i class="fa fa-plus" aria-hidden="true"></i>
               Add
             </button>
@@ -103,25 +101,23 @@
     </div>
   </div>
 
-  <div class="card-body">
-    <div class="table-responsive scrollable-table-container">
-      <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
-        <thead class="table-dark table-header">
-          <tr>
-          <tr>
-            <th class="col-1">ID</th>
-            <th class="col-2">Name</th>
-            <th class="col-1">Category</th>
-            <th class="col-2">Created by</th>
-            <th class="col-2">Created date</th>
-            <th class="col-1">Status</th>
-            <th class="col-1">Action</th>
-          </tr>
-          </tr>
-        </thead>
+  <div class="table-responsive scrollable-table-container">
+    <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+      <thead class="table-header header-style">
+        <tr>
+        <tr>
+          <th class="col-1">ID</th>
+          <th class="col-2">Name</th>
+          <th class="col-1">Category</th>
+          <th class="col-2">Created by</th>
+          <th class="col-2">Created date</th>
+          <th class="col-1">Status</th>
+          <th class="col-1"></th>
+        </tr>
+        </tr>
+      </thead>
 
-        <tbody class="no-border"></tbody>
-      </table>
-    </div>
+      <tbody class="no-border"></tbody>
+    </table>
   </div>
 </div>
