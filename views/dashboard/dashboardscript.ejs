@@ -149,7 +149,7 @@
                                 producByDateTable[date][productName].totalPrice += totalPrice;
                             });
 
-                            let tableHtml = '<thead class="table-header" style="background-color: white;"><tr>' +
+                            let tableHtml = '<thead class="table-header header-style" style="background-color: white;"><tr>' +
                                 '<th class="text-center">Date</th>' +
                                 '<th class="text-center">Product Name</th>' +
                                 '<th class="text-center">Quantity</th>' +
@@ -204,8 +204,8 @@
                                 datasets: allProducts.map(product => ({
                                     label: product,
                                     data: dates.map(date => productByDate[date][product] || 0),
-                                    backgroundColor: 'rgb(187, 37, 37, 0.2)',
-                                    borderColor: 'rgb(187, 37, 37)',
+                                    backgroundColor: 'rgb(216, 42, 39, 0.65)',
+                                    borderColor: 'rgb(216, 42, 39, 0.65)',
                                     borderWidth: 2,
                                     fill: false,
                                     lineTension: 0.4
@@ -242,29 +242,11 @@
                                         legend: {
                                             labels: {
                                                 font: {
-                                                    family: 'Manrope',
+                                                    family: 'Share Tech',
                                                     size: 14, // Set the font size here
                                                 },
                                             },
-                                        },
-                                        scales: {
-                                            x: {
-                                                ticks: {
-                                                    font: {
-                                                        family: 'Manrope',
-                                                        size: 12,
-                                                    },
-                                                },
-                                            },
-                                            y: {
-                                                ticks: {
-                                                    font: {
-                                                        family: 'Manrope',
-                                                        size: 12,
-                                                    },
-                                                },
-                                            },
-                                        },
+                                        }
                                     },
                                 },
                             };
@@ -360,7 +342,7 @@
         }
 
         function displayDataInTable(groupedData) {
-            var tableHtml = '<thead class="table-header"><tr>' +
+            var tableHtml = '<thead class="table-header header-style"><tr>' +
                 '<th class="text-center">Item Name</th>' +
                 '<th class="text-center">Category</th>' +
                 '<th class="text-center">Stocks</th>' +
@@ -403,28 +385,20 @@
                     datasets: [{
                         label: 'Stock Counts',
                         data: chartData,
-                        backgroundColor: 'rgb(187, 37, 37, 0.2)',
-                        borderColor: 'rgb(187, 37, 37)',
+                        backgroundColor: 'rgb(216, 42, 39, 0.65)',
+                        borderColor: 'rgb(216, 42, 39',
                         borderWidth: 1
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            color: '#ffffff'
-                        },
-                        x: {
-                            color: '#ffffff'
-                        }
-                    },
                     plugins: {
-                        legend: {
-                            labels: {
-                                color: '#ffffff'
-                            }
-                        }
+                        labels: {
+                             font: {
+                                family: 'Share Tech',
+                                size: 14,
+                            },
+                        },
                     }
                 }
             });

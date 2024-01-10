@@ -212,6 +212,7 @@
               }
               const statusBackground = item.status === 'ACTIVE' ? 'status-success' : 'status-warning';
               const containerBackground = item.status === 'ACTIVE' ? 'status-container-sc' : 'status-container-wr';
+              
               const tr = $('<tr>').append(
                   $('<td>', { text: item.id, 'data-label': 'ID', class: 'custom-mobile-align' }),
                   $('<td>', { text: item.name, 'data-label': 'Category', class: 'custom-mobile-align' }),

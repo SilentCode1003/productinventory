@@ -4,6 +4,7 @@
     --clr-btn: #dd5353;
     --clr-default: #eb1c23;
     --clr-white: #fff;
+    --clr-black: black;
     --clr-bg-table: #ff6459;
     /*
     Cybper Power Color Pallete
@@ -62,8 +63,9 @@
     --fw-700: '700';
 
     --sidebar-text-active: rgb(0, 167, 111);
+    --hover-effect: rgb(0, 167, 111, 0.75);
     --sidebar-text-bg: rgb(0, 167, 111, 0.2);
-
-    --accent-clr: #004225;
+    --table-tr-hover: rgb(0, 167, 111, 0.10);
+    --accent-clr: #9b9cab;
     --subheading: #9499a3;
 }

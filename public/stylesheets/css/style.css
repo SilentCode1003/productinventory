@@ -4,15 +4,48 @@
 @import url(colors.css);
 @import url(custom-components.css);
 
+:root{
+  --txt-500: 2rem;
+  --txt-600: 2.5rem;
+  --txt-700: 3rem;
+}
+
+.t-500{
+  font-size: var(--txt-500) !important;
+}
+
+.t-600{
+  font-size: var(--txt-600) !important;
+}
+
+.white-text{
+  color: var(--clr-white);
+}
+
 .border-left-inventory {
   border-left: 0.25rem solid var(--sidebar-text-active) !important;
 }
 
 .category-bg{
   background-image: url(/images/img/category-card.png);
-  background-size: cover; /* This will make the image cover the entire element */
+  background-size: auto; 
   background-repeat: no-repeat;
 }
+
+.card1-bg{
+  background-image: url(/images/img/card-bg-1.png);
+  background-size: cover; 
+  background-repeat: no-repeat;
+  opacity: 0.75;
+}
+
+.card2-bg{
+  background-image: url(/images/img/card-bg-2.png);
+  background-size: cover; 
+  background-repeat: no-repeat;
+  opacity: 0.75;
+}
+
 
 .navbar{
   position: fixed !important;
@@ -39,13 +72,17 @@
 
 .custom-br-left{
   border-radius: 0.35rem 0 0 0.35rem !important;
-  border-right: none !important;
   width: 45px !important;
 }
 
 .custom-br-right{
   border-radius: 0 0.35rem 0.35rem 0 !important;
   width: 45px !important;
+}
+
+table tr:hover {
+  background-color: var(--table-tr-hover);
+  color: var(--sidebar-text-active);
 }
 
 @media (min-width: 768px) {
@@ -679,4 +716,8 @@ CALENDAR
   100% {
     height: 0%;
   }
+}
+
+.bg-normal{
+  background-color: transparent !important;
 }

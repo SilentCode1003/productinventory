@@ -53,16 +53,18 @@
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-6 col-md-6 mb-3 mt-3">
-            <div class="card border-left-teal h-100 py-2">
+            <div class="card  card1-bg  h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="font-weight-bold text-primary text-uppercase mb-1">
+                            <div class="h5 mb-0 font-weight-bold t-500 white-text"><span id="totalstocks"></span></div>
+                            <div class="font-weight-bold text-uppercase mb-1 white-text">
                                 Total Stocks</div>
-                            <div class="h5 mb-0 font-weight-bold "><span id="totalstocks"></span></div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            <div class="icon-container green-bg">
+                                <i class="fas fa-calendar fa-2x white-text"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -71,17 +73,19 @@
 
         <!-- Earnings (Monthly) Card Example -->
         <div class="col-xl-6 col-md-6 mb-3 mt-3">
-            <div class="card border-left-teal h-100 py-2">
+            <div class="card card2-bg h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="font-weight-bold text-success text-uppercase mb-1">
+                            <div class="h5 mb-0 font-weight-bold t-500 white-text "><span id="totalsold"></span></div>
+                            <div class="font-weight-bold text-uppercase mb-1 white-text">
                                 Total Sold <span class="" id="date"></span>
                             </div>
-                            <div class="h5 mb-0 font-weight-bold "><span id="totalsold"></span></div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            <div class="icon-container blue-bg">
+                                <i class="fas fa-dollar-sign fa-2x white-text"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -93,11 +97,11 @@
     <div class="row mb-2 ml-1">
         <div class="responsive-col">
             <div class="input-group">
-                <button id="adjustDateBackward" class="btn btn-outline-primary custom-br-left"><i
+                <button id="adjustDateBackward" class="custom-btn btn-sm custom-br-left"><i
                         class="fas fa-caret-left"></i></button>
-                <input id="dateRange" name="dateRange" type="text" class="form-control text-center"
+                <input id="dateRange" name="dateRange" type="text" class="form-control text-center bg-normal"
                     placeholder="Select Date Range" aria-describedby="basic-addon1" readonly>
-                <button id="adjustDateForward" class="btn btn-outline-primary custom-br-right"><i
+                <button id="adjustDateForward" class="custom-btn btn-sm custom-br-right"><i
                         class="fas fa-caret-right"></i></button>
             </div>
         </div>
@@ -137,12 +141,10 @@
                 <div class="card-header card-bg align-content-center">
                     <h4 class="m-0 card-title">Sold Items Details</h4>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive scrollable-dashboard-size">
-                        <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
-                            <tbody class="no-border"></tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive scrollable-dashboard-size">
+                    <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+                        <tbody class="no-border"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -175,28 +177,17 @@
                             <h4 class="m-0 card-title">Current Stock Table</h4>
                         </div>
                         <div class="col-md-4">
-                            <button class="btn btn-outline-primary" id="convertopdf" type="button">
+                            <button class="custom-btn" id="convertopdf" type="button" style="border-radius: 0.2rem;">
                                 <i class="fas fa-file-export"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive scrollable-dashboard-size">
-                        <table class="table custom-mobile-table" id="datatable2" width="100%" cellspacing="10">
-                            <thead class="table-header">
-                                <tr>
-                                    <th class="text-center">Item Name</th>
-                                    <th class="text-center">Category</th>
-                                    <th class="text-center">Stocks</th>
-                                    <th class="text-center">Price</th>
-                                    <th class=""></th>
-                                </tr>
-                            </thead>
+                <div class="table-responsive scrollable-dashboard-size">
+                    <table class="table custom-mobile-table" id="datatable2" width="100%" cellspacing="10">
 
-                            <tbody class="no-border"></tbody>
-                        </table>
-                    </div>
+                        <tbody class="no-border"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -217,20 +208,18 @@
                     </div>
                 </div>
     
-                <div class="card-body">
-                    <div class="table-responsive scrollable-table-container-sm">
-                        <table class="table custom-mobile-table" id="soldtable" width="100%" cellspacing="10">
-                            <thead class="table-header">
-                                <tr>
-                                    <th>Asset Control</th>
-                                    <th>Date</th>
-                                    <th>Ref. No.</th>
-                                </tr>
-                            </thead>
-    
-                            <tbody class="no-border"></tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive scrollable-table-container-sm">
+                    <table class="table custom-mobile-table" id="soldtable" width="100%" cellspacing="10">
+                        <thead class="table-header header-style">
+                            <tr>
+                                <th>Asset Control</th>
+                                <th>Date</th>
+                                <th>Ref. No.</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="no-border"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -249,20 +238,18 @@
                     </div>
                 </div>
             
-                <div class="card-body">
-                    <div class="table-responsive scrollable-table-container-sm">
-                        <table class="table custom-mobile-table" id="deploytable" width="100%" cellspacing="10">
-                            <thead class="table-header">
-                                <tr>
-                                    <th>Asset Control</th>
-                                    <th>Date</th>
-                                    <th>Ref. No.</th>
-                                </tr>
-                            </thead>
-            
-                            <tbody class="no-border"></tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive scrollable-table-container-sm">
+                    <table class="table custom-mobile-table" id="deploytable" width="100%" cellspacing="10">
+                        <thead class="table-header header-style">
+                            <tr>
+                                <th>Asset Control</th>
+                                <th>Date</th>
+                                <th>Ref. No.</th>
+                            </tr>
+                        </thead>
+        
+                        <tbody class="no-border"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
