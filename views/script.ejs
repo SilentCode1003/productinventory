@@ -1,11 +1,10 @@
-<!-- LOADER -->
-<div class="loader-wrapper">
+<!-- <div class="loader-wrapper">
   <div class="spinner"></div>
-</div>
+</div> -->
 <!-- LOADER -->
-<div class="loader-wrapper">
+<!-- <div class="loader-wrapper">
   <span class="loader"><span class="loader-inner"></span></span>
-</div>
+</div> -->
 
 <!-- Logout Modal-->
 <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -43,13 +42,6 @@
 <!-- Custom scripts for all pCreated bys-->
 <script src="/javascripts/js/sb-admin-2.min.js"></script>
 
-<!-- PCreated by level plugins -->
-<script src="/vendor/datatables/jquery.dataTables.min.js"></script>
-<script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-<!-- PCreated by level custom scripts -->
-<script src="/javascripts/js/demo/datatables-demo.js"></script>
-
 <!-- DATE RANGE PICKER -->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -73,6 +65,37 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    // Specify the IDs of the collapsible sections
+    var collapseSectionIds = ['#ProductCollapse', '#EmplopyeeCollapse', '#ClientCollapse', '#ProductRequestCollapse'];
+
+    collapseSectionIds.forEach(function(sectionId) {
+      var collapseItems = document.querySelectorAll(sectionId + ' .collapse-item');
+
+      collapseItems.forEach(function(item) {
+        var iconElement = item.querySelector('i');
+
+        if (iconElement) {
+          if (item.classList.contains('active')) {
+            console.log('Active class detected:', item);
+            iconElement.classList.remove('far');
+            iconElement.classList.add('fas');
+          } else {
+            console.log('Active class NOT detected:', item);
+            iconElement.classList.remove('fas');
+            iconElement.classList.add('far');
+          }
+        } else {
+          console.log('No icon element found in:', item);
+        }
+      });
+    });
+  }, 100);
+});
+
+
+
   $("#searchproduct").on("click", function () {
     let searchdata = $("#searchdata").val();
     if (searchdata != '') {
@@ -83,20 +106,20 @@
     }
   })
 
-  hidespinner();
+  // hidespinner();
 
-  function showspinner() {
-    console.log("show loader");
-    $(".loader-wrapper").show();
-  }
+  // function showspinner() {
+  //   console.log("show loader");
+  //   $(".loader-wrapper").show();
+  // }
 
-  function hidespinner() {
-    console.log("hide loader");
+  // function hidespinner() {
+  //   console.log("hide loader");
 
-    setTimeout(() => {
-      $(".loader-wrapper").hide();
-    }, 1500);
-  }
+  //   setTimeout(() => {
+  //     $(".loader-wrapper").hide();
+  //   }, 1500);
+  // }
 
   function successlogin(title, text) {
     return swal({
@@ -442,32 +465,32 @@
   }
 
   function formatPrice(event, input) {
-      event.preventDefault();
+    event.preventDefault();
 
-      const cursorPosition = input.selectionStart;
-      const originalValue = input.value;
-      const defaultValue = '$0.00';
-      const currentValue = originalValue || defaultValue;
+    const cursorPosition = input.selectionStart;
+    const originalValue = input.value;
+    const defaultValue = '$0.00';
+    const currentValue = originalValue || defaultValue;
 
-      let value = currentValue.replace(/[^0-9.]/g, '');
-      let number = parseFloat(value);
+    let value = currentValue.replace(/[^0-9.]/g, '');
+    let number = parseFloat(value);
 
-      if (!isNaN(number)) {
-          const formattedValue = number.toLocaleString('en-PH', {
-              style: 'currency',
-              currency: 'USD',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-          });
+    if (!isNaN(number)) {
+      const formattedValue = number.toLocaleString('en-PH', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
 
-          input.value = formattedValue;
+      input.value = formattedValue;
 
-          let newPosition = cursorPosition + (formattedValue.indexOf('.') > currentValue.indexOf('.') ? 1 : 0);
+      let newPosition = cursorPosition + (formattedValue.indexOf('.') > currentValue.indexOf('.') ? 1 : 0);
 
-          // Set the new cursor position
-          input.setSelectionRange(newPosition, newPosition);
-      } else {
-          input.value = defaultValue;
-      }
+      // Set the new cursor position
+      input.setSelectionRange(newPosition, newPosition);
+    } else {
+      input.value = defaultValue;
+    }
   }
 </script>

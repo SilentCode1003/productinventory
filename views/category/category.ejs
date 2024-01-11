@@ -40,27 +40,24 @@
   </div>
 </div>
 
-<!-- PCreated by Heading -->
+<!-- PCreated by Heading
 <div class="d-sm-flex align-items-center justify-content-between mb-3">
   <h1 class="cyber-title">Category</h1>
-</div>
+</div> -->
 <!-- Content Row -->
-<div class="row mb-2">
+<div class="row mb-2 mt-3">
   <div class="col-lg-12">
-    <div class="card">
+    <div class="card category-bg border-left-inventory">
       <div class="card-body">
         <div class="row align-content-center">
           <div class="col-md-8">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon2">Category</span>
-              </div>
-              <input id="categoryname" name="categoryname" type="text" class="form-control"
-                placeholder="Enter Position Name" aria-label="categoryname" aria-describedby="basic-addon1" />
+            <div class="custom-input-group">
+              <input required="" id="categoryname" name="categoryname" type="text" name="text" autocomplete="off" class="custom-input">
+              <label class="custom-label">Input Category</label>
             </div>
           </div>
-          <div class="col-md-4 align mt-1">
-            <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-50">
+          <div class="col-md-4 mt-1 align-items-start">
+            <button id="addBtn" name="addBtn" class="custom-btn btn-sm shadow-sm">
               <i class="fa fa-plus" aria-hidden="true"></i>
               Add
             </button>
@@ -72,7 +69,7 @@
 </div>
 
 <!-- DataTales Example -->
-<div class="card shadow mb-4 table-size">
+<div class="card shadow  table-size">
   <div class="progress progress-sm mb-2">
     <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
       aria-valuemax="100"></div>
@@ -80,7 +77,7 @@
   <div class="card-header card-bg align-content-center">
     <div class="row">
       <div class="col-md-3">
-        <h5 class="m-0 font-weight-bold cyber-title mt-2">Category Table</h5>
+        <h5 class="m-0 font-weight-bold mt-2">Category Table</h5>
       </div>
       <div class="col-md-8 mt-1">
         <input id="search" name="search" type="text" class="form-control" placeholder="Search Category Name"
@@ -89,22 +86,24 @@
     </div>
   </div>
 
-  <div class="card-body">
-    <div class="table-responsive scrollable-table-container">
-      <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
-        <thead class="table-dark table-header">
-          <tr>
-            <th class="col-2 text-start">ID</th>
-            <th class="col-4 text-center">Name</th>
-            <th class="col-2 text-center">Status</th>
-            <th class="col-2 text-center">Created by</th>
-            <th class="col-2 text-center">Created date</th>
-            <th class=""></th>
-          </tr>
-        </thead>
+  <!-- <div class="card-body">
 
-        <tbody class="no-border"></tbody>
-      </table>
-    </div>
+  </div> -->
+  <div class="table-responsive scrollable-table-container">
+    <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+      <thead class="table-header header-style">
+        <tr>
+          <th class="col-1 text-start">ID</th>
+          <th class="col-3 text-center">Name</th>
+          <th class="col-3 text-center">Created by</th>
+          <th class="col-2 text-center">Created date</th>
+          <th class="col-1 text-center">Status</th>
+          <th class="col-1"></th>
+        </tr>
+      </thead>
+      <tbody class="no-border">
+        
+      </tbody>
+    </table>
   </div>
 </div>

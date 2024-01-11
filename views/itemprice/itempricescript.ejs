@@ -6,6 +6,22 @@
 
     LoadTable();
 
+    const loader = `  
+        <tr>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+        </tr>`;
+
+    const tbody = $('#datatable tbody');
+    for(let i = 0; i < 7; i++){
+      tbody.append(loader);
+    }
+
     $("#datatable tbody").on("click", "tr", function () {
       var dataRow = [];
       $(this)
@@ -16,7 +32,7 @@
         });
       // console.log(dataRow);
       itemid = dataRow[0];
-      status = dataRow[3];
+      status = dataRow[5];
     });
 
     $(document).on("click", "#editBtn", function () {
@@ -93,13 +109,16 @@
         data.forEach((item) => {
           if (item.status === "ACTIVE") {
             action = `
-                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                            <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                            <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
           } else if (item.status === "INACTIVE") {
             action = `
-                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                            <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                            <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                            <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
           }
+          const statusBackground = item.status === 'ACTIVE' ? 'status-success' : 'status-warning';
+          const containerBackground = item.status === 'ACTIVE' ? 'status-container-sc' : 'status-container-wr';
+
           const tr = $("<tr>").append(
             $("<td>", {
               text: item.id,
@@ -117,11 +136,6 @@
               class: "custom-mobile-align",
             }),
             $("<td>", {
-              text: item.status,
-              "data-label": "Status",
-              class: "custom-mobile-align",
-            }),
-            $("<td>", {
               text: item.createdby,
               "data-label": "Created By",
               class: "custom-mobile-align no-wrap",
@@ -131,6 +145,11 @@
               "data-label": "Created Date",
               class: "custom-mobile-align no-wrap",
             }),
+            $('<td>', { class: 'custom-mobile-align' }).append(
+              $('<div>', { class: containerBackground }).append(
+                $('<span>', { text: item.status, class: statusBackground })
+              )
+            ),
             $("<td>", {
               html: action,
               // "data-label": "Created Date",

@@ -1,4 +1,5 @@
-<nav class="navbar navbar-expand navbar-light cyber-bg topbar static-top shadow">
+<nav class="navbar navbar-expand navbar-light cyber-bg topbar static-top shadow"
+style="background-color: rgba(255, 255, 255, 0.4) !important; backdrop-filter: blur(5px);" >
 
     <!-- Sidebar Toggle (Topbar) -->
     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
@@ -6,13 +7,42 @@
     </button>
 
     <!-- Topbar Search -->
+      <!-- Sidebar Toggler (Sidebar) -->
+    <div class="text-center d-none d-md-inline">
+        <div class="hamburger" id="sidebarToggle" style="margin-top: 7px;">
+            <input class="checkbox" type="checkbox" />
+            <svg fill="none" viewBox="0 0 50 50" height="40" width="40">
+              <path
+                class="lineTop line"
+                stroke-linecap="round"
+                stroke-width="4"
+                stroke="black"
+                d="M6 11L44 11"
+              ></path>
+              <path
+                stroke-linecap="round"
+                stroke-width="4"
+                stroke="black"
+                d="M6 24H43"
+                class="lineMid line"
+              ></path>
+              <path
+                stroke-linecap="round"
+                stroke-width="4"
+                stroke="black"
+                d="M6 37H43"
+                class="lineBottom line"
+              ></path>
+            </svg>
+          </div>
+    </div>
     <form
         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
         <div class="input-group">
             <input type="text" class="form-control small" placeholder="Search Serial/Asset Control" id="searchdata" name="searchdata"
                 aria-label="Search" aria-describedby="basic-addon2">
             <div class="input-group-append">
-                <button class="btn btn-outline-cyberpower" type="button" id="searchproduct" name="searchproduct"> 
+                <button class="custom-btn btn-sm" type="button" id="searchproduct" name="searchproduct"> 
                     <i class="fas fa-search fa-sm"></i>
                 </button>
             </div>
@@ -53,7 +83,7 @@
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="mr-4 d-none d-lg-inline cyber-title small"><%= fullname%><br> 
-                    <span class="small"><%= position%> (<%= access%>)</span>
+                    <span class="small cyber-subheading"><%= position%> (<%= access%>)</span>
                 </span>
                 <img class="img-profile rounded-circle"
                     src="/images/img/undraw_profile.svg">
