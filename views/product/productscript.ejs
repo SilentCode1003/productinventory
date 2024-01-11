@@ -11,6 +11,24 @@
     let assetcontrol = "";
     let status = "";
 
+    const loader = `  
+        <tr class="loading-row">
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+        </tr>`;
+
+    const tbody = $('#datatable tbody');
+    for(let i = 0; i < 7; i++){
+      tbody.append(loader);
+    }
+
     LoadTable();
 
     $("#data-table tbody").on("click", "tr", function () {
@@ -293,6 +311,10 @@
                 tableBody.append(tr);
               } else {
                 if (data.msg === "success") {
+                  var loadingstate = document.querySelectorAll('.loading-row');
+                  loadingstate.forEach(function (row) {
+                    row.remove();
+                  });
                   populatetable(data.data);
                   currentPage++;
                 } else {
