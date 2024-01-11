@@ -5,6 +5,22 @@
         let hasMoreData = true;
         let currentPage = 1;
         let assetcontrol = "";
+
+        const loader = `  
+        <tr class="loading-row">
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+        </tr>`;
+
+        const tbody = $('#datatable tbody');
+        for (let i = 0; i < 7; i++) {
+            tbody.append(loader);
+        }
         
         LoadTable();
 
@@ -189,6 +205,10 @@
                                 tableBody.append(tr);
                             } else {
                                 if (data.msg === "success") {
+                                    var loadingstate = document.querySelectorAll('.loading-row');
+                                    loadingstate.forEach(function (row) {
+                                        row.remove();
+                                    });
                                     populatetable(data.data);
                                     currentPage++;
                                 } else {

@@ -484,3 +484,24 @@ exports.RemoveSpecialCharacters = (inputString) => {
   return inputString.replace(/[^\w\s]/gi, "");
 };
 //#endregion
+
+exports.formatCurrency = (value) => {
+  var formattedValue = parseFloat(value).toFixed(2);
+  return "₱" + formattedValue.replace(/\d(?=(\d{3})+\.)/g, "$&,");
+};
+
+//#region Network Information
+
+exports.getNetwork = () => {
+  return new Promise((resolve, reject) => {
+    Object.keys(interfaces).forEach((interfaceName) => {
+      interfaces[interfaceName].forEach((iface) => {
+        // Filter for IPv4 addresses
+        if (iface.family === "IPv4" && !iface.internal) {
+          console.log(`${interfaceName}: ${iface.address}`);
+          resolve(`${iface.address}`);
+        }
+      });
+    });
+  });
+};
