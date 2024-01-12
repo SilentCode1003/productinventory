@@ -145,6 +145,36 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+    function Loading(title) {
+      toastr.info(
+        `<strong>${title}</strong> <br>
+        <div style="text-align: center; margin-top: 5px;">
+          <div class="spinner-border" role="status" style="display: inline-block;">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>`,
+        null,  // No title for the notification itself
+        {
+          "closeButton": false,
+          "debug": false,
+          "newestOnTop": true,
+          "progressBar": true,
+          "positionClass": "toast-top-right",
+          "preventDuplicates": false,
+          "onclick": null,
+          "showDuration": "300",
+          "hideDuration": "0",  // Set to 0 to make it indefinite until manually cleared
+          "timeOut": "0",      // Set to 0 to make it indefinite until manually cleared
+          "extendedTimeOut": "0",  // Set to 0 to make it indefinite until manually cleared
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+        }
+      );
+    }
+
+
   function success(title, text) {
     toastr.success(text, title, {
       "closeButton": false,
@@ -181,8 +211,12 @@ document.addEventListener('DOMContentLoaded', function() {
       "showEasing": "swing",
       "hideEasing": "linear",
       "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
+      "hideMethod": "hide"
     });
+  }
+
+  function hideLoading() {
+    toastr.clear();
   }
 
   function info(title, text) {
