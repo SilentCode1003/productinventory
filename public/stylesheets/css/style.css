@@ -344,9 +344,7 @@ td {
 } */
 
 .modal-header {
-  background-color: var(--clr-card) !important;
   color: var(--clr-text);
-  border-bottom: 1px solid var(--clr-card) !important;
 }
 
 .modal-body{
@@ -355,7 +353,6 @@ td {
 
 .modal-footer{
   background-color: var(--clr-background) !important;
-  border-top: 1px solid var(--clr-card) !important;
 }
 
 body {
