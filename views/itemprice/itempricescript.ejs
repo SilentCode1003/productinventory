@@ -431,7 +431,6 @@
       //   console.log("clicked!");
       let uploaddata = $("#fileinput").val();
       if (uploaddata != "") {
-        showspinner();
         UploadProcess();
       } else {
         warning("Warning!", "No File Chosen!");
@@ -528,8 +527,9 @@
           data: dataraw,
         },
         success: function (result) {
-          hidespinner();
+          Loading('Uploading, Please wait for a moment...');
           if (result.msg != "success") {
+            hideLoading();
             warning(
               "Duplicate",
               `Some data already exist on the database. ID[${result.data}]`
@@ -542,6 +542,7 @@
             //   button: "OK!",
             // });
           } else {
+            hideLoading();
             success("Saved!", "Data saved!");
             LoadTable();
             // swal({
