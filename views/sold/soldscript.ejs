@@ -508,7 +508,7 @@
       //   console.log("clicked!");
       let uploaddata = $("#fileinput").val();
       if (uploaddata != "") {
-        showspinner();
+        Loading('Uploading, Please wait for a moment...');
         UploadProcess();
       } else {
         warning("Warning!", "No File Chosen!");
@@ -607,7 +607,7 @@
           data: dataraw,
         },
         success: function (result) {
-          hidespinner();
+          hideLoading();
           if (result.msg != "success") {
             warning(
               "Duplicate",
