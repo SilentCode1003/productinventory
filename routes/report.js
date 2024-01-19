@@ -102,3 +102,49 @@ router.get("/salesreporthistory", (req, res) => {
     });
   }
 });
+
+router.post("/getsalesreport", (req, res) => {
+  try {
+    // let daterange = req.body.daterange;
+    // let [startDate, endDate] = daterange.split(" - ");
+
+    // let formattedStartDate = startDate.split("/").reverse().join("-");
+    // let formattedEndDate = endDate.split("/").reverse().join("-");
+
+    // formattedStartDate = formattedStartDate.replace(
+    //   /(\d{4})-(\d{2})-(\d{2})/,
+    //   "$1-$3-$2"
+    // );
+    // formattedEndDate = formattedEndDate.replace(
+    //   /(\d{4})-(\d{2})-(\d{2})/,
+    //   "$1-$3-$2"
+    // );
+
+    let sql = `SELECT sr_date as date, sr_soldrefno as soldrefno,  mc_name as category, mi_name as itemname, 
+                sr_sellingprice as price, sr_quantity as quantity, sr_paymenttype as paymenttype, 
+                sr_referenceno as transacrefno, sr_status as status
+              FROM cyberpowerproduct.sales_report
+              INNER JOIN master_item ON sr_item = mi_id
+              INNER JOIN master_category ON sr_category = mc_id;`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      if (result.length != 0) {
+        console.log(result);
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});

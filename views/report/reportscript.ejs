@@ -157,6 +157,11 @@
                             class: "custom-mobile-align",
                         }),
                         $("<td>", {
+                            text: item.soldrefno,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
                             text: item.referenceno,
                             "data-label": "Created Date",
                             class: "custom-mobile-align",
@@ -287,5 +292,66 @@
             });
 
         }
+
+        $('#convertopdf').on('click', function () {
+            $.ajax({
+                type: "POST",
+                url: "/report/getsalesreport",
+                success: function (result) {
+                    let container = result.data;
+
+                    let data = salesreportdata(container);
+                    let template = 'SALES REPORT';
+                    // console.log("Current Stock: ", groupedData);
+                    if(data.length != 0){
+                        $.ajax({
+                            type: "POST",
+                            url: "/index/processpdfdata",
+                            data: {
+                                processeddata: data,
+                                template: template
+                            },
+                            success: function (result) {
+                                window.open(`/index/generatepdf`, "_blank");
+                                success("Success", "PDF generate successfully!");
+                            },
+                            error: function (err) {
+                                errormsg(err);
+                            },
+                        });
+                    }
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        });
+
+        function salesreportdata(data) {
+            return data.reduce((result, current) => {
+                const date = current.date;
+
+                if (!result[date]) {
+                    result[date] = [];
+                }
+
+                const matchingEntry = result[date].find(entry =>
+                    entry.soldrefno === current.soldrefno &&
+                    entry.transacrefno === current.transacrefno &&
+                    entry.itemname === current.itemname &&
+                    entry.category === current.category
+                );
+
+                if (matchingEntry) {
+                    matchingEntry.quantity += current.quantity;
+                    matchingEntry.price += current.price;
+                } else {
+                    result[date].push({ ...current });
+                }
+
+                return result;
+            }, {});
+        }
+
     });
 </script>

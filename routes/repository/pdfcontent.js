@@ -205,27 +205,29 @@ exports.document = (data, template) => {
                 text: "Payment Type", style: 'tableheader', border: [false, true, false, true],
             },
             {
+                text: "Trx Ref. No. Type", style: 'tableheader', border: [false, true, false, true],
+            },
+            {
                 text: "Status", style: 'tableheader', border: [false, true, false, true],
             },
         ]);
-        Object.keys(data).forEach((key, index) => {
-            const item = data[key];
-            totalsales += parseInt(item.totalPrice);
 
-            itemdetails.push([
-                {
-                    text: key, border: [false, false, false, false], style: 'tablecontent',
-                },
-                {
-                    text: item.category, border: [false, false, false, false], style: 'tablecontent',
-                },
-                {
-                    text: item.stocks.toString(), border: [false, false, false, false], style: 'tablecontent',
-                },
-                {
-                    text: `Php ${formatCurrency(item.totalPrice)}`, border: [false, false, false, false], style: 'tablecontent',
-                },
-            ]);
+        Object.keys(data).forEach((key, index) => {
+            const itemsForDate = data[key];
+        
+            itemsForDate.forEach(item => {
+                itemdetails.push([
+                    { text: key, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: item.soldrefno, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: item.category, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: item.itemname, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: item.price, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: item.quantity, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: item.paymenttype, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: item.transacrefno, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: item.status, border: [false, false, false, false], style: 'tablecontent' },
+                ]);
+            });
         });
 
         let content = {
@@ -278,7 +280,7 @@ exports.document = (data, template) => {
                 {
                     margin: [0, 15, 0, 0],
                     table: {
-                        widths: ["20%", "30%", "20%", "30%"],
+                        widths: ["*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
                         body: itemdetails,
                     },
                 },
