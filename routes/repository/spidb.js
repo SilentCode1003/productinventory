@@ -463,7 +463,7 @@ exports.InsertTable = (tablename, data, callback) => {
   }
 
   if (tablename == "sales_report") {
-    let sql = `INSERT INTO master_item(
+    let sql = `INSERT INTO sales_report(
       sr_category,
       sr_item,
       sr_date,
@@ -484,7 +484,7 @@ exports.InsertTable = (tablename, data, callback) => {
   }
 
   if (tablename == "sales_report_history") {
-    let sql = `INSERT INTO master_item(
+    let sql = `INSERT INTO sales_report_history(
       srh_salesreportid,
       srh_date,
       srh_remarks,

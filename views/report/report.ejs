@@ -31,7 +31,7 @@
                                     <div class="card-header card-bg align-content-center">
                                         <div class="row">
                                             <div class="col-md-8">
-                                                <h4 class="m-0 card-title">Sales Report Table</h4>
+                                                <h4 class="m-0 card-title">Sales Table</h4>
                                             </div>
                                             <div class="col-md-4">
                                                 <button class="custom-btn" id="convertopdf" type="button" style="border-radius: 0.2rem;">
@@ -42,7 +42,54 @@
                                     </div>
                                     <div class="table-responsive scrollable-dashboard-size">
                                         <table class="table custom-mobile-table" id="salesreport-table" width="100%" cellspacing="10">
-                    
+                                            <thead class="table-header header-style">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Category</th>
+                                                    <th>Item</th>
+                                                    <th>Date</th>
+                                                    <th>Quantity</th>
+                                                    <th>Selling Price</th>
+                                                    <th>Sold By</th>
+                                                    <th>Sold To</th>
+                                                    <th>Payment Type</th>
+                                                    <th>Remarks</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="no-border"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row d-flex mt-2">
+                            <div class="col">
+                                <div class="card dashboard-size">
+                                    <div class="card-header card-bg align-content-center">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <h4 class="m-0 card-title">Sales History Table</h4>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button class="custom-btn" id="convertopdf" type="button" style="border-radius: 0.2rem;">
+                                                    <i class="fas fa-file-export"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive scrollable-dashboard-size">
+                                        <table class="table custom-mobile-table" id="salesreporthistory-table" width="100%" cellspacing="10">
+                                            <thead class="table-header header-style">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Report ID</th>
+                                                    <th>Date</th>
+                                                    <th>Remarks</th>
+                                                    <th class="col-1">Status</th>
+                                                </tr>
+                                            </thead>
                                             <tbody class="no-border"></tbody>
                                         </table>
                                     </div>

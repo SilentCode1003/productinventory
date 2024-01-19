@@ -1,0 +1,286 @@
+<script>
+    $(document).ready(function () {
+        let id = "";
+        let name = "";
+        let status = "";
+
+        LoadTable();
+
+        const loader = `  
+          <tr>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+          </tr>`;
+        const historyloader = `  
+          <tr>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+          </tr>`;
+
+        const salesreport = $('#salesreport-table tbody');
+        const saleshistory = $('#salesreporthistory-table tbody');
+        for (let i = 0; i < 5; i++) {
+            salesreport.append(loader);
+            saleshistory.append(historyloader);
+        }
+
+        $("#salesreport-table tbody").on("click", "tr", function () {
+            var dataRow = [];
+            $(this)
+                .closest("tr")
+                .find("td")
+                .each(function () {
+                    dataRow.push($(this).text());
+                });
+            console.log(dataRow);
+            id = dataRow[0];
+            name = dataRow[1];
+            status = dataRow[4];
+        });
+
+        function filterTableRows() {
+            const searchQuery = $("#search").val().trim().toLowerCase();
+            let foundMatches = false;
+
+            $("#no-match-row").remove();
+
+            $("#datatable tbody tr").each(function () {
+                const rowData = $(this).text().toLowerCase();
+                if (rowData.includes(searchQuery)) {
+                    $(this).show();
+                    foundMatches = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (!foundMatches) {
+                const noMatchRow = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 6,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                $("#datatable tbody").append(noMatchRow);
+                noMatchRow.attr("id", "no-match-row");
+            }
+        }
+
+        $("#search").on("input", filterTableRows);
+
+        function populatesalesreport(data) {
+            // console.log(data);
+            const tableBody = $("#salesreport-table tbody");
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 6,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                tableBody.append(tr);
+            } else {
+                data.forEach((item) => {
+                    let action = "";
+                    // if (item.status === "ACTIVE") {
+                    //   action = `
+                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                    //         <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
+                    // } else if (item.status === "INACTIVE") {
+                    //   action = `
+                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                    //         <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
+                    // }
+                    const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
+                    const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
+
+                    const tr = $("<tr>").append(
+                        $("<td>", {
+                            text: item.id,
+                            "data-label": "ID",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.category,
+                            "data-label": "department",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.item,
+                            "data-label": "Created By",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.date,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.quantity,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.sellingprice,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.soldby,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.soldto,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.paymenttype,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.remarks,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                          $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+                            $('<div>', { class: containerBackground }).append(
+                              $('<span>', { text: item.status, class: statusBackground })
+                            )
+                          ),
+                        // $("<td>", {
+                        //     html: action,
+                        //     "data-label": "Action",
+                        //     class: "actionWidth",
+                        // })
+                    );
+
+                    tableBody.append(tr);
+                });
+            }
+        }
+
+        function populatesalesreporthistory(data) {
+            // console.log(data);
+            const tableBody = $("#salesreporthistory-table tbody");
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 6,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                tableBody.append(tr);
+            } else {
+                data.forEach((item) => {
+                    let action = "";
+                    // if (item.status === "ACTIVE") {
+                    //   action = `
+                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                    //         <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
+                    // } else if (item.status === "INACTIVE") {
+                    //   action = `
+                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                    //         <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
+                    // }
+                    const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
+                    const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
+
+                    const tr = $("<tr>").append(
+                        $("<td>", {
+                            text: item.id,
+                            "data-label": "ID",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.salesreportid,
+                            "data-label": "department",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.date,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.remarks,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                          $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+                            $('<div>', { class: containerBackground }).append(
+                              $('<span>', { text: item.status, class: statusBackground })
+                            )
+                          ),
+                        // $("<td>", {
+                        //     html: action,
+                        //     "data-label": "Action",
+                        //     class: "actionWidth",
+                        // })
+                    );
+
+                    tableBody.append(tr);
+                });
+            }
+        }
+
+        function LoadTable() {
+
+            $.ajax({
+                url: "/report/salesreport",
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log("Data: ", data.data)
+                    if (data.msg === "success") {
+                        populatesalesreport(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                },
+            });
+
+            $.ajax({
+                url: "/report/salesreporthistory",
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log("Data: ", data.data)
+                    if (data.msg === "success") {
+                        populatesalesreporthistory(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                },
+            });
+
+        }
+    });
+</script>

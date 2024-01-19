@@ -1,4 +1,5 @@
 var express = require("express");
+const dictionary = require("./repository/dictionary");
 const {
   Sold,
   SoldProduct,
@@ -80,10 +81,35 @@ router.get("/load", (req, res) => {
 
 router.post("/save", (req, res) => {
   try {
-    const { assetcontrol, serial, date, soldby, soldto, referenceno } =
+    const { assetcontrol, serial, date, soldby, soldto, referenceno, paymenttype, sellingprice, remarks, transactionstatus } =
       req.body;
     let sold = [[assetcontrol, serial, date, soldby, soldto, referenceno]];
-    console.log("Sold data: ", sold);
+    let status = dictionary.GetValue(dictionary.NPD());
+    // console.log("Sold data: ", sold);
+
+    Check_Product(serial)
+    .then((result) => {
+        let product = Product(result);
+        let quantity = 1;
+        let category = product[0].category;
+        let itemname = product[0].itemname;
+        let salesreport = [[category, itemname, date, quantity, sellingprice, soldby, soldto, paymenttype, remarks, status]]
+
+        InsertTable("sales_report", salesreport, (err, result) => {
+          if (err) console.error("Error: ", err);
+          console.log(result);
+          let salesreportid = result[0].id;
+
+          let salesreporthistory = [[salesreportid, date, remarks, status]]
+          InsertTable("sales_report_history", salesreporthistory, (err, result) => {
+            if (err) console.error("Error: ", err);
+            console.log(result);
+          });
+
+        });
+      }
+    );
+
     Check_Sold(assetcontrol, date, soldto)
       .then((result) => {
         let data = Sold(result);

@@ -111,6 +111,48 @@
                     </div>
                 </div>
 
+                <div class="row d-flex mt-2">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Selling Price</span>
+                            </div>
+                            <input id="sellingprice" name="sellingprice" type="text" class="form-control"
+                                placeholder="Enter Selling Price" aria-label="sellingprice"
+                                aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Payment Type</span>
+                            </div>
+                            <input id="paymenttype" name="paymenttype" type="text" class="form-control" placeholder="Enter Payment Type"
+                                aria-label="paymenttype" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row d-flex mt-2 justify-content-center">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Transaction Status</label>
+                        <select class="form-control text-center" name="transactionstatus" id="transactionstatus">
+                            <option value="">-- Select here --</option>
+                            <option value="PAID">PAID</option>
+                            <option value="NOT PAID">NOT PAID</option>
+                        </select>  
+                    </div>
+                </div>
+
+                <div class="row d-flex mt-2 justify-content-center">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="remarks" style="color: var(--clr-glow) !important;">Remarks: </label>
+                            <textarea class="form-control" id="remarks" rows="3" placeholder="Enter Remarks"></textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row justify-content-end">
                     <div class="col-md-4 align mt-1">
                         <button id="addBtn" name="addBtn" class="btn btn-sm btn-outline-cyberpower shadow-sm w-100">
