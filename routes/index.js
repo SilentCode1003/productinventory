@@ -146,16 +146,15 @@ router.post("/getsoldcount", (req, res) => {
       msg: error,
     });
   }
-});
+}); 
 
 let pdfBuffer = "";
 router.post("/processpdfdata", (req, res) => {
   try {
     let data = req.body.processeddata;
     if (data.length != 0) {
-      Generate(data)
+      Generate(data, 'STOCKS REPORT')
       .then((result) => {
-        console.log("PDF Generation Result: ", result);
 
         pdfBuffer = result;
 
@@ -179,7 +178,6 @@ router.post("/processpdfdata", (req, res) => {
 
 router.get("/generatepdf", (req, res) => {
   try {
-    console.log("data: ", pdfBuffer)
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",

@@ -27,6 +27,8 @@ const {
   UploadItemPriceModel,
   UploadDefectiveItemModel,
   UploadReplaceItemModel,
+  SalesReportModel,
+  SalesReportHistoryModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -689,6 +691,68 @@ exports.ReturnProduct = (data) => {
         key["returnby"],
         key["returnfrom"],
         key["referenceno"]
+      )
+  );
+};
+
+exports.SalesReport = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.sr_id,
+      category: key.sr_category,
+      item: key.sr_item,
+      date: key.sr_date,
+      quantity: key.sr_quantity,
+      sellingprice: key.sr_sellingprice,
+      soldby: key.sr_soldby,
+      soldto: key.sr_soldto,
+      paymenttype: key.sr_paymenttype,
+      remarks: key.sr_remarks,
+      status: key.sr_status,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new SalesReportModel(
+        key["id"],
+        key["category"],
+        key["item"],
+        key["date"],
+        key["quantity"],
+        key["sellingprice"],
+        key["soldby"],
+        key["soldto"],
+        key["paymenttype"],
+        key["remarks"],
+        key["status"],
+      )
+  );
+};
+
+exports.SalesReportHistory = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      id: key.srh_id,
+      salesreportid: key.srh_salesreportid,
+      date: key.srh_date,
+      ramarks: key.srh_remarks,
+      status: key.srh_status,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new SalesReportHistoryModel(
+        key["id"],
+        key["salesreportid"],
+        key["date"],
+        key["ramarks"],
+        key["status"]
       )
   );
 };

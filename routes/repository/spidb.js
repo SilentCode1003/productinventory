@@ -461,4 +461,40 @@ exports.InsertTable = (tablename, data, callback) => {
       callback(null, result);
     });
   }
+
+  if (tablename == "sales_report") {
+    let sql = `INSERT INTO master_item(
+      sr_category,
+      sr_item,
+      sr_date,
+      sr_quantity,
+      sr_sellingprice,
+      sr_soldby,
+      sr_soldto,
+      sr_paymenttype,
+      sr_remarks,
+      sr_status) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "sales_report_history") {
+    let sql = `INSERT INTO master_item(
+      srh_salesreportid,
+      srh_date,
+      srh_remarks,
+      srh_status) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
 };

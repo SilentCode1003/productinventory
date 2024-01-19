@@ -1,0 +1,62 @@
+<!-- Content Row -->
+<div class="row mt-3">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row mb-2 justify-content-center">
+                    <div class="responsive-col">
+                        <div class="input-group">
+                            <button id="adjustDateBackward" class="custom-btn btn-sm custom-br-left"><i class="fas fa-caret-left"></i></button>
+                            <input id="dateRange" name="dateRange" type="text" class="form-control text-center" placeholder="Select Date Range" aria-describedby="basic-addon1" readonly>
+                            <button id="adjustDateForward" class="custom-btn btn-sm custom-br-right"><i class="fas fa-caret-right"></i></button>
+                        </div> 
+                    </div>   
+                </div>
+                <ul class="nav nav-pills" id="pills-tab" role="tablist">
+
+                    <li class="nav-item col text-center mb-1">
+                      <a class="nav-link btn btn-outline-cyberpower active" id="salesreport-tab" data-toggle="pill" href="#salesreport" role="tab" aria-controls="salesreport" aria-selected="true">Sales Report</a>
+                    </li>
+                    <li class="nav-item col text-center mb-1">
+                        <a class="nav-link btn btn-outline-cyberpower" id="sales-per-employee-tab" data-toggle="pill" href="#sales-per-employee" role="tab" aria-controls="sales-per-employee" aria-selected="false">Employee</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="salesreport" role="tabpanel" aria-labelledby="salesreport-tab">
+                        <div class="row d-flex">
+                            <div class="col">
+                                <div class="card dashboard-size">
+                                    <div class="card-header card-bg align-content-center">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <h4 class="m-0 card-title">Sales Report Table</h4>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <button class="custom-btn" id="convertopdf" type="button" style="border-radius: 0.2rem;">
+                                                    <i class="fas fa-file-export"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive scrollable-dashboard-size">
+                                        <table class="table custom-mobile-table" id="salesreport-table" width="100%" cellspacing="10">
+                    
+                                            <tbody class="no-border"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="sales-per-employee" role="tabpanel" aria-labelledby="sales-per-employee-tab">
+                        <div class="row">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
