@@ -135,9 +135,18 @@
 
                 <div class="row d-flex mt-2 justify-content-center">
                     <div class="col-md-6 mb-2">
-                        <label class="form-label">Transaction Status</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Transaction Ref. No.</span>
+                            </div>
+                            <input id="transactionref" name="transactionref" type="text" class="form-control"
+                                placeholder="Enter Transaction Reference No." aria-label="transactionref"
+                                aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
                         <select class="form-control text-center" name="transactionstatus" id="transactionstatus">
-                            <option value="">-- Select here --</option>
+                            <option value="">-- Select Transaction Status --</option>
                             <option value="PAID">PAID</option>
                             <option value="NOT PAID">NOT PAID</option>
                         </select>  

@@ -709,6 +709,7 @@ exports.SalesReport = (data) => {
       soldby: key.sr_soldby,
       soldto: key.sr_soldto,
       paymenttype: key.sr_paymenttype,
+      referenceno: key.sr_referenceno,
       remarks: key.sr_remarks,
       status: key.sr_status,
     });
@@ -726,6 +727,7 @@ exports.SalesReport = (data) => {
         key["soldby"],
         key["soldto"],
         key["paymenttype"],
+        key["referenceno"],
         key["remarks"],
         key["status"],
       )

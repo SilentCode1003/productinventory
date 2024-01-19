@@ -318,7 +318,7 @@ class ReturnProductModel {
 }
 
 class SalesReportModel {
-  constructor(id, category, item, date, quantity, sellingprice, soldby, soldto, paymenttype, remarks, status) {
+  constructor(id, category, item, date, quantity, sellingprice, soldby, soldto, paymenttype, referenceno, remarks, status) {
     this.id = id;
     this.category = category;
     this.item = item;
@@ -328,6 +328,7 @@ class SalesReportModel {
     this.soldby = soldby;
     this.soldto = soldto;
     this.paymenttype = paymenttype;
+    this.referenceno = referenceno;
     this.remarks = remarks;
     this.status = status;
   }

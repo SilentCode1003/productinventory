@@ -6,7 +6,7 @@ const { GetCurrentDate, formatCurrency } = require("./customhelper");
 exports.document = (data, template) => {
     let itemdetails = [];
     let totalsales = 0;
-    
+
     if (template == 'STOCKS REPORT') {
         itemdetails.push([
             {
@@ -23,23 +23,24 @@ exports.document = (data, template) => {
             },
         ]);
         Object.keys(data).forEach((key, index) => {
-          const item = data[key];
-          totalsales += parseInt(item.totalPrice);
-    
-          itemdetails.push([
-            { 
-              text: key, border: [false, false, false, false], style: 'tablecontent',
-            },
-            { 
-              text: item.category, border: [false, false, false, false], style: 'tablecontent',
-            },
-            {
-              text: item.stocks.toString(), border: [false, false, false, false], style: 'tablecontent',
-            },
-            {
-              text: `Php ${formatCurrency(item.totalPrice)}`, border: [false, false, false, false], style: 'tablecontent',
-            },
-          ]);
+            const item = data[key];
+            console.log("ITEMS STRUCTURE: ", item);
+            totalsales += parseInt(item.totalPrice);
+
+            itemdetails.push([
+                {
+                    text: key, border: [false, false, false, false], style: 'tablecontent',
+                },
+                {
+                    text: item.category, border: [false, false, false, false], style: 'tablecontent',
+                },
+                {
+                    text: item.stocks.toString(), border: [false, false, false, false], style: 'tablecontent',
+                },
+                {
+                    text: `Php ${formatCurrency(item.totalPrice)}`, border: [false, false, false, false], style: 'tablecontent',
+                },
+            ]);
         });
 
         let content = {
@@ -155,7 +156,7 @@ exports.document = (data, template) => {
                     canvas: [
                         {
                             //517 portrait
-                            type: 'line', x1: 0,  y1: 10, x2: 762, y2: 10, lineWidth: 1.3
+                            type: 'line', x1: 0, y1: 10, x2: 762, y2: 10, lineWidth: 1.3
                         }
                     ]
                 }
@@ -169,10 +170,10 @@ exports.document = (data, template) => {
                     fontSize: 11, alignment: "center",
                 },
                 tableheader: {
-                    bold: true, margin: [ 0, 5, 0, 5 ] 
+                    bold: true, margin: [0, 5, 0, 5]
                 },
                 tablecontent: {
-                    fontSize: 9, margin: [ 0, 2.5, 0, 2.5 ],
+                    fontSize: 9, margin: [0, 2.5, 0, 2.5],
                 }
             },
         }
@@ -180,12 +181,193 @@ exports.document = (data, template) => {
         return content;
     }
 
-    if (template == 'SALES REPORT'){
+    if (template == 'SALES REPORT') {
+        itemdetails.push([
+            {
+                text: "Date", style: 'tableheader', border: [false, true, false, true],
+            },
+            {
+                text: "Reference No.", style: 'tableheader', border: [false, true, false, true],
+            },
+            {
+                text: "Category", style: 'tableheader', border: [false, true, false, true],
+            },
+            {
+                text: "Item Name", style: 'tableheader', border: [false, true, false, true],
+            },
+            {
+                text: "Price", style: 'tableheader', border: [false, true, false, true],
+            },
+            {
+                text: "Quantity", style: 'tableheader', border: [false, true, false, true],
+            },
+            {
+                text: "Payment Type", style: 'tableheader', border: [false, true, false, true],
+            },
+            {
+                text: "Status", style: 'tableheader', border: [false, true, false, true],
+            },
+        ]);
+        Object.keys(data).forEach((key, index) => {
+            const item = data[key];
+            totalsales += parseInt(item.totalPrice);
 
+            itemdetails.push([
+                {
+                    text: key, border: [false, false, false, false], style: 'tablecontent',
+                },
+                {
+                    text: item.category, border: [false, false, false, false], style: 'tablecontent',
+                },
+                {
+                    text: item.stocks.toString(), border: [false, false, false, false], style: 'tablecontent',
+                },
+                {
+                    text: `Php ${formatCurrency(item.totalPrice)}`, border: [false, false, false, false], style: 'tablecontent',
+                },
+            ]);
+        });
+
+        let content = {
+            pageSize: "A4", pageOrientation: "landscape", margin: 10,
+            content: [
+                {
+                    columns: [
+                        {
+                            image: imagesample, width: 80, alignment: 'right'
+                        },
+                        {
+                            stack: [
+                                {
+                                    text: '5L SOLUTION SUPPLIES AND ALLIED SERVICES CORP.',
+                                    style: 'header',
+                                },
+                                {
+                                    text: '39 Macaria Drive, San Pedro, Laguna',
+                                    style: 'subheader'
+                                },
+                                {
+                                    text: 'Tel. # 83-565-810',
+                                    style: 'subheader'
+                                }
+                            ],
+                            width: '*'
+                        }
+                    ],
+                },
+                {
+                    layout: "noBorders",
+                    text: template,
+                    style: 'header',
+                    margin: [0, 20, 0, 0],
+                },
+                {
+                    layout: "noBorders",
+                    alignment: "left",
+                    table: {
+                        body: [
+                            [
+                                {
+                                    text: "Date: " + GetCurrentDate(),
+                                    margin: [0, 20, 0, 0],
+                                }
+                            ],
+                        ],
+                    },
+                }, //Sub Header Details
+                {
+                    margin: [0, 15, 0, 0],
+                    table: {
+                        widths: ["20%", "30%", "20%", "30%"],
+                        body: itemdetails,
+                    },
+                },
+
+                //divider
+                {
+                    canvas: [
+                        {
+                            type: 'line', x1: 0, y1: 10, x2: 762, y2: 10, lineWidth: 1.3
+                            //x2: 517 portrait
+                        }
+                    ]
+                },
+                //divider
+
+                {
+                    layout: "noBorders",
+                    fontSize: 9,
+                    table: {
+                        widths: ["70.5%", "29.5%"],
+                        body: [
+                            [
+                                {
+                                    text: "Subtotal: ",
+                                    margin: [0, 2.5, 0, 0],
+                                    bold: true,
+                                    alignment: 'right'
+                                },
+                                {
+                                    text: `Php ${formatCurrency(totalsales)}`,
+                                    margin: [0, 2.5, 0, 0],
+                                },
+                            ],
+                        ],
+                    },
+                },
+
+                {
+                    layout: "noBorders",
+                    fontSize: 9,
+                    table: {
+                        widths: ["70.5%", "29.5%"],
+                        body: [
+                            [
+                                {
+                                    text: "Total: ",
+                                    margin: [0, 2.5, 0, 0],
+                                    bold: true,
+                                    alignment: 'right'
+                                },
+                                {
+                                    text: `Php ${formatCurrency(totalsales)}`,
+                                    margin: [0, 2.5, 0, 0],
+                                },
+                            ],
+                        ],
+                    },
+                },
+                {
+                    canvas: [
+                        {
+                            //517 portrait
+                            type: 'line', x1: 0, y1: 10, x2: 762, y2: 10, lineWidth: 1.3
+                        }
+                    ]
+                }
+            ],
+
+            styles: {
+                header: {
+                    fontSize: 16, bold: true, alignment: 'center'
+                },
+                subheader: {
+                    fontSize: 11, alignment: "center",
+                },
+                tableheader: {
+                    bold: true, margin: [0, 5, 0, 5]
+                },
+                tablecontent: {
+                    fontSize: 9, margin: [0, 2.5, 0, 2.5],
+                }
+            },
+        }
+
+        return content;
 
     }
 
-    if (template == 'TRANSFER REPORT'){
+    if (template == 'TRANSFER REPORT') {
 
     }
 }

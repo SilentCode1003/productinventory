@@ -16,6 +16,7 @@ const boldfont = path.join(
 
 exports.Generate = (data, template) => {
   console.log("Generating Phase: ", data);
+  
   return new Promise((resolve, reject) => {
     var fonts = {
       Roboto: {

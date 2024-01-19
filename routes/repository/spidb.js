@@ -472,6 +472,7 @@ exports.InsertTable = (tablename, data, callback) => {
       sr_soldby,
       sr_soldto,
       sr_paymenttype,
+      sr_referenceno,
       sr_remarks,
       sr_status) VALUES ?`;
 

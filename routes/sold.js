@@ -81,7 +81,7 @@ router.get("/load", (req, res) => {
 
 router.post("/save", (req, res) => {
   try {
-    const { assetcontrol, serial, date, soldby, soldto, referenceno, paymenttype, sellingprice, remarks, transactionstatus } =
+    const { assetcontrol, serial, date, soldby, soldto, referenceno, paymenttype, sellingprice, remarks, transactionstatus, transactionref } =
       req.body;
     let sold = [[assetcontrol, serial, date, soldby, soldto, referenceno]];
     let status = dictionary.GetValue(dictionary.NPD());
@@ -93,7 +93,7 @@ router.post("/save", (req, res) => {
         let quantity = 1;
         let category = product[0].category;
         let itemname = product[0].itemname;
-        let salesreport = [[category, itemname, date, quantity, sellingprice, soldby, soldto, paymenttype, remarks, status]]
+        let salesreport = [[category, itemname, date, quantity, sellingprice, soldby, soldto, paymenttype, transactionref, remarks, transactionstatus]]
 
         InsertTable("sales_report", salesreport, (err, result) => {
           if (err) console.error("Error: ", err);

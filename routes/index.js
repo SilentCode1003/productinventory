@@ -8,6 +8,7 @@ var router = express.Router();
 const { Select } = require("./repository/spidb");
 const { Deploy } = require("./model/spimodel");
 const { Generate } = require("./repository/pdf.js");
+const { GetCurrentDate } = require('./repository/customhelper.js');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -149,14 +150,20 @@ router.post("/getsoldcount", (req, res) => {
 }); 
 
 let pdfBuffer = "";
+let filename = "";
+let date = "";
+
 router.post("/processpdfdata", (req, res) => {
   try {
     let data = req.body.processeddata;
+    let template = req.body.template;
     if (data.length != 0) {
-      Generate(data, 'STOCKS REPORT')
+      Generate(data, template)
       .then((result) => {
 
         pdfBuffer = result;
+        filename = template;
+        date = GetCurrentDate();
 
         res.json({
           msg: "success",
@@ -181,7 +188,7 @@ router.get("/generatepdf", (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      "attachment; filename=Sales_Report.pdf"
+      `attachment; filename=${filename}_${date}.pdf`
     );
 
     res.send(pdfBuffer);

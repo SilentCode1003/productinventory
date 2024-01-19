@@ -65,6 +65,7 @@
       let sellingprice = $("#sellingprice").val();
       let paymenttype = $("#paymenttype").val();
       let transactionstatus = $("#transactionstatus").val();
+      let transactionref = $("#transactionref").val();
 
       var message = "";
 
@@ -94,6 +95,9 @@
       }
       if (transactionstatus == "") {
         message += "Empty Transaction Status, ";
+      }
+      if (transactionref == "") {
+        message += "Empty Transaction Reference No., ";
       }
 
       if (message != "") {
@@ -136,6 +140,7 @@
                     referenceno: referenceno,
                     sellingprice: sellingprice,
                     paymenttype: paymenttype,
+                    transactionref: transactionref,
                     transactionstatus: transactionstatus,
                     remarks: remarks,
                   },
