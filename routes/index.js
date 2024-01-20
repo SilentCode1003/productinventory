@@ -8,6 +8,7 @@ var router = express.Router();
 const { Select } = require("./repository/spidb");
 const { Deploy } = require("./model/spimodel");
 const { Generate } = require("./repository/pdf.js");
+const { GetCurrentDate } = require('./repository/customhelper.js');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -115,7 +116,7 @@ router.post("/getsoldcount", (req, res) => {
       /(\d{4})-(\d{2})-(\d{2})/,
       "$1-$3-$2"
     );
-      console.log(formattedStartDate, formattedEndDate)
+      console.log("Date: ",formattedStartDate, formattedEndDate)
     let sql = `SELECT s_id as id, s_assetcontrol as assetcontrol, s_serial as serial, mi_name as productname, 
               mc_name as category, p_status as status, e_fullname as soldby, s_date as date, mip_fobprice as price
               FROM sold 
@@ -146,21 +147,31 @@ router.post("/getsoldcount", (req, res) => {
       msg: error,
     });
   }
-});
+}); 
 
 let pdfBuffer = "";
+let filename = "";
+let date = "";
+
 router.post("/processpdfdata", (req, res) => {
   try {
     let data = req.body.processeddata;
-    if (data.length != 0) {
-      Generate(data)
+    let template = req.body.template;
+    let employee = req.body.employee;
+    let date = req.body.date;
+    // console.log("Processed Data: ", data);
+
+    if (data.length != 0 && data != undefined) {
+      Generate(data, template, employee, date)
       .then((result) => {
-        console.log("PDF Generation Result: ", result);
 
         pdfBuffer = result;
+        filename = template;
+        date = GetCurrentDate();
 
         res.json({
           msg: "success",
+          data: result,
         });
       })
       .catch((error) => {
@@ -168,6 +179,10 @@ router.post("/processpdfdata", (req, res) => {
         return res.json({
           msg: error,
         });
+      });
+    }else{
+      res.json({
+        msg: "nodata",
       });
     }
   } catch (error) {
@@ -179,11 +194,10 @@ router.post("/processpdfdata", (req, res) => {
 
 router.get("/generatepdf", (req, res) => {
   try {
-    console.log("data: ", pdfBuffer)
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      "attachment; filename=Sales_Report.pdf"
+      `attachment; filename=${filename}_${date}.pdf`
     );
 
     res.send(pdfBuffer);

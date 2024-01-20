@@ -35,7 +35,7 @@
         .each(function () {
           dataRow.push($(this).text());
         });
-      console.log(dataRow);
+      // console.log(dataRow);
       assetcontrol = dataRow[0];
     });
 
@@ -61,6 +61,11 @@
       let employee = $("#employee").val();
       let referenceno = $("#referenceno").val();
       let date = $("#date").val();
+      let remarks = $("#remarks").val();
+      let sellingprice = $("#sellingprice").val();
+      let paymenttype = $("#paymenttype").val();
+      let transactionstatus = $("#transactionstatus").val();
+      let transactionref = $("#transactionref").val();
 
       var message = "";
 
@@ -79,6 +84,21 @@
       if (date == "") {
         message += "Empty Date, ";
       }
+      if (remarks == "") {
+        message += "Empty Remarks, ";
+      }
+      if (sellingprice == "") {
+        message += "Empty Selling Price, ";
+      }
+      if (paymenttype == "") {
+        message += "Empty Payment Type, ";
+      }
+      if (transactionstatus == "") {
+        message += "Empty Transaction Status, ";
+      }
+      if (transactionref == "") {
+        message += "Empty Transaction Reference No., ";
+      }
 
       if (message != "") {
         warning("Required", `Please fill up ${message}`);
@@ -86,15 +106,16 @@
         let splitData = data.split(" ");
         let serial = splitData[0];
         let assetControl = splitData[1].replace("(", "").replace(")", "");
-        console.log(assetControl, serial, date, soldby, soldto, referenceno);
-        console.log("locationdata: ", location);
+        // console.log(assetControl, serial, date, soldby, soldto, referenceno);
+        // console.log("locationdata: ", location);
+      
         if (location != "") {
           let match = location.match(/\((.*?)\)\s*\((.*?)\)/);
           let branch = match[1].trim();
           let company = match[2].trim();
 
-          console.log("Branch: ", branch);
-          console.log("Company: ", company);
+          // console.log("Branch: ", branch);
+          // console.log("Company: ", company);
           $.ajax({
             type: "POST",
             url: "/client/checklocation",
@@ -117,6 +138,11 @@
                     soldby: soldby,
                     soldto: soldto,
                     referenceno: referenceno,
+                    sellingprice: sellingprice,
+                    paymenttype: paymenttype,
+                    transactionref: transactionref,
+                    transactionstatus: transactionstatus,
+                    remarks: remarks,
                   },
                   success: function (result) {
                     if (result.msg == "success") {

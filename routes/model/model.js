@@ -317,6 +317,34 @@ class ReturnProductModel {
   }
 }
 
+class SalesReportModel {
+  constructor(id, category, item, date, quantity, sellingprice, soldby, soldto, paymenttype, soldrefno, referenceno, remarks, status) {
+    this.id = id;
+    this.category = category;
+    this.item = item;
+    this.date = date;
+    this.quantity = quantity;
+    this.sellingprice = sellingprice;
+    this.soldby = soldby;
+    this.soldto = soldto;
+    this.paymenttype = paymenttype;
+    this.soldrefno = soldrefno;
+    this.referenceno = referenceno;
+    this.remarks = remarks;
+    this.status = status;
+  }
+}
+
+class SalesReportHistoryModel {
+  constructor(id, salesreportid, date, remarks, status) {
+    this.id = id;
+    this.salesreportid = salesreportid;
+    this.date = date;
+    this.remarks = remarks;
+    this.status = status;
+  }
+}
+
 class UploadItemPriceModel {
   constructor(itemname, fobprice) {
     this.itemname = itemname;
@@ -440,4 +468,6 @@ module.exports = {
   UploadItemPriceModel,
   UploadDefectiveItemModel,
   UploadReplaceItemModel,
+  SalesReportModel,
+  SalesReportHistoryModel,
 };

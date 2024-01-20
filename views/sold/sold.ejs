@@ -1,3 +1,47 @@
+<!-- Modal -->
+<div class="modal fade bd-example-modal-lg" id="salesreportmodal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sales Report</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-2">
+                    <div class="col-lg-12">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-md-12">
+                                    <label class="form-label" for="itemscodemodal">Item ID</label>
+                                    <input id="itemscodemodal" name="itemscodemodal" type="text" class="form-control"
+                                        placeholder="Enter new itemcode" aria-label="itemscodemodal"
+                                        aria-describedby="basic-addon1" disabled />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label class="form-label" for="itemsnamemodal">Category Name</label>
+                                    <input id="itemsnamemodal" name="itemsnamemodal" type="text" class="form-control"
+                                        placeholder="Enter new item name" aria-label="itemsnamemodal"
+                                        aria-describedby="basic-addon1" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-cyberpower" data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i>Close
+                </button>
+                <button type="button" id="saveBtn" class="btn btn-outline-cyberpower">
+                    <i class="fa fa-check" aria-hidden="true"></i>Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Content Row -->
 <div class="row mb-2 mt-3">
@@ -8,11 +52,12 @@
                 <div class="row d-flex justify-content-center">
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
-                          <input class="form-control text-center custom-input" placeholder="Select/Input Asset Control or Serial" name="serialname" id="serialname"/>
-                          <input type="hidden" id="hiddenSerialValue" name="hiddenSerialValue" />
-                          <div class="input-group-append">
-                            <span class="input-group-text">Asset Control/Serial</span>
-                          </div>
+                            <input class="form-control text-center custom-input"
+                                placeholder="Select/Input Asset Control or Serial" name="serialname" id="serialname" />
+                            <input type="hidden" id="hiddenSerialValue" name="hiddenSerialValue" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">Asset Control/Serial</span>
+                            </div>
                         </div>
                         <div class="custom-dropdown custom-dropdown-margin-left" id="serialDropdown"></div>
                     </div>
@@ -21,22 +66,24 @@
                 <div class="row d-flex mt-2">
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
-                          <input class="form-control text-center custom-input" placeholder="Select Sold To" name="location" id="location"/>
-                          <input type="hidden" id="hiddenValue" name="hiddenValue" />
-                          <div class="input-group-append">
-                            <span class="input-group-text">Sold To</span>
-                          </div>
+                            <input class="form-control text-center custom-input" placeholder="Select Sold To"
+                                name="location" id="location" />
+                            <input type="hidden" id="hiddenValue" name="hiddenValue" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">Sold To</span>
+                            </div>
                         </div>
                         <div class="custom-dropdown custom-dropdown-margin-left" id="locationDropdown"></div>
                     </div>
 
                     <div class="col-md-6 mb-2">
                         <div class="input-group">
-                          <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee"/>
-                          <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
-                          <div class="input-group-append">
-                            <span class="input-group-text">Sold By</span>
-                          </div>
+                            <input class="form-control text-center custom-input" placeholder="Select Employee"
+                                name="employee" id="employee" />
+                            <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">Sold By</span>
+                            </div>
                         </div>
                         <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
                     </div>
@@ -49,7 +96,8 @@
                                 <span class="input-group-text" id="basic-addon2">Reference Number</span>
                             </div>
                             <input id="referenceno" name="referenceno" type="text" class="form-control"
-                                placeholder="Enter Reference Number" aria-label="referenceno" aria-describedby="basic-addon1" />
+                                placeholder="Enter Reference Number" aria-label="referenceno"
+                                aria-describedby="basic-addon1" />
                         </div>
                     </div>
                     <div class="col-md-6 mb-2">
@@ -57,8 +105,59 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon2">Date</span>
                             </div>
-                            <input id="date" name="date" type="date" class="form-control"
-                                placeholder="Enter Date" aria-label="date" aria-describedby="basic-addon1" />
+                            <input id="date" name="date" type="date" class="form-control" placeholder="Enter Date"
+                                aria-label="date" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row d-flex mt-2">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Selling Price</span>
+                            </div>
+                            <input id="sellingprice" name="sellingprice" type="text" class="form-control"
+                                placeholder="Enter Selling Price" aria-label="sellingprice"
+                                aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Payment Type</span>
+                            </div>
+                            <input id="paymenttype" name="paymenttype" type="text" class="form-control" placeholder="Enter Payment Type"
+                                aria-label="paymenttype" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row d-flex mt-2 justify-content-center">
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon2">Transaction Ref. No.</span>
+                            </div>
+                            <input id="transactionref" name="transactionref" type="text" class="form-control"
+                                placeholder="Enter Transaction Reference No." aria-label="transactionref"
+                                aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <select class="form-control text-center" name="transactionstatus" id="transactionstatus">
+                            <option value="">-- Select Transaction Status --</option>
+                            <option value="PAID">PAID</option>
+                            <option value="NOT PAID">NOT PAID</option>
+                        </select>  
+                    </div>
+                </div>
+
+                <div class="row d-flex mt-2 justify-content-center">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="remarks" style="color: var(--clr-glow) !important;">Remarks: </label>
+                            <textarea class="form-control" id="remarks" rows="3" placeholder="Enter Remarks"></textarea>
                         </div>
                     </div>
                 </div>
@@ -87,24 +186,22 @@
             <div class="col-md-2 mt-2">
                 <h5 class="m-0 font-weight-bold cyber-title mt-2">Sold Table</h5>
             </div>
-            <div class="col-md-5 mt-2">
+            <div class="col-md-4 mt-2">
                 <input id="search" name="search" type="text" class="form-control" placeholder="Search Serial"
                     aria-label="search" aria-describedby="basic-addon1" />
             </div>
             <div class="col-md-3 mt-2">
                 <div class="input-group mb-3">
-                    <input
-                        class="btn btn-outline-cyberpower w-100"
-                        type="file"
-                        id="fileinput"
-                        accept=".xlsx, .xls"
-                        placeholder="Select Excel File"
-                    />
-                </div>                
+                    <input class="btn btn-outline-cyberpower w-100" type="file" id="fileinput" accept=".xlsx, .xls"
+                        placeholder="Select Excel File" />
+                </div>
             </div>
-            <div class="col-md-2 mt-2">
+            <div class="col-md-3 mt-2">
                 <button class="btn btn-outline-cyberpower" id="uploadButton" type="button">
                     <i class="fas fa-upload"></i>
+                </button>
+                <button class="custom-btn" id="convertopdf" type="button" style="border-radius: 0.2rem;">
+                    <i class="fas fa-file-export"></i>
                 </button>
             </div>
         </div>
