@@ -3,7 +3,7 @@ var imagesample = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA9wAAAKXCAYAAAB
 //#endregion
 const { GetCurrentDate, formatCurrency } = require("./customhelper");
 
-exports.document = (data, template) => {
+exports.document = (data, template, employee, date) => {
     let itemdetails = [];
     let totalsales = 0;
 
@@ -24,7 +24,6 @@ exports.document = (data, template) => {
         ]);
         Object.keys(data).forEach((key, index) => {
             const item = data[key];
-            console.log("ITEMS STRUCTURE: ", item);
             totalsales += parseInt(item.totalPrice);
 
             itemdetails.push([
@@ -182,6 +181,8 @@ exports.document = (data, template) => {
     }
 
     if (template == 'SALES REPORT') {
+        let paid = 0;
+        let notpaid = 0;
         itemdetails.push([
             {
                 text: "Date", style: 'tableheader', border: [false, true, false, true],
@@ -210,12 +211,21 @@ exports.document = (data, template) => {
             {
                 text: "Status", style: 'tableheader', border: [false, true, false, true],
             },
+            {
+                text: "Total", style: 'tableheader', border: [false, true, false, true],
+            },
         ]);
 
         Object.keys(data).forEach((key, index) => {
             const itemsForDate = data[key];
-        
             itemsForDate.forEach(item => {
+                let totalcost = parseFloat(item.price) * parseInt(item.quantity);
+                totalsales += totalcost;
+                if(item.status == "PAID"){
+                    paid += parseFloat(item.price);
+                }else{
+                    notpaid += parseFloat(item.price);
+                }
                 itemdetails.push([
                     { text: key, border: [false, false, false, false], style: 'tablecontent' },
                     { text: item.soldrefno, border: [false, false, false, false], style: 'tablecontent' },
@@ -226,6 +236,7 @@ exports.document = (data, template) => {
                     { text: item.paymenttype, border: [false, false, false, false], style: 'tablecontent' },
                     { text: item.transacrefno, border: [false, false, false, false], style: 'tablecontent' },
                     { text: item.status, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: `Php ${formatCurrency(totalcost)}`, border: [false, false, false, false], style: 'tablecontent' },
                 ]);
             });
         });
@@ -270,9 +281,15 @@ exports.document = (data, template) => {
                         body: [
                             [
                                 {
-                                    text: "Date: " + GetCurrentDate(),
+                                    text: "Employee: " + employee,
                                     margin: [0, 20, 0, 0],
-                                }
+                                },
+                            ],
+                            [
+                                {
+                                    text: "Date From: " + date,
+                                    margin: [0, 1, 0, 0],
+                                },
                             ],
                         ],
                     },
@@ -300,29 +317,49 @@ exports.document = (data, template) => {
                     layout: "noBorders",
                     fontSize: 9,
                     table: {
-                        widths: ["70.5%", "29.5%"],
+                        widths: ["90%", "10%"],
                         body: [
                             [
                                 {
-                                    text: "Subtotal: ",
+                                    text: "Total Unpaid: ",
                                     margin: [0, 2.5, 0, 0],
                                     bold: true,
                                     alignment: 'right'
                                 },
                                 {
-                                    text: `Php ${formatCurrency(totalsales)}`,
+                                    text: `Php ${formatCurrency(notpaid)}`,
                                     margin: [0, 2.5, 0, 0],
                                 },
                             ],
                         ],
                     },
                 },
-
                 {
                     layout: "noBorders",
                     fontSize: 9,
                     table: {
-                        widths: ["70.5%", "29.5%"],
+                        widths: ["90%", "10%"],
+                        body: [
+                            [
+                                {
+                                    text: "Total Paid: ",
+                                    margin: [0, 2.5, 0, 0],
+                                    bold: true,
+                                    alignment: 'right'
+                                },
+                                {
+                                    text: `Php ${formatCurrency(paid)}`,
+                                    margin: [0, 2.5, 0, 0],
+                                },
+                            ],
+                        ],
+                    },
+                },
+                {
+                    layout: "noBorders",
+                    fontSize: 9,
+                    table: {
+                        widths: ["90%", "10%"],
                         body: [
                             [
                                 {

@@ -374,6 +374,8 @@
                                     data: {
                                         processeddata: data,
                                         template: template,
+                                        employee: soldby,
+                                        date: formattedDate,
                                     },
                                     success: function (result) {
                                         // console.log("MSG: ", result.msg)
@@ -416,7 +418,8 @@
                     entry.soldrefno === current.soldrefno &&
                     entry.transacrefno === current.transacrefno &&
                     entry.itemname === current.itemname &&
-                    entry.category === current.category
+                    entry.category === current.category &&
+                    entry.price === current.price
                 );
 
                 if (matchingEntry) {

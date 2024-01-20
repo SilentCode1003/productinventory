@@ -157,10 +157,12 @@ router.post("/processpdfdata", (req, res) => {
   try {
     let data = req.body.processeddata;
     let template = req.body.template;
+    let employee = req.body.employee;
+    let date = req.body.date;
     // console.log("Processed Data: ", data);
 
     if (data.length != 0 && data != undefined) {
-      Generate(data, template)
+      Generate(data, template, employee, date)
       .then((result) => {
 
         pdfBuffer = result;
