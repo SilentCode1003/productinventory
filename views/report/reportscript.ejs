@@ -1,0 +1,529 @@
+<script>
+    $(document).ready(function () {
+        let id = "";
+        let name = "";
+        let status = "";
+
+        $('#dateRange').daterangepicker({
+            opens: 'right',
+            startDate: moment().startOf('month'),
+            endDate: moment(),
+            maxDate: moment(),
+            ranges: {
+                'This Week': [moment().startOf('week'), moment().endOf('week')],
+                'Last Week': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Last 2 Month': [moment().subtract(2, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Last 3 Month': [moment().subtract(3, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            },
+            alwaysShowCalendars: true,
+            showCustomRangeLabel: false,
+            buttonClasses: ['btn btn-outline-inventory'],
+            locale: {
+                format: 'MMM D, YYYY'
+            }
+        });
+
+        $('#adjustDateBackward').on('click', function () {
+            var startDate = $('#dateRange').data('daterangepicker').startDate;
+            var endDate = $('#dateRange').data('daterangepicker').endDate.clone().subtract(7, 'days');
+            $('#dateRange').data('daterangepicker').setEndDate(endDate);
+            $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().subtract(7, 'days'));
+        });
+
+        $('#adjustDateForward').on('click', function () {
+            var startDate = $('#dateRange').data('daterangepicker').startDate;
+            var endDate = $('#dateRange').data('daterangepicker').endDate.clone().add(7, 'days');
+            $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().add(7, 'days'));
+            $('#dateRange').data('daterangepicker').setEndDate(endDate);
+        });
+
+        let initialdate = $('#dateRange').val();
+
+        LoadTable();
+
+        const loader = `  
+          <tr>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+          </tr>`;
+        const historyloader = `  
+          <tr>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+          </tr>`;
+
+        const salesreport = $('#salesreport-table tbody');
+        const saleshistory = $('#salesreporthistory-table tbody');
+        for (let i = 0; i < 5; i++) {
+            salesreport.append(loader);
+            saleshistory.append(historyloader);
+        }
+
+        $("#salesreport-table tbody").on("click", "tr", function () {
+            var dataRow = [];
+            $(this)
+                .closest("tr")
+                .find("td")
+                .each(function () {
+                    dataRow.push($(this).text());
+                });
+            // console.log(dataRow);
+            id = dataRow[0];
+            name = dataRow[1];
+            status = dataRow[4];
+        });
+
+        function filterTableRows() {
+            const searchQuery = $("#search").val().trim().toLowerCase();
+            let foundMatches = false;
+
+            $("#no-match-row").remove();
+
+            $("#datatable tbody tr").each(function () {
+                const rowData = $(this).text().toLowerCase();
+                if (rowData.includes(searchQuery)) {
+                    $(this).show();
+                    foundMatches = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (!foundMatches) {
+                const noMatchRow = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 6,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                $("#datatable tbody").append(noMatchRow);
+                noMatchRow.attr("id", "no-match-row");
+            }
+        }
+
+        $("#search").on("input", filterTableRows);
+
+        function populatesalesreport(data) {
+            // console.log(data);
+            const tableBody = $("#salesreport-table tbody");
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 6,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                tableBody.append(tr);
+            } else {
+                data.forEach((item) => {
+                    let action = "";
+                    // if (item.status === "ACTIVE") {
+                    //   action = `
+                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                    //         <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
+                    // } else if (item.status === "INACTIVE") {
+                    //   action = `
+                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                    //         <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
+                    // }
+                    const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
+                    const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
+
+                    const tr = $("<tr>").append(
+                        $("<td>", {
+                            text: item.id,
+                            "data-label": "ID",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.category,
+                            "data-label": "department",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.item,
+                            "data-label": "Created By",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.date,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align no-wrap",
+                        }),
+                        $("<td>", {
+                            text: item.quantity,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: formatCurrency(item.sellingprice),
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.soldby,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align no-wrap",
+                        }),
+                        $("<td>", {
+                            text: item.soldto,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.paymenttype,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.soldrefno,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.transacrefno,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.remarks,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align no wrap",
+                        }),
+                        $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+                            $('<div>', { class: containerBackground }).append(
+                                $('<span>', { text: item.status, class: statusBackground })
+                            )
+                        ),
+                        // $("<td>", {
+                        //     html: action,
+                        //     "data-label": "Action",
+                        //     class: "actionWidth",
+                        // })
+                    );
+
+                    tableBody.append(tr);
+                });
+            }
+        }
+
+        function populatesalesreporthistory(data) {
+            // console.log(data);
+            const tableBody = $("#salesreporthistory-table tbody");
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 6,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                tableBody.append(tr);
+            } else {
+                data.forEach((item) => {
+                    let action = "";
+                    // if (item.status === "ACTIVE") {
+                    //   action = `
+                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                    //         <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
+                    // } else if (item.status === "INACTIVE") {
+                    //   action = `
+                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                    //         <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
+                    // }
+                    const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
+                    const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
+
+                    const tr = $("<tr>").append(
+                        $("<td>", {
+                            text: item.id,
+                            "data-label": "ID",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.salesreportid,
+                            "data-label": "department",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.date,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.remarks,
+                            "data-label": "Created Date",
+                            class: "custom-mobile-align",
+                        }),
+                        $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+                            $('<div>', { class: containerBackground }).append(
+                                $('<span>', { text: item.status, class: statusBackground })
+                            )
+                        ),
+                        // $("<td>", {
+                        //     html: action,
+                        //     "data-label": "Action",
+                        //     class: "actionWidth",
+                        // })
+                    );
+
+                    tableBody.append(tr);
+                });
+            }
+        }
+
+        function LoadTable() {
+
+            $.ajax({
+                url: "/report/salesreport",
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    // console.log("Data: ", data.data)
+                    if (data.msg === "success") {
+                        populatesalesreport(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                },
+            });
+
+            $.ajax({
+                url: "/report/salesreporthistory",
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    // console.log("Data: ", data.data)
+                    if (data.msg === "success") {
+                        populatesalesreporthistory(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                },
+            });
+
+        }
+
+        $(document).on("input", "#employee", function () {
+            $("#hiddenemmployeevalue").val("");
+        });
+
+        $('#convertopdf').on('click', function () {
+            let daterange = $('#dateRange').val();
+            let soldby;
+            let employee;
+
+            if ("<%= access%>" == "Admin") {
+                soldby = $("#hiddenemmployeevalue").val();
+                employee = $("#employee").val();
+            } else {
+                soldby = "<%= fullname%>";
+            }
+
+            let startDate = moment(daterange.split(' - ')[0], 'MMM D, YYYY');
+            let endDate = moment(daterange.split(' - ')[1], 'MMM D, YYYY');
+            let formattedStartDate = startDate.format('MM/DD/YYYY');
+            let formattedEndDate = endDate.format('MM/DD/YYYY');
+            let formattedDate = formattedStartDate + ' - ' + formattedEndDate;
+
+            if (soldby !== '') {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/report/getsalesreport",
+                    data: {
+                        daterange: formattedDate,
+                        soldby: soldby,
+                    },
+                    success: function (result) {
+                        if (result.msg == "success") {
+                            let container = result.data;
+                            let data = salesreportdata(container);
+                            let template = 'SALES REPORT';
+                            // console.log("Current Stock: ", groupedData);
+                            if (data.length != 0) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/index/processpdfdata",
+                                    data: {
+                                        processeddata: data,
+                                        template: template,
+                                        employee: soldby,
+                                        date: formattedDate,
+                                    },
+                                    success: function (result) {
+                                        // console.log("MSG: ", result.msg)
+                                        if (result.msg == "success") {
+                                            window.open(`/index/generatepdf`, "_blank");
+                                            success("Success", "PDF generate successfully!");
+                                            $("#employee").val("");
+                                            $("#hiddenemmployeevalue").val("");
+                                        } else {
+                                            info("Notice", "No Data within in the date range.");
+                                        }
+                                    },
+                                    error: function (err) {
+                                        errormsg(err);
+                                    },
+                                });
+                            }
+                        } else {
+                            warning("Notice", "No Data within in the date range.")
+                        }
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    },
+                });
+            } else {
+                warning("Warning", "Empty Employee Field!");
+            }
+        });
+
+        function salesreportdata(data) {
+            return data.reduce((result, current) => {
+                const date = current.date;
+
+                if (!result[date]) {
+                    result[date] = [];
+                }
+
+                const matchingEntry = result[date].find(entry =>
+                    entry.soldrefno === current.soldrefno &&
+                    entry.transacrefno === current.transacrefno &&
+                    entry.itemname === current.itemname &&
+                    entry.category === current.category &&
+                    entry.price === current.price
+                );
+
+                if (matchingEntry) {
+                    matchingEntry.quantity += current.quantity;
+                    matchingEntry.price += current.price;
+                } else {
+                    result[date].push({ ...current });
+                }
+
+                return result;
+            }, {});
+        }
+
+        let activeEmployee = [];
+
+        function LoadList() {
+
+            $.ajax({
+                type: "GET",
+                url: "/employee/load",
+                success: function (result) {
+                    let container = result.data;
+                    // console.log(container)
+                    $.each(container, (key, item) => {
+                        let displayname = item.fullname;
+                        let dataid = item.id;
+                        activeEmployee.push({
+                            display: displayname,
+                            value: displayname,
+                        });
+                    });
+                    populateCustomDropdown();
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        }
+
+        function populateCustomDropdown() {
+            for (const employee of activeEmployee) {
+                addOption("employeeDropdown", employee.display, employee.value);
+            }
+        }
+
+        function addOption(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenemmployeevalue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("employee");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        function setupCustomDropdown(inputId, dropdownId, optionClass) {
+            const inputElement = document.getElementById(inputId);
+            const dropdownElement = document.getElementById(dropdownId);
+            const options = dropdownElement.getElementsByClassName(optionClass);
+
+            inputElement.addEventListener("click", function () {
+                dropdownElement.style.display = "block";
+            });
+
+            for (const option of options) {
+                option.addEventListener("click", function () {
+                    inputElement.value = option.textContent;
+                    const actualValue = option.getAttribute("data-value");
+                    inputElement.setAttribute("data-actual-value", actualValue);
+                    dropdownElement.style.display = "none";
+                });
+            }
+
+            inputElement.addEventListener("input", function () {
+                const value = inputElement.value.toUpperCase();
+                for (const option of options) {
+                    if (option.textContent.toUpperCase().includes(value)) {
+                        option.style.display = "block";
+                    } else {
+                        option.style.display = "none";
+                    }
+                }
+                dropdownElement.style.display = "block";
+            });
+
+            document.addEventListener("click", function (event) {
+                const target = event.target;
+                if (!dropdownElement.contains(target) && target !== inputElement) {
+                    dropdownElement.style.display = "none";
+                }
+            });
+        }
+
+        setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
+        LoadList();
+
+    });
+</script>

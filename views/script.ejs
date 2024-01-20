@@ -78,23 +78,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (iconElement) {
           if (item.classList.contains('active')) {
-            console.log('Active class detected:', item);
             iconElement.classList.remove('far');
             iconElement.classList.add('fas');
           } else {
-            console.log('Active class NOT detected:', item);
             iconElement.classList.remove('fas');
             iconElement.classList.add('far');
           }
-        } else {
-          console.log('No icon element found in:', item);
         }
       });
     });
   }, 100);
 });
-
-
 
   $("#searchproduct").on("click", function () {
     let searchdata = $("#searchdata").val();

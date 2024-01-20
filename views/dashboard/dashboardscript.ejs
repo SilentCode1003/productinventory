@@ -535,17 +535,19 @@
                     // console.log("stocks: ", container);
 
                     let groupedData = groupDataByItemName(container);
-                    console.log("Current Stock: ", groupedData);
+                    let template = 'STOCKS REPORT';
+                    // console.log("Current Stock: ", groupedData);
                     if(groupedData.length != 0){
                         $.ajax({
                             type: "POST",
                             url: "/index/processpdfdata",
                             data: {
-                                processeddata: groupedData
+                                processeddata: groupedData,
+                                template: template
                             },
                             success: function (result) {
-                                success("Success", "PDF generate successfully!");
                                 window.open(`/index/generatepdf`, "_blank");
+                                success("Success", "PDF generate successfully!");
                             },
                             error: function (err) {
                                 errormsg(err);

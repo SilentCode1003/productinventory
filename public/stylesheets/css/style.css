@@ -23,6 +23,11 @@
   color: var(--clr-white);
 }
 
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link{
+  color: var(--clr-white) !important;
+  background-color: var(--clr-text) !important;
+}
+
 .border-left-inventory {
   border-left: 0.25rem solid var(--sidebar-text-active) !important;
 }
