@@ -116,7 +116,7 @@ router.post("/getsoldcount", (req, res) => {
       /(\d{4})-(\d{2})-(\d{2})/,
       "$1-$3-$2"
     );
-      console.log(formattedStartDate, formattedEndDate)
+      console.log("Date: ",formattedStartDate, formattedEndDate)
     let sql = `SELECT s_id as id, s_assetcontrol as assetcontrol, s_serial as serial, mi_name as productname, 
               mc_name as category, p_status as status, e_fullname as soldby, s_date as date, mip_fobprice as price
               FROM sold 
@@ -157,7 +157,9 @@ router.post("/processpdfdata", (req, res) => {
   try {
     let data = req.body.processeddata;
     let template = req.body.template;
-    if (data.length != 0) {
+    // console.log("Processed Data: ", data);
+
+    if (data.length != 0 && data != undefined) {
       Generate(data, template)
       .then((result) => {
 
@@ -167,6 +169,7 @@ router.post("/processpdfdata", (req, res) => {
 
         res.json({
           msg: "success",
+          data: result,
         });
       })
       .catch((error) => {
@@ -174,6 +177,10 @@ router.post("/processpdfdata", (req, res) => {
         return res.json({
           msg: error,
         });
+      });
+    }else{
+      res.json({
+        msg: "nodata",
       });
     }
   } catch (error) {

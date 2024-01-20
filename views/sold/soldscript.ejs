@@ -35,7 +35,7 @@
         .each(function () {
           dataRow.push($(this).text());
         });
-      console.log(dataRow);
+      // console.log(dataRow);
       assetcontrol = dataRow[0];
     });
 
@@ -114,8 +114,8 @@
           let branch = match[1].trim();
           let company = match[2].trim();
 
-          console.log("Branch: ", branch);
-          console.log("Company: ", company);
+          // console.log("Branch: ", branch);
+          // console.log("Company: ", company);
           $.ajax({
             type: "POST",
             url: "/client/checklocation",

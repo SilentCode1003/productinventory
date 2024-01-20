@@ -43,20 +43,27 @@ router.get("/pdf", (req, res) => {
 
 router.get("/salesreport", (req, res) => {
   try {
-    let sql = `select * from sales_report`;
+    let sql = `SELECT 
+            sr_id AS id, mc_name AS category, mi_name as item, sr_date as date,sr_quantity as quantity, sr_sellingprice as sellingprice,
+            e_fullname as soldby, sr_soldto as soldto ,sr_paymenttype as paymenttype, sr_soldrefno as soldrefno, 
+            sr_referenceno as transacrefno, sr_remarks as remarks, sr_status as status
+          FROM sales_report
+          INNER JOIN master_item ON sr_item = mi_id
+          INNER JOIN master_category ON sr_category = mc_id
+          INNER JOIN employee ON sr_soldby = e_id;`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
-      console.log("Data: ", result);
+      // console.log("Data: ", result);
 
       if (result.length != 0) {
-        let data = SalesReport(result);
+        // let data = SalesReport(result);
 
-        console.log(data);
+        // console.log(data);
         res.json({
           msg: "success",
-          data: data,
+          data: result,
         });
       } else {
         res.json({
@@ -79,12 +86,12 @@ router.get("/salesreporthistory", (req, res) => {
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
-      console.log("Data: ", result);
+      // console.log("Data: ", result);
 
       if (result.length != 0) {
         let data = SalesReportHistory(result);
 
-        console.log(data);
+        // console.log(data);
         res.json({
           msg: "success",
           data: data,
@@ -105,32 +112,37 @@ router.get("/salesreporthistory", (req, res) => {
 
 router.post("/getsalesreport", (req, res) => {
   try {
-    // let daterange = req.body.daterange;
-    // let [startDate, endDate] = daterange.split(" - ");
+    let soldby = req.body.soldby;
+    let daterange = req.body.daterange;
+    let [startDate, endDate] = daterange.split(" - ");
 
-    // let formattedStartDate = startDate.split("/").reverse().join("-");
-    // let formattedEndDate = endDate.split("/").reverse().join("-");
+    let formattedStartDate = startDate.split("/").reverse().join("-");
+    let formattedEndDate = endDate.split("/").reverse().join("-");
 
-    // formattedStartDate = formattedStartDate.replace(
-    //   /(\d{4})-(\d{2})-(\d{2})/,
-    //   "$1-$3-$2"
-    // );
-    // formattedEndDate = formattedEndDate.replace(
-    //   /(\d{4})-(\d{2})-(\d{2})/,
-    //   "$1-$3-$2"
-    // );
+    formattedStartDate = formattedStartDate.replace(
+      /(\d{4})-(\d{2})-(\d{2})/,
+      "$1-$3-$2"
+    );
+    formattedEndDate = formattedEndDate.replace(
+      /(\d{4})-(\d{2})-(\d{2})/,
+      "$1-$3-$2"
+    );
+
+    // console.log("Date: ", formattedStartDate, formattedEndDate, "Sold By: ", soldby)
 
     let sql = `SELECT sr_date as date, sr_soldrefno as soldrefno,  mc_name as category, mi_name as itemname, 
                 sr_sellingprice as price, sr_quantity as quantity, sr_paymenttype as paymenttype, 
                 sr_referenceno as transacrefno, sr_status as status
               FROM cyberpowerproduct.sales_report
               INNER JOIN master_item ON sr_item = mi_id
-              INNER JOIN master_category ON sr_category = mc_id;`;
+              INNER JOIN master_category ON sr_category = mc_id
+              INNER JOIN employee ON sr_soldby = e_id
+              WHERE e_fullname = '${soldby}' and sr_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}';`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
       if (result.length != 0) {
-        console.log(result);
+        // console.log(sql);
         res.json({
           msg: "success",
           data: result,

@@ -30,10 +30,23 @@
                                 <div class="card dashboard-size">
                                     <div class="card-header card-bg align-content-center">
                                         <div class="row">
-                                            <div class="col-md-8">
+                                            <div class="col">
                                                 <h4 class="m-0 card-title">Sales Table</h4>
                                             </div>
-                                            <div class="col-md-4">
+                                            <% if (access === "Admin") { %> 
+                                                <div class="col-md-6 mb-2">
+                                                    <div class="input-group">
+                                                        <input class="form-control text-center custom-input" placeholder="Select Employee"
+                                                            name="employee" id="employee" />
+                                                        <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">Employee</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
+                                                </div>
+                                            <% } %>
+                                            <div class="col">
                                                 <button class="custom-btn" id="convertopdf" type="button" style="border-radius: 0.2rem;">
                                                     <i class="fas fa-file-export"></i>
                                                 </button>
