@@ -364,6 +364,7 @@
                     success: function (result) {
                         if (result.msg == "success") {
                             let container = result.data;
+                            // console.log("Container: ", container)
                             let data = salesreportdata(container);
                             let template = 'SALES REPORT';
                             // console.log("Current Stock: ", groupedData);
@@ -407,6 +408,7 @@
         });
 
         function salesreportdata(data) {
+            // console.log(data);
             return data.reduce((result, current) => {
                 const date = current.date;
 
@@ -419,7 +421,8 @@
                     entry.transacrefno === current.transacrefno &&
                     entry.itemname === current.itemname &&
                     entry.category === current.category &&
-                    entry.price === current.price
+                    entry.price === current.price &&
+                    entry.deliveryfee === current.deliveryfee
                 );
 
                 if (matchingEntry) {

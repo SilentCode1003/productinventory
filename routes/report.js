@@ -132,7 +132,7 @@ router.post("/getsalesreport", (req, res) => {
 
     let sql = `SELECT sr_date as date, sr_soldrefno as soldrefno,  mc_name as category, mi_name as itemname, 
                 sr_sellingprice as price, sr_quantity as quantity, sr_paymenttype as paymenttype, 
-                sr_referenceno as transacrefno, sr_status as status
+                sr_referenceno as transacrefno, sr_status as status, sr_deliveryfee as deliveryfee
               FROM cyberpowerproduct.sales_report
               INNER JOIN master_item ON sr_item = mi_id
               INNER JOIN master_category ON sr_category = mc_id

@@ -200,6 +200,9 @@ exports.document = (data, template, employee, date) => {
                 text: "Price", style: 'tableheader', border: [false, true, false, true],
             },
             {
+                text: "Delivery Fee", style: 'tableheader', border: [false, true, false, true],
+            },
+            {
                 text: "Quantity", style: 'tableheader', border: [false, true, false, true],
             },
             {
@@ -222,7 +225,7 @@ exports.document = (data, template, employee, date) => {
                 let totalcost = parseFloat(item.price) * parseInt(item.quantity);
                 totalsales += totalcost;
                 if(item.status == "PAID"){
-                    paid += parseFloat(item.price);
+                    paid += parseFloat(item.price) * parseInt(item.quantity);;
                 }else{
                     notpaid += parseFloat(item.price);
                 }
@@ -232,6 +235,7 @@ exports.document = (data, template, employee, date) => {
                     { text: item.category, border: [false, false, false, false], style: 'tablecontent' },
                     { text: item.itemname, border: [false, false, false, false], style: 'tablecontent' },
                     { text: item.price, border: [false, false, false, false], style: 'tablecontent' },
+                    { text: item.deliveryfee, border: [false, false, false, false], style: 'tablecontent' },
                     { text: item.quantity, border: [false, false, false, false], style: 'tablecontent' },
                     { text: item.paymenttype, border: [false, false, false, false], style: 'tablecontent' },
                     { text: item.transacrefno, border: [false, false, false, false], style: 'tablecontent' },
@@ -297,7 +301,7 @@ exports.document = (data, template, employee, date) => {
                 {
                     margin: [0, 15, 0, 0],
                     table: {
-                        widths: ["*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
+                        widths: ["*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
                         body: itemdetails,
                     },
                 },
@@ -397,7 +401,7 @@ exports.document = (data, template, employee, date) => {
                     bold: true, margin: [0, 5, 0, 5]
                 },
                 tablecontent: {
-                    fontSize: 9, margin: [0, 2.5, 0, 2.5],
+                    fontSize: 9, margin: [0, 2.5, 0, 2.5], alignment: 'left'
                 }
             },
         }
