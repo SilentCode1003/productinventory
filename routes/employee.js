@@ -241,7 +241,7 @@ router.post("/upload", (req, res) => {
 
 router.post("/edit", (req, res) => {
   try {
-    const { employeeid, position, access, department } = req.body;
+    const { employeeid, position, access, department, fullname } = req.body;
 
     let data = [];
     let sql_update = "update employee set";
@@ -258,11 +258,17 @@ router.post("/edit", (req, res) => {
       sql_update += " e_access=?,";
       data.push(access);
     }
+    if (fullname) {
+      sql_update += " e_fullname=?,";
+      data.push(fullname);
+    }
 
     sql_update = sql_update.slice(0, -1);
     sql_update += " where e_id=?";
 
     data.push(employeeid);
+
+    // console.log(sql_update)
     
     Update(sql_update, data, (err, result) => {
       if (err) console.error("Error: ", err);
