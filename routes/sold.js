@@ -96,13 +96,13 @@ router.post("/save", (req, res) => {
 
         InsertTable("sales_report", salesreport, (err, result) => {
           if (err) console.error("Error: ", err);
-          console.log(result);
+          // console.log(result);
           let salesreportid = result[0].id;
 
           let salesreporthistory = [[salesreportid, date, remarks, transactionstatus]]
           InsertTable("sales_report_history", salesreporthistory, (err, result) => {
             if (err) console.error("Error: ", err);
-            console.log(result);
+            // console.log(result);
           });
 
         });
@@ -121,7 +121,7 @@ router.post("/save", (req, res) => {
             .then((result) => {
               InsertTable("sold", sold, (err, result) => {
                 if (err) console.error("Error: ", err);
-                console.log(result);
+                // console.log(result);
 
                 res.json({
                   msg: "success",
@@ -178,7 +178,7 @@ router.post("/getsold", (req, res) => {
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
       if (result.length != 0) {
-        console.log(result);
+        // console.log(result);
         res.json({
           msg: "success",
           data: result,
@@ -201,6 +201,7 @@ router.post("/upload", (req, res) => {
   try {
     const { data } = req.body;
     let dataJson = SoldProduct(JSON.parse(data));
+    // console.log("DataJson:", dataJson)
     let sold = [];
     let counter = 0;
     let noentry = [];
@@ -214,11 +215,14 @@ router.post("/upload", (req, res) => {
           Check_Product(item.serial)
             .then((result) => {
               let product = Product(result);
+              let quantity = 1;
+              let category = product[0].category;
+              let itemname = product[0].itemname;
 
               if (product.length != 0) {
                 let assetcontrol = product[0].assetcontrol;
 
-                Check_Sold(assetcontrol, item.date, soldto)
+                Check_Sold(assetcontrol, convertExcelDate(item.date), soldto)
                   .then((result) => {
                     let check_sold = Sold(result);
                     counter += 1;
@@ -243,6 +247,42 @@ router.post("/upload", (req, res) => {
                         soldto,
                         item.referenceno,
                       ]);
+
+                      let salesreport = [[
+                        category, 
+                        itemname, 
+                        convertExcelDate(item.date), 
+                        quantity, 
+                        item.sellingprice, 
+                        item.deliveryfee, 
+                        item.soldby, 
+                        soldto, 
+                        item.paymenttype, 
+                        item.referenceno, 
+                        item.transactionref, 
+                        item.remarks, 
+                        item.transactionstatus
+                      ]];
+
+                      Upload_sales_report(salesreport)
+                        .then((result) => {
+                          let salesreporthistory = [[
+                            result, 
+                            convertExcelDate(item.date), 
+                            item.remarks, 
+                            item.transactionstatus
+                          ]];
+
+                          Upload_sales_history(salesreporthistory)
+                            .then((result) => {
+                              console.log("Hisotry recorded ID No.: ", result);
+                            }).catch((error) => {
+                              console.error(error, item.serial);
+                            });
+
+                        }).catch((error) => {
+                          console.error(error, item.serial);
+                        });
 
                       let status = GetValue(SLD());
                       let product_update =
@@ -275,8 +315,10 @@ router.post("/upload", (req, res) => {
                         res.json(
                           JsonWarningResponse(message, [dupentry, noentry])
                         );
+                        console.log("Task Completed!");
                       } else {
                         res.json(JsonSuccess());
+                        console.log("Task Completed!");
                       }
                     }
                   })
@@ -307,6 +349,28 @@ router.post("/upload", (req, res) => {
 });
 
 //#region Function
+
+function Upload_sales_report(data) {
+  return new Promise((resolve, reject) => {
+
+    InsertTable("sales_report", data, (err, result) => {
+      if (err) reject(err);
+      let id = result[0].id;
+      resolve(id);
+    });
+  });
+}
+
+function Upload_sales_history(data) {
+  return new Promise((resolve, reject) => {
+
+    InsertTable("sales_report_history", data, (err, result) => {
+      if (err) reject(err);
+      let id = result[0].id;
+      resolve(id);
+    });
+  });
+}
 
 function Check_Sold(assetcontrol, date, soldto) {
   return new Promise((resolve, reject) => {

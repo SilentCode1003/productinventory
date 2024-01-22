@@ -152,9 +152,9 @@
         "closeButton": false,
         "debug": false,
         "newestOnTop": true,
-        "progressBar": true,
+        "progressBar": false,
         "positionClass": "toast-top-right",
-        "preventDuplicates": false,
+        "preventDuplicates": true,
         "onclick": null,
         "showDuration": "300",
         "hideDuration": "0",  // Set to 0 to make it indefinite until manually cleared
@@ -163,11 +163,10 @@
         "showEasing": "swing",
         "hideEasing": "linear",
         "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
+        "hideMethod": "hide"
       }
     );
   }
-
 
   function success(title, text) {
     toastr.success(text, title, {
@@ -211,6 +210,7 @@
 
   function hideLoading() {
     toastr.clear();
+    console.log("Toastr Cleared!")
   }
 
   function info(title, text) {

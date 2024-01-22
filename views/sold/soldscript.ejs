@@ -628,6 +628,12 @@
           branch: data[3].item,
           soldby: data[4].item,
           referenceno: data[5].item,
+          sellingprice: data[6].item,
+          paymenttype: data[7].item,
+          deliveryfee: data[8].item,
+          transactionref: data[9].item,
+          transactionstatus: data[10].item,
+          remarks: data[11].item,
         });
       }
       excelDataSave(dataExcelArr);
@@ -635,6 +641,7 @@
 
     function excelDataSave(data) {
       var dataraw = JSON.stringify(data, null, 2);
+      console.log(dataraw);
       $.ajax({
         type: "POST",
         url: "/sold/upload",
@@ -642,31 +649,18 @@
           data: dataraw,
         },
         success: function (result) {
+          
           hideLoading();
+          console.log("Message: ", result.msg);
           if (result.msg != "success") {
             warning(
               "Duplicate",
               `Some data already exist on the database. ID[${result.data}]`
             );
-
-            // swal({
-            //   title: "Exist",
-            //   text: "Some data already exist on the database. ID[${result.data}]",
-            //   icon: "warning",
-            //   button: "OK!",
-            // });
-          } else {
+          } else{
             success("Saved!", "Data saved!");
             resettable();
-            // swal({
-            //   title: "Success",
-            //   text: "Data saved!",
-            //   icon: "success",
-            //   button: "OK!",
-            // });
           }
-
-          // $('#item-tbl').DataTable().ajax.reload();
         },
         error: function (result) {
           console.error(result);
