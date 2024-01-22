@@ -301,7 +301,7 @@ exports.document = (data, template, employee, date) => {
                 {
                     margin: [0, 15, 0, 0],
                     table: {
-                        widths: ["*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
+                        widths: ["7.5%", "15%", "8%", "*", "7.5%", "8%", "7.5%", "*", "*", "*", "*"],
                         body: itemdetails,
                     },
                 },
@@ -398,10 +398,10 @@ exports.document = (data, template, employee, date) => {
                     fontSize: 11, alignment: "center",
                 },
                 tableheader: {
-                    bold: true, margin: [0, 5, 0, 5]
+                    bold: true, margin: [0, 5, 0, 5],  alignment: 'center'
                 },
                 tablecontent: {
-                    fontSize: 9, margin: [0, 2.5, 0, 2.5], alignment: 'left'
+                    fontSize: 9, margin: [0, 2.5, 0, 2.5], alignment: 'center'
                 }
             },
         }

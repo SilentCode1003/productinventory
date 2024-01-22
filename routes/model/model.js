@@ -288,13 +288,19 @@ class EmployeeUploadModel {
 }
 
 class SoldProductModel {
-  constructor(serial, date, company, branch, soldby, referenceno) {
+  constructor(serial, date, company, branch, soldby, referenceno, sellingprice, paymenttype, deliveryfee, transactionref, transactionstatus, remarks) {
     this.serial = serial;
     this.date = date;
     this.company = company;
     this.branch = branch;
     this.soldby = soldby;
     this.referenceno = referenceno;
+    this.sellingprice = sellingprice;
+    this.deliveryfee = deliveryfee;
+    this.paymenttype = paymenttype;
+    this.transactionref = transactionref;
+    this.transactionstatus = transactionstatus;
+    this.remarks = remarks;
   }
 }
 
