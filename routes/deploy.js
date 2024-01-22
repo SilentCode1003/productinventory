@@ -176,16 +176,6 @@ router.post("/upload", (req, res) => {
                     }
                   }
 
-                  // console.log(
-                  //   "Counter: ",
-                  //   counter,
-                  //   "Current: ",
-                  //   dataJson.length
-                  // );
-                  // console.log("No Entry: ", noentry);
-                  // console.log("Dup Entry: ", dupentry);
-                  // console.log("Deploy: ", item.deployby);
-                  // console.log("Employee: ", employee);
                   if (counter == dataJson.length) {
                     if (deploy.length != 0) {
                       InsertTable("deploy", deploy, (err, result) => {

@@ -631,6 +631,12 @@ exports.SoldProduct = (data) => {
       branch: key.branch,
       soldby: key.soldby,
       referenceno: key.referenceno,
+      sellingprice: key.sellingprice,
+      paymenttype: key.paymenttype,
+      deliveryfee: key.deliveryfee,
+      transactionref: key.transactionref,
+      transactionstatus: key.transactionstatus,
+      remarks: key.remarks,
     });
   });
 
@@ -642,7 +648,13 @@ exports.SoldProduct = (data) => {
         key["company"],
         key["branch"],
         key["soldby"],
-        key["referenceno"]
+        key["referenceno"],
+        key["sellingprice"],
+        key["paymenttype"],
+        key["deliveryfee"],
+        key["transactionref"],
+        key["transactionstatus"],
+        key["remarks"],
       )
   );
 };
