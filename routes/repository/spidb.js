@@ -469,6 +469,7 @@ exports.InsertTable = (tablename, data, callback) => {
       sr_date,
       sr_quantity,
       sr_sellingprice,
+      sr_deliveryfee,
       sr_soldby,
       sr_soldto,
       sr_paymenttype,

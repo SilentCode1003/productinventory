@@ -318,13 +318,14 @@ class ReturnProductModel {
 }
 
 class SalesReportModel {
-  constructor(id, category, item, date, quantity, sellingprice, soldby, soldto, paymenttype, soldrefno, referenceno, remarks, status) {
+  constructor(id, category, item, date, quantity, sellingprice, deliveryfee, soldby, soldto, paymenttype, soldrefno, referenceno, remarks, status) {
     this.id = id;
     this.category = category;
     this.item = item;
     this.date = date;
     this.quantity = quantity;
     this.sellingprice = sellingprice;
+    this.deliveryfee = deliveryfee;
     this.soldby = soldby;
     this.soldto = soldto;
     this.paymenttype = paymenttype;
