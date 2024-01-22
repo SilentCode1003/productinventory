@@ -66,6 +66,7 @@
       let paymenttype = $("#paymenttype").val();
       let transactionstatus = $("#transactionstatus").val();
       let transactionref = $("#transactionref").val();
+      let deliveryfee= $("#deliveryfee").val();
 
       var message = "";
 
@@ -98,6 +99,9 @@
       }
       if (transactionref == "") {
         message += "Empty Transaction Reference No., ";
+      }
+      if (deliveryfee == "") {
+        message += "Empty Delivery Fee, ";
       }
 
       if (message != "") {
@@ -141,6 +145,7 @@
                     sellingprice: sellingprice,
                     paymenttype: paymenttype,
                     transactionref: transactionref,
+                    deliveryfee: deliveryfee,
                     transactionstatus: transactionstatus,
                     remarks: remarks,
                   },
@@ -155,6 +160,10 @@
                       $("#serialname").val("");
                       $("#hiddenSerialValue").val("");
                       $("#date").val("");
+                      $("#sellingprice").val("");
+                      $("#paymenttype").val("");
+                      $("#transactionref").val("");
+                      $("#deliveryfee").val("");
                       $("#hiddenValue").val("");
                     }
 
