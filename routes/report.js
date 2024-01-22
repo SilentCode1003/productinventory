@@ -46,7 +46,7 @@ router.get("/salesreport", (req, res) => {
     let sql = `SELECT 
             sr_id AS id, mc_name AS category, mi_name as item, sr_date as date,sr_quantity as quantity, sr_sellingprice as sellingprice,
             e_fullname as soldby, sr_soldto as soldto ,sr_paymenttype as paymenttype, sr_soldrefno as soldrefno, 
-            sr_referenceno as transacrefno, sr_remarks as remarks, sr_status as status
+            sr_referenceno as transacrefno, sr_remarks as remarks, sr_status as status, sr_deliveryfee as deliveryfee
           FROM sales_report
           INNER JOIN master_item ON sr_item = mi_id
           INNER JOIN master_category ON sr_category = mc_id

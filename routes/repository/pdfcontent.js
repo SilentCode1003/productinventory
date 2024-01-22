@@ -225,9 +225,9 @@ exports.document = (data, template, employee, date) => {
                 let totalcost = parseFloat(item.price) * parseInt(item.quantity);
                 totalsales += totalcost;
                 if(item.status == "PAID"){
-                    paid += parseFloat(item.price) * parseInt(item.quantity);;
+                    paid += parseFloat(item.price) * parseInt(item.quantity);
                 }else{
-                    notpaid += parseFloat(item.price);
+                    notpaid += parseFloat(item.price) * parseInt(item.quantity);
                 }
                 itemdetails.push([
                     { text: key, border: [false, false, false, false], style: 'tablecontent' },

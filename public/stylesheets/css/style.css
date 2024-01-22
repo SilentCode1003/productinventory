@@ -52,6 +52,16 @@
   opacity: 0.75;
 }
 
+.toggle-view {
+  display: none;
+}
+
+.toggle-view {
+  display: none;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.75s ease;
+}
 
 .navbar{
   position: fixed !important;
