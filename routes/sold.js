@@ -87,7 +87,7 @@ router.post("/save", (req, res) => {
     // console.log("Sold data: ", sold);
 
     Check_Product(serial)
-    .then((result) => {
+      .then((result) => {
         let product = Product(result);
         let quantity = 1;
         let category = product[0].category;
@@ -107,7 +107,7 @@ router.post("/save", (req, res) => {
 
         });
       }
-    );
+      );
 
     Check_Sold(assetcontrol, date, soldto)
       .then((result) => {
@@ -203,6 +203,7 @@ router.post("/upload", (req, res) => {
     let dataJson = SoldProduct(JSON.parse(data));
     // console.log("DataJson:", dataJson)
     let sold = [];
+    let salesreporthistory = [];
     let counter = 0;
     let noentry = [];
     let dupentry = [];
@@ -211,6 +212,7 @@ router.post("/upload", (req, res) => {
       Check_MasterClient(item.company, item.branch, req)
         .then((result) => {
           let soldto = result;
+          
 
           Check_Product(item.serial)
             .then((result) => {
@@ -225,7 +227,6 @@ router.post("/upload", (req, res) => {
                 Check_Sold(assetcontrol, convertExcelDate(item.date), soldto)
                   .then((result) => {
                     let check_sold = Sold(result);
-                    counter += 1;
 
                     if (check_sold.length != 0) {
                       dupentry.push(item.serial);
@@ -236,7 +237,7 @@ router.post("/upload", (req, res) => {
                       let product = [status, assetcontrol];
                       Update(product_update, product, (err, result) => {
                         if (err) console.error("Error: ", err);
-                        // console.log(result);
+                        console.log("Status updated: ",result);
                       });
                     } else {
                       sold.push([
@@ -249,36 +250,70 @@ router.post("/upload", (req, res) => {
                       ]);
 
                       let salesreport = [[
-                        category, 
-                        itemname, 
-                        convertExcelDate(item.date), 
-                        quantity, 
-                        item.sellingprice, 
-                        item.deliveryfee, 
-                        item.soldby, 
-                        soldto, 
-                        item.paymenttype, 
-                        item.referenceno, 
-                        item.transactionref, 
-                        item.remarks, 
+                        category,
+                        itemname,
+                        convertExcelDate(item.date),
+                        quantity,
+                        item.sellingprice,
+                        item.deliveryfee,
+                        item.soldby,
+                        soldto,
+                        item.paymenttype,
+                        item.referenceno,
+                        item.transactionref,
+                        item.remarks,
                         item.transactionstatus
                       ]];
-
+                      ;
+                      
                       Upload_sales_report(salesreport)
                         .then((result) => {
-                          let salesreporthistory = [[
-                            result, 
-                            convertExcelDate(item.date), 
-                            item.remarks, 
-                            item.transactionstatus
-                          ]];
+                          counter += 1;
+                          if (ReferenceNo_Checker(item.referenceno, salesreporthistory)) {
+                            salesreporthistory.push([
+                              convertExcelDate(item.date),
+                              item.remarks,
+                              item.transactionstatus,
+                              item.referenceno,
+                              "N/A"
+                            ]);
+                            console.log(`Reference number ${item.referenceno} Inserted.`);
+                          } else {
+                            console.log(`Reference number ${item.referenceno} already exists.`);
+                          }
 
-                          Upload_sales_history(salesreporthistory)
-                            .then((result) => {
-                              console.log("Hisotry recorded ID No.: ", result);
-                            }).catch((error) => {
-                              console.error(error, item.serial);
+                          if (counter == dataJson.length) {
+                            console.log("TO BE INSERTED", salesreporthistory)
+                            console.log("TO BE INSERTED SOLD: ", sold)
+
+                            InsertTable("sales_report_history", salesreporthistory, (err, result) => {
+                              if (err) console.error("Error: ", err);
+                              console.log(result);
                             });
+      
+                            if (sold.length != 0) {
+                              InsertTable("sold", sold, (err, result) => {
+                                if (err) console.error("Error: ", err);
+                                console.log(result);
+                              });
+                            }
+      
+                            let message = "";
+                            if (dupentry.length != 0) {
+                              message += MessageStatus.DUPENTRY;
+                            }
+                            if (noentry.length != 0) {
+                              message += MessageStatus.NOENTRY;
+                            }
+      
+                            if (message != "") {
+                              res.json(
+                                JsonWarningResponse(message, [dupentry, noentry])
+                              );
+                            } else {
+                              res.json(JsonSuccess());
+                            }
+                          }
 
                         }).catch((error) => {
                           console.error(error, item.serial);
@@ -292,34 +327,6 @@ router.post("/upload", (req, res) => {
                         if (err) console.error("Error: ", err);
                         // console.log(result);
                       });
-                    }
-
-                    if (counter == dataJson.length) {
-                      // console.log(sold);
-                      if (sold.length != 0) {
-                        InsertTable("sold", sold, (err, result) => {
-                          if (err) console.error("Error: ", err);
-                          console.log(result);
-                        });
-                      }
-
-                      let message = "";
-                      if (dupentry.length != 0) {
-                        message += MessageStatus.DUPENTRY;
-                      }
-                      if (noentry.length != 0) {
-                        message += MessageStatus.NOENTRY;
-                      }
-
-                      if (message != "") {
-                        res.json(
-                          JsonWarningResponse(message, [dupentry, noentry])
-                        );
-                        console.log("Task Completed!");
-                      } else {
-                        res.json(JsonSuccess());
-                        console.log("Task Completed!");
-                      }
                     }
                   })
                   .catch((error) => {
@@ -356,21 +363,48 @@ function Upload_sales_report(data) {
     InsertTable("sales_report", data, (err, result) => {
       if (err) reject(err);
       let id = result[0].id;
+      console.log("Upload Report: ", id);
       resolve(id);
     });
   });
 }
 
-function Upload_sales_history(data) {
-  return new Promise((resolve, reject) => {
-
-    InsertTable("sales_report_history", data, (err, result) => {
-      if (err) reject(err);
-      let id = result[0].id;
-      resolve(id);
-    });
-  });
+function ReferenceNo_Checker(referenceno, data){
+  return data.every(record => record[3] !== referenceno);
 }
+
+// function Check_History(referenceno){
+//   return new Promise((resolve, reject) => {
+//     let sql = "select * from sales_report_history where srh_referenceno = ?";
+//     let command = SelectStatement(sql, [referenceno]);
+
+//     Select(command, (err, result) => {
+//       if (err) {
+//         console.error(err);
+//         resolve(err);
+//       }else{
+//         console.log("History Check: ", result)
+//         resolve(result);
+//       }
+
+//     });
+//   });
+// }
+
+// function Upload_sales_history(data) {
+//   return new Promise((resolve, reject) => {
+//     InsertTable("sales_report_history", data, (err, result) => {
+//       if (err) {
+//         console.error(err);
+//         reject(err);
+//         return;
+//       }
+//       let id = result[0].id;
+//       console.log("History recorded ID No.: ", id);
+//       resolve(id);
+//     });
+//   });
+// }
 
 function Check_Sold(assetcontrol, date, soldto) {
   return new Promise((resolve, reject) => {

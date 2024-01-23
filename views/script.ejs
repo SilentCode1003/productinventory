@@ -375,12 +375,20 @@
     return val.replace(/[^\d.-]/g, "");
   }
 
-  function formatCurrency(value) {
+  function formatCurrencyUsd(value) {
     if (!value) {
       return '$0.00';
     }
     var formattedValue = parseFloat(value).toFixed(2);
     return '$' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  }
+
+  function formatCurrencyPhp(value) {
+    if (!value) {
+      return '$0.00';
+    }
+    var formattedValue = parseFloat(value).toFixed(2);
+    return '₱' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
   }
 
   $(document).ready(function () {

@@ -174,12 +174,12 @@
                             class: "custom-mobile-align",
                         }),
                         $("<td>", {
-                            text: formatCurrency(item.sellingprice),
+                            text: formatCurrencyUsd(item.sellingprice),
                             "data-label": "Created Date",
                             class: "custom-mobile-align",
                         }),
                         $("<td>", {
-                            text: formatCurrency(item.deliveryfee),
+                            text: formatCurrencyPhp(item.deliveryfee),
                             "data-label": "Created Date",
                             class: "custom-mobile-align",
                         }),
@@ -191,7 +191,7 @@
                         $("<td>", {
                             text: item.soldto,
                             "data-label": "Created Date",
-                            class: "custom-mobile-align",
+                            class: "custom-mobile-align no-wrap",
                         }),
                         $("<td>", {
                             text: item.paymenttype,
@@ -201,7 +201,7 @@
                         $("<td>", {
                             text: item.soldrefno,
                             "data-label": "Created Date",
-                            class: "custom-mobile-align",
+                            class: "custom-mobile-align no-wrap",
                         }),
                         $("<td>", {
                             text: item.transacrefno,
@@ -211,7 +211,7 @@
                         $("<td>", {
                             text: item.remarks,
                             "data-label": "Created Date",
-                            class: "custom-mobile-align no wrap",
+                            class: "custom-mobile-align no-wrap",
                         }),
                         $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
                             $('<div>', { class: containerBackground }).append(
@@ -412,7 +412,7 @@
             }
         });
 
-        function salesreportdata(data) {
+        function  salesreportdata(data) {
             // console.log(data);
             return data.reduce((result, current) => {
                 const date = current.date;
@@ -432,7 +432,6 @@
 
                 if (matchingEntry) {
                     matchingEntry.quantity += current.quantity;
-                    matchingEntry.price += current.price;
                 } else {
                     result[date].push({ ...current });
                 }

@@ -67,9 +67,10 @@ exports.Select = (sql, callback) => {
     });
     connection.query(sql, (error, results, fields) => {
       if (error) {
+        console.log(error)
+
         return callback(error, null);
       }
-
       callback(null, results);
     });
   } catch (error) {
@@ -488,10 +489,11 @@ exports.InsertTable = (tablename, data, callback) => {
 
   if (tablename == "sales_report_history") {
     let sql = `INSERT INTO sales_report_history(
-      srh_salesreportid,
       srh_date,
       srh_remarks,
-      srh_status) VALUES ?`;
+      srh_status,
+      srh_referenceno,
+      srh_documents) VALUES ?`;
 
     this.Insert(sql, data, (err, result) => {
       if (err) {
