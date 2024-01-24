@@ -769,7 +769,6 @@ exports.SalesReportHistory = (data) => {
     (key) =>
       new SalesReportHistoryModel(
         key["id"],
-        key["salesreportid"],
         key["date"],
         key["ramarks"],
         key["status"],

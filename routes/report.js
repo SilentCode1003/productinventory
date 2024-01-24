@@ -41,8 +41,9 @@ router.get("/pdf", (req, res) => {
   }
 });
 
-router.get("/salesreport", (req, res) => {
+router.post("/salesreport", (req, res) => {
   try {
+    let referenceno = req.body.referenceno;
     let sql = `SELECT 
             sr_id AS id, mc_name AS category, mi_name as item, sr_date as date,sr_quantity as quantity, sr_sellingprice as sellingprice,
             e_fullname as soldby, sr_soldto as soldto ,sr_paymenttype as paymenttype, sr_soldrefno as soldrefno, 
@@ -50,7 +51,8 @@ router.get("/salesreport", (req, res) => {
           FROM sales_report
           INNER JOIN master_item ON sr_item = mi_id
           INNER JOIN master_category ON sr_category = mc_id
-          INNER JOIN employee ON sr_soldby = e_id;`;
+          INNER JOIN employee ON sr_soldby = e_id
+          WHERE sr_soldrefno = '${referenceno}';`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -82,6 +84,38 @@ router.get("/salesreport", (req, res) => {
 router.get("/salesreporthistory", (req, res) => {
   try {
     let sql = `select * from sales_report_history`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      // console.log("Data: ", result);
+
+      if (result.length != 0) {
+        let data = SalesReportHistory(result);
+
+        // console.log(data);
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/historydetails", (req, res) => {
+  try {
+    let id = req.body.id;
+    let sql = `select * from sales_report_history WHERE srh_id = '${id}'`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);

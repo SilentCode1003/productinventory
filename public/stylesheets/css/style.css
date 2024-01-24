@@ -127,7 +127,10 @@ table tr:hover {
 }
 
 /* Sidebar */
-
+.modal-lg {
+  max-width: 100%;
+  /* Adjust this value to your desired width */
+}
 
 .cbi-link{
   color: var(--clr-default);
@@ -154,6 +157,10 @@ table, th, td {
 
 .dashboard-size{
   height: 435px !important;
+}
+
+.dashboard-size-dynamic{
+  max-height: 435px !important;
 }
 
 .scrollable-dashboard-size{

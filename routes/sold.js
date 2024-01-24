@@ -205,14 +205,15 @@ router.post("/upload", (req, res) => {
     let sold = [];
     let salesreporthistory = [];
     let counter = 0;
+    let historycounter = 0;
     let noentry = [];
     let dupentry = [];
-
+    let salesreport = [];
     dataJson.forEach((item) => {
       Check_MasterClient(item.company, item.branch, req)
         .then((result) => {
           let soldto = result;
-          
+
 
           Check_Product(item.serial)
             .then((result) => {
@@ -227,18 +228,17 @@ router.post("/upload", (req, res) => {
                 Check_Sold(assetcontrol, convertExcelDate(item.date), soldto)
                   .then((result) => {
                     let check_sold = Sold(result);
-
+                    counter += 1;
                     if (check_sold.length != 0) {
                       dupentry.push(item.serial);
-
-                      let status = GetValue(SLD());
-                      let product_update =
-                        "update product set p_status=? where p_assetcontrol=?";
-                      let product = [status, assetcontrol];
-                      Update(product_update, product, (err, result) => {
-                        if (err) console.error("Error: ", err);
-                        console.log("Status updated: ",result);
-                      });
+                      // let status = GetValue(SLD());
+                      // let product_update =
+                      //   "update product set p_status=? where p_assetcontrol=?";
+                      // let product = [status, assetcontrol];
+                      // Update(product_update, product, (err, result) => {
+                      //   if (err) console.error("Error: ", err);
+                      //   console.log("Status updated: ",result);
+                      // });
                     } else {
                       sold.push([
                         assetcontrol,
@@ -249,7 +249,7 @@ router.post("/upload", (req, res) => {
                         item.referenceno,
                       ]);
 
-                      let salesreport = [[
+                      salesreport = [[
                         category,
                         itemname,
                         convertExcelDate(item.date),
@@ -265,13 +265,18 @@ router.post("/upload", (req, res) => {
                         item.transactionstatus
                       ]];
                       ;
-                      
+
                       Upload_sales_report(salesreport)
                         .then((result) => {
-                          counter += 1;
+                          historycounter += 1;
+                          console.log("TRIGGERED: ", historycounter)
                           if (ReferenceNo_Checker(item.referenceno, salesreporthistory)) {
+                            let activities = [{
+                              sold: { date: convertExcelDate(item.date), details: item.remarks }
+                            }];
+
                             salesreporthistory.push([
-                              convertExcelDate(item.date),
+                              JSON.stringify(activities),
                               item.remarks,
                               item.transactionstatus,
                               item.referenceno,
@@ -282,42 +287,20 @@ router.post("/upload", (req, res) => {
                             console.log(`Reference number ${item.referenceno} already exists.`);
                           }
 
-                          if (counter == dataJson.length) {
-                            console.log("TO BE INSERTED", salesreporthistory)
-                            console.log("TO BE INSERTED SOLD: ", sold)
+                          if (historycounter === dataJson.length){
+                            console.log("TO BE INSERTED SOLD: ", salesreporthistory)
 
-                            InsertTable("sales_report_history", salesreporthistory, (err, result) => {
-                              if (err) console.error("Error: ", err);
-                              console.log(result);
-                            });
-      
-                            if (sold.length != 0) {
-                              InsertTable("sold", sold, (err, result) => {
+                            if (salesreporthistory != 0){
+                              InsertTable("sales_report_history", salesreporthistory, (err, result) => {
                                 if (err) console.error("Error: ", err);
                                 console.log(result);
                               });
                             }
-      
-                            let message = "";
-                            if (dupentry.length != 0) {
-                              message += MessageStatus.DUPENTRY;
-                            }
-                            if (noentry.length != 0) {
-                              message += MessageStatus.NOENTRY;
-                            }
-      
-                            if (message != "") {
-                              res.json(
-                                JsonWarningResponse(message, [dupentry, noentry])
-                              );
-                            } else {
-                              res.json(JsonSuccess());
-                            }
                           }
-
                         }).catch((error) => {
                           console.error(error, item.serial);
                         });
+                      console.log(counter)
 
                       let status = GetValue(SLD());
                       let product_update =
@@ -328,6 +311,32 @@ router.post("/upload", (req, res) => {
                         // console.log(result);
                       });
                     }
+                    if (counter == dataJson.length) {
+                      console.log("TO BE INSERTED SOLD: ", sold)
+
+                      if (sold.length != 0) {
+                        InsertTable("sold", sold, (err, result) => {
+                          if (err) console.error("Error: ", err);
+                          console.log(result);
+                        });
+                      }
+
+                      let message = "";
+                        if (dupentry.length != 0) {
+                          message += MessageStatus.DUPENTRY;
+                        }
+                        if (noentry.length != 0) {
+                          message += MessageStatus.NOENTRY;
+                        }
+
+                        if (message != "") {
+                          res.json(
+                            JsonWarningResponse(message, [dupentry, noentry])
+                          );
+                        } else {
+                          res.json(JsonSuccess());
+                        }
+                      }
                   })
                   .catch((error) => {
                     console.error(error, item.serial);
@@ -369,42 +378,10 @@ function Upload_sales_report(data) {
   });
 }
 
-function ReferenceNo_Checker(referenceno, data){
+function ReferenceNo_Checker(referenceno, data) {
+  console.log("Inserted");
   return data.every(record => record[3] !== referenceno);
 }
-
-// function Check_History(referenceno){
-//   return new Promise((resolve, reject) => {
-//     let sql = "select * from sales_report_history where srh_referenceno = ?";
-//     let command = SelectStatement(sql, [referenceno]);
-
-//     Select(command, (err, result) => {
-//       if (err) {
-//         console.error(err);
-//         resolve(err);
-//       }else{
-//         console.log("History Check: ", result)
-//         resolve(result);
-//       }
-
-//     });
-//   });
-// }
-
-// function Upload_sales_history(data) {
-//   return new Promise((resolve, reject) => {
-//     InsertTable("sales_report_history", data, (err, result) => {
-//       if (err) {
-//         console.error(err);
-//         reject(err);
-//         return;
-//       }
-//       let id = result[0].id;
-//       console.log("History recorded ID No.: ", id);
-//       resolve(id);
-//     });
-//   });
-// }
 
 function Check_Sold(assetcontrol, date, soldto) {
   return new Promise((resolve, reject) => {
