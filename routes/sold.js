@@ -272,7 +272,7 @@ router.post("/upload", (req, res) => {
                           console.log("TRIGGERED: ", historycounter)
                           if (ReferenceNo_Checker(item.referenceno, salesreporthistory)) {
                             let activities = [{
-                              sold: { date: convertExcelDate(item.date), details: item.remarks }
+                              SOLD: { date: convertExcelDate(item.date), details: item.remarks }
                             }];
 
                             salesreporthistory.push([

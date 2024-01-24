@@ -155,9 +155,7 @@
                     } else {
                         $.each(data, function (key, item) {
                             var details = JSON.parse(item.details);
-                            console.log("test: ", details)
-
-
+                            console.log("Data: ", details)
                             if (details.return) {
                                 let historydiv = $(`
                                     <div class="row">

@@ -1,8 +1,7 @@
 var express = require("express");
 const { Validator } = require("./controller/middleware");
 var router = express.Router();
-
-const { JsonErrorResponse } = require("./repository/responce");
+const { JsonErrorResponse, JsonSuccess } = require("./repository/responce");
 const { GeneratePDF } = require("./repository/pdf");
 const { SalesReport, SalesReportHistory } = require("./model/spimodel");
 const {
@@ -136,6 +135,46 @@ router.post("/historydetails", (req, res) => {
           data: result,
         });
       }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/updatehistory", (req, res) => {
+  try {
+    const { details, documents, id, status} = req.body;
+    console.log(details, documents, id, status);
+    let data = [];
+    let sql_update = "update sales_report_history set";
+
+    if (documents) {
+      sql_update += " srh_documents=?,";
+      data.push(JSON.stringify(documents));
+    }
+    if (details) {
+      sql_update += " srh_date=?,";
+      data.push(JSON.stringify(details) );
+    }
+    if (status) {
+      sql_update += " srh_status=?,";
+      data.push(status);
+    }
+
+    sql_update = sql_update.slice(0, -1);
+    sql_update += " where srh_id=?";
+
+    data.push(id);
+
+    console.log(sql_update)
+
+    Update(sql_update, data, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      console.log(result);
+      res.json(JsonSuccess());
     });
   } catch (error) {
     res.json({

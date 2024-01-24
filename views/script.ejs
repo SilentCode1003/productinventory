@@ -391,6 +391,14 @@
     return '₱' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
   }
 
+  function formatCurrency(value) {
+    if (!value) {
+      return '$0.00';
+    }
+    var formattedValue = parseFloat(value).toFixed(2);
+    return '$' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  }
+
   $(document).ready(function () {
     if ($('.collapse-item.active').length > 0) {
       $('.collapse-item.active').closest('.collapse').addClass('show');

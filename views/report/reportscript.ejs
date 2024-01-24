@@ -52,6 +52,10 @@
             <td><div class="custom-loader"></div></td>
           </tr>`;
 
+        $(document).on("click", "#editBtn", function () {
+            $(".id-edit").text(id);
+        });
+
         const saleshistory = $('#salesreporthistory-table tbody');
         for (let i = 0; i < 5; i++) {
             saleshistory.append(historyloader);
@@ -104,7 +108,9 @@
 
 
         $(document).on('click', '.cbi-link', function () {
-            console.log(referenceno);
+            // console.log(referenceno);
+            let downloadLinksDiv = document.getElementById('downloadLinks');
+            downloadLinksDiv.innerHTML = '';
             $.ajax({
                 type: 'POST',
                 url: '/report/salesreport',
@@ -120,7 +126,7 @@
                     tableBody.empty();
                     Object.keys(processeddata).forEach((key, index) => {
                         const itemsForDate = processeddata[key];
-                        console.log(itemsForDate);
+                        // console.log(itemsForDate);
                         itemsForDate.forEach(item => {
 
                             const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
@@ -147,6 +153,7 @@
 
                         });
                     });
+
                     $(".id").text(id);
                     $.ajax({
                         type: 'POST',
@@ -157,9 +164,16 @@
                         success: function (result) {
                             var myDiv = document.getElementById('historydata');
                             myDiv.innerHTML = '';
+
                             let data = result.data;
-                            let historydata = data[0].date;
-                            
+                            let base64docu = data[0].documents;
+                            if (base64docu != "N/A") {
+                                let downloadLinksDiv = document.getElementById('downloadLinks');
+                                downloadLinksDiv.innerHTML = '';
+                                let parsedData = JSON.parse(base64docu);
+                                console.log(parsedData);
+                                displayLinks(parsedData);
+                            }
                             if (data.length == 0) {
                                 let historydiv = $(`
                                     <div class="row justify-content-center">
@@ -168,86 +182,42 @@
                                     <hr class="sidebar-divider">`);
                                 $('#historydata').append(historydiv);
                             } else {
-                                $.each(data, function (key, item) {
-                                    var details = JSON.parse(item.date);
-                                    
-                                    console.log("test: ", details)
-                                    if (details[0].sold) {
-                                        let historydiv = $(`
-                                    <div class="row">
-                                        <div class="col-3 text-center">
-                                            <div>
-                                                <span class="">${details[0].sold.date}</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-3 text-center">
-                                            <h5 class="">SOLD</h5>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="row ml-1">
-                                                <h5><span class="">${details[0].sold.details}</span></h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr class="sidebar-divider">`);
-                                        $('#historydata').append(historydiv);
-                                    }
+                                let historydata = JSON.parse(data[0].date);
+                                // console.log("all data: ", historydata)
+                                let jsonData = {};
 
-                                    if (details.replace) {
-                                        let historydiv = $(`
-                                            <div class="row">
-                                                <div class="col-3 text-center" style="margin-top: 50px;">
-                                                    <div>
-                                                        <span class="">${details.replace.date}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-3 text-center" style="margin-top: 50px;">
-                                                    <h5 class="">Replaced</h5>
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="row">
-                                                        <h5>Replacement Serial: <span class="referenceno">${details.replace.replacedserial}</span></h5>
-                                                    </div>
-                                                    <div class="row">
-                                                        <h5>Replaced By: <span class="">${details.replace.replacedby}</span></h5>
-                                                    </div>
-                                                    <div class="row">
-                                                        <h5>Remarks: <span class="">${details.replace.remarks}</span></h5>
-                                                    </div>
-                                                    <div class="row">
-                                                        <h5>Reference No.: <span class="referenceno">${details.replace.referenceno}</span></h5>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <hr class="sidebar-divider">`);
-                                        $('#historydata').append(historydiv);
-                                    }
+                                for (let item of historydata) {
+                                    let key = Object.keys(item)[0];
+                                    jsonData[key] = item[key];
+                                }
+                                // console.log("JSON Data: ", jsonData)
 
-                                    if (details.deffective) {
-                                        let historydiv = $(`
-                                    <div class="row">
-                                        <div class="col-3 text-center" style="margin-top: 20px;">
-                                            <div>
-                                                <span class="">${details.deffective.date}</span>
+                                for (let key in jsonData) {
+                                    let item = jsonData[key];
+
+                                    let historydiv = $(`
+                                        <div class="row">
+                                            <div class="col-4 text-center">
+                                                <div>
+                                                    <span class="">${item.date}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-4 text-center">
+                                                <span class="">${key}</span>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="row ml-1">
+                                                    <span class="">${item.details}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-3 text-center" style="margin-top: 20px;">
-                                            <h5 class="">Defective</h5>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="row">
-                                                <h5>Remarks: <span class="">${details.deffective.remarks}</span></h5>
-                                            </div>
-                                            <div class="row">
-                                                <h5>Reference No.: <span class="referenceno">${details.deffective.referenceno}</span></h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr class="sidebar-divider">`);
-                                        $('#historydata').append(historydiv);
-                                    }
-                                });
+                                        <hr class="sidebar-divider">`);
+
+                                    $('#historydata').append(historydiv);
+                                }
                             }
+
+
 
                         },
                         error: function (err) {
@@ -262,7 +232,7 @@
         });
 
         function populatesalesreporthistory(data) {
-            console.log(data);
+            // console.log(data);
             const tableBody = $("#salesreporthistory-table tbody");
             tableBody.empty();
 
@@ -278,7 +248,9 @@
             } else {
                 data.forEach((item) => {
                     let action = "";
-                    action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span> `;
+                    if (item.status != 'PAID') {
+                        action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span> `;
+                    }
 
                     const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
                     const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
@@ -529,6 +501,144 @@
 
         setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
         LoadList();
+
+        function getBase64() {
+            const inputElement = document.getElementById('fileinput');
+            const fileList = inputElement.files;
+            let documents = [];
+
+            function handleFileProcessed() {
+                if (documents.length === fileList.length) {
+                    // console.log(documents);
+                    displaySelectedFiles();
+                }
+            }
+
+            function displaySelectedFiles() {
+                const selectedFilesList = document.getElementById('selectedFilesList');
+                selectedFilesList.innerHTML = '<p><strong>Selected Files:</strong></p>';
+
+                for (const doc of documents) {
+                    const fileItem = document.createElement('div');
+                    fileItem.textContent = `${doc.filename}: ${doc.data.substring(0, 20)}...`;
+                    selectedFilesList.appendChild(fileItem);
+                }
+            }
+
+            for (const file of fileList) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const base64String = e.target.result;
+                    documents.push({
+                        filename: file.name,
+                        data: base64String
+                    });
+
+                    handleFileProcessed();
+                };
+
+                reader.readAsDataURL(file);
+            }
+            return documents;
+        }
+
+
+        $(document).on("click", "#updateBtn", function () {
+            $(".id").text(id);
+
+            let dateupdate = $("#date").val();
+            let remarks = $("#remarks").val();
+            let transactionstatus = $("#transactionstatus").val();
+            let documents = getBase64();
+            let historydata = [];
+            var message = "";
+
+            if ((dateupdate !== "" || remarks !== "" || transactionstatus !== "") &&
+                (dateupdate === "" || remarks === "" || transactionstatus === "")) {
+                message = "If one of Status, Remarks, or Date is not empty, all three should be filled.";
+            }
+
+            if (message != "") {
+                warning("Required", `Please fill up ${message}`);
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/report/historydetails',
+                    data: {
+                        id: id,
+                    },
+                    success: function (result) {
+                        let data = result.data;
+                        historydata = JSON.parse(data[0].date);
+                        let newdata = {
+                            [transactionstatus]: { date: dateupdate, details: remarks }
+                        };
+                        historydata.push(newdata);
+                        // console.log("appended date", historydata)
+                        // console.log(historydata, documents, id, transactionstatus);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/report/updatehistory",
+                            data: {
+                                details: historydata,
+                                documents: documents,
+                                id: id,
+                                status: transactionstatus,
+                            },
+                            success: function (result) {
+                                if (result.msg == "success") {
+                                    $("#date").val("");
+                                    $("#remarks").val("");
+                                    $("#transactionstatus").val("");
+                                    $("#editModal").modal("hide");
+                                    success("Saved", "Successfully");
+                                    LoadTable();
+                                }
+                            },
+                            error: function (err) {
+                                errormsg(err);
+                            },
+                        });
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    }
+                });
+
+
+            }
+        });
+
+        function displayLinks(dataArray) {
+            let downloadLinksDiv = document.getElementById('downloadLinks');
+            downloadLinksDiv.innerHTML = '';
+            dataArray.forEach((item, index) => {
+                let base64Data = item.data.split(',')[1];
+                let blob = b64toBlob(base64Data);
+                let link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = item.filename;
+                link.textContent = `Download ${item.filename}`;
+                downloadLinksDiv.appendChild(link);
+                downloadLinksDiv.appendChild(document.createElement("br"));
+
+            });
+
+            function b64toBlob(b64Data) {
+                let byteCharacters = atob(b64Data);
+                let byteNumbers = new Array(byteCharacters.length);
+
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+
+                let byteArray = new Uint8Array(byteNumbers);
+
+                return new Blob([byteArray], { type: "application/octet-stream" });
+            }
+        }
 
     });
 </script>
