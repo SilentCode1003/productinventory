@@ -554,9 +554,14 @@
             let historydata = [];
             var message = "";
 
-            if ((dateupdate !== "" || remarks !== "" || transactionstatus !== "") &&
-                (dateupdate === "" || remarks === "" || transactionstatus === "")) {
-                message = "If one of Status, Remarks, or Date is not empty, all three should be filled.";
+            if (dateupdate === "" ) {
+                message += "Empty Date, ";
+            }
+            if (remarks === "" ) {
+                message += "Empty Remarks, ";
+            }
+            if (transactionstatus === "" ) {
+                message += "Empty Status ";
             }
 
             if (message != "") {
