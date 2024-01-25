@@ -1,3 +1,176 @@
+<!-- Modal -->
+<div class="modal fade bd-example-modal-lg" id="editModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Sales History ID: <span class="id-edit">(Sample ID)</span></h5>
+            </div>
+            <div class="modal-body">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label class="form-label" for="transactionstatus">Update Status</label>
+                                    <select class="form-control text-center" name="transactionstatus" id="transactionstatus">
+                                        <option value="">-- Select Transaction Status --</option>
+                                        <option value="PAID">PAID</option>
+                                        <option value="PARTIALLY PAID">PARTIALLY PAID</option>
+                                    </select>  
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon2">Date</span>
+                                        </div>
+                                        <input id="date" name="date" type="date" class="form-control" placeholder="Enter Date"
+                                            aria-label="date" aria-describedby="basic-addon1" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-label" for="remarks">Remarks</label>
+                                        <textarea class="form-control" id="remarks" rows="3" placeholder="Enter Remarks"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label class="form-label" for="fileinput">Supporting Documents</label>
+                                    <input class="btn btn-outline-cyberpower w-100" type="file" id="fileinput" multiple
+                                    placeholder="Select Supporting Documents" />
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col">
+                                    <div class="card">
+                                        <div id="selectedFilesList"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-cyberpower" data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i>Close
+                </button>
+                <button type="button" id="updateBtn" class="btn btn-outline-cyberpower">
+                    <i class="fa fa-check" aria-hidden="true"></i>Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="salesreportmodal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row ml-1">
+                    <h5 class="modal-title" id="exampleModalLabel">Sales Report ID: <span class="id">(Sample ID)</span>
+                    </h5>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="card dashboard-size-dynamic">
+                    <div class="card-header card-bg align-content-center">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h4 class="m-0 card-title">Sales History Table</h4>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="custom-btn" id="convertopdf2" type="button"
+                                    style="border-radius: 0.2rem;">
+                                    <i class="fas fa-file-export"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive scrollable-table-container">
+                        <table class="table custom-mobile-table" id="salesreport-table" width="100%" cellspacing="10">
+                            <thead class="table-header header-style">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Reference No.</th>
+                                    <th>Category</th>
+                                    <th>Item Name</th>
+                                    <th>Price</th>
+                                    <th>Delivery Fee</th>
+                                    <th>Quantity</th>
+                                    <th>Payment Type</th>
+                                    <th>Trx Ref. No. Type</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="no-border"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <div class="card">
+                            <div class="card-header card-bg" style="padding: 0rem !important;">
+                                <div class="card-title justify-content-center">
+                                    <div class="row justify-content-center">
+                                        <h3 class="mt-3" style="color: var(--clr-glow) !important;">Sales History
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body document-size">
+                                <div class="row">
+                                    <div class="col-4 text-center">
+                                        <h5 class="cyber-title">DATE</h5>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <h5 class="cyber-title">DETAILS</h5>
+                                    </div>
+                                    <div class="col-4">
+                                        <h5 class="cyber-title">REMARKS</h5>
+                                    </div>
+                                </div>
+                                <hr class="sidebar-divider">
+                                <div id="historydata">
+    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="document-size">
+                            <span>Supporting Documents: </span>
+
+                            <div class="row justify-content-center">
+                                <div class="col-12 scrollable-document-size">
+                                    <div id="downloadLinks"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-cyberpower" data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i>Close
+                </button>
+                <!-- <button type="button" id="saveBtn" class="btn btn-outline-cyberpower">
+                    <i class="fa fa-check" aria-hidden="true"></i>Update
+                </button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Content Row -->
 <div class="row mt-3">
     <div class="col-lg-12">
@@ -6,118 +179,90 @@
                 <div class="row mb-2 justify-content-center">
                     <div class="responsive-col">
                         <div class="input-group">
-                            <button id="adjustDateBackward" class="custom-btn btn-sm custom-br-left"><i class="fas fa-caret-left"></i></button>
-                            <input id="dateRange" name="dateRange" type="text" class="form-control text-center" placeholder="Select Date Range" aria-describedby="basic-addon1" readonly>
-                            <button id="adjustDateForward" class="custom-btn btn-sm custom-br-right"><i class="fas fa-caret-right"></i></button>
-                        </div> 
-                    </div>   
+                            <button id="adjustDateBackward" class="custom-btn btn-sm custom-br-left"><i
+                                    class="fas fa-caret-left"></i></button>
+                            <input id="dateRange" name="dateRange" type="text" class="form-control text-center"
+                                placeholder="Select Date Range" aria-describedby="basic-addon1" readonly>
+                            <button id="adjustDateForward" class="custom-btn btn-sm custom-br-right"><i
+                                    class="fas fa-caret-right"></i></button>
+                        </div>
+                    </div>
                 </div>
                 <ul class="nav nav-pills" id="pills-tab" role="tablist">
 
                     <li class="nav-item col text-center mb-1">
-                      <a class="nav-link btn btn-outline-cyberpower active" id="salesreport-tab" data-toggle="pill" href="#salesreport" role="tab" aria-controls="salesreport" aria-selected="true">Sales Report</a>
+                        <a class="nav-link btn btn-outline-cyberpower active" id="salesreport-tab" data-toggle="pill"
+                            href="#salesreport" role="tab" aria-controls="salesreport" aria-selected="true">Sales
+                            Report</a>
                     </li>
                     <li class="nav-item col text-center mb-1">
-                        <a class="nav-link btn btn-outline-cyberpower" id="sales-per-employee-tab" data-toggle="pill" href="#sales-per-employee" role="tab" aria-controls="sales-per-employee" aria-selected="false">Employee</a>
+                        <a class="nav-link btn btn-outline-cyberpower" id="sales-per-employee-tab" data-toggle="pill"
+                            href="#sales-per-employee" role="tab" aria-controls="sales-per-employee"
+                            aria-selected="false">Employee</a>
                     </li>
                 </ul>
             </div>
             <div class="card-body">
                 <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="salesreport" role="tabpanel" aria-labelledby="salesreport-tab">
+                    <div class="tab-pane fade show active" id="salesreport" role="tabpanel"
+                        aria-labelledby="salesreport-tab">
                         <div class="row d-flex">
                             <div class="col">
                                 <div class="card table-size">
                                     <div class="card-header card-bg align-content-center">
                                         <div class="row">
                                             <div class="col">
-                                                <h4 class="m-0 card-title">Sales Table</h4>
+                                                <h4 class="m-0 card-title">Sales History</h4>
                                             </div>
-                                            <% if (access === "Admin") { %> 
+                                            <% if (access==="Admin" ) { %>
                                                 <div class="col-md-6 mb-2">
                                                     <div class="input-group">
-                                                        <input class="form-control text-center custom-input" placeholder="Select Employee"
-                                                            name="employee" id="employee" />
-                                                        <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+                                                        <input class="form-control text-center custom-input"
+                                                            placeholder="Select Employee" name="employee"
+                                                            id="employee" />
+                                                        <input type="hidden" id="hiddenemmployeevalue"
+                                                            name="hiddenemmployeevalue" />
                                                         <div class="input-group-append">
                                                             <span class="input-group-text">Employee</span>
                                                         </div>
                                                     </div>
-                                                    <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
+                                                    <div class="custom-dropdown custom-dropdown-margin-left"
+                                                        id="employeeDropdown"></div>
                                                 </div>
-                                            <% } %>
-                                            <div class="col">
-                                                <button class="custom-btn" id="convertopdf" type="button" style="border-radius: 0.2rem;">
-                                                    <i class="fas fa-file-export"></i>
-                                                </button>
-                                            </div>
+                                                <% } %>
+                                                    <div class="col">
+                                                        <button class="custom-btn" id="convertopdf" type="button"
+                                                            style="border-radius: 0.2rem;">
+                                                            <i class="fas fa-file-export"></i>
+                                                        </button>
+                                                    </div>
                                         </div>
                                     </div>
-                                    <div class="table-responsive scrollable-table-container">
-                                        <table class="table custom-mobile-table" id="salesreport-table" width="100%" cellspacing="10">
+                                    <div class="table-responsive scrollable-table-size">
+                                        <table class="table custom-mobile-table" id="salesreporthistory-table"
+                                            width="100%" cellspacing="10">
                                             <thead class="table-header header-style">
                                                 <tr>
                                                     <th>ID</th>
-                                                    <th>Category</th>
-                                                    <th>Item</th>
-                                                    <th>Date</th>
-                                                    <th>Quantity</th>
-                                                    <th>Selling Price</th>
-                                                    <th>Delivery Fee</th>
-                                                    <th>Sold By</th>
-                                                    <th>Sold To</th>
-                                                    <th>Payment Type</th>
-                                                    <th>Sold Ref. No.</th>
                                                     <th>Reference No.</th>
-                                                    <th>Remarks</th>
-                                                    <th>Status</th>
+                                                    <th class="col-1">Status</th>
+                                                    <th class="col-1"></th>
                                                 </tr>
                                             </thead>
                                             <tbody class="no-border"></tbody>
                                         </table>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
 
-                        <!-- <div class="row d-flex mt-2">
-                            <div class="col">
-                                <div class="card dashboard-size">
-                                    <div class="card-header card-bg align-content-center">
-                                        <div class="row">
-                                            <div class="col-md-8">
-                                                <h4 class="m-0 card-title">Sales History Table</h4>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <button class="custom-btn" id="convertopdf2" type="button" style="border-radius: 0.2rem;">
-                                                    <i class="fas fa-file-export"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="table-responsive scrollable-dashboard-size">
-                                        <table class="table custom-mobile-table" id="salesreporthistory-table" width="100%" cellspacing="10">
-                                            <thead class="table-header header-style">
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Report ID</th>
-                                                    <th>Date</th>
-                                                    <th>Remarks</th>
-                                                    <th class="col-1">Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="no-border"></tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
-                    
                     </div>
 
-                    <div class="tab-pane fade" id="sales-per-employee" role="tabpanel" aria-labelledby="sales-per-employee-tab">
+                    <div class="tab-pane fade" id="sales-per-employee" role="tabpanel"
+                        aria-labelledby="sales-per-employee-tab">
                         <div class="row">
-                            
+
                         </div>
                     </div>
                 </div>

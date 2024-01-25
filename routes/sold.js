@@ -87,7 +87,7 @@ router.post("/save", (req, res) => {
     // console.log("Sold data: ", sold);
 
     Check_Product(serial)
-    .then((result) => {
+      .then((result) => {
         let product = Product(result);
         let quantity = 1;
         let category = product[0].category;
@@ -107,7 +107,7 @@ router.post("/save", (req, res) => {
 
         });
       }
-    );
+      );
 
     Check_Sold(assetcontrol, date, soldto)
       .then((result) => {
@@ -203,14 +203,17 @@ router.post("/upload", (req, res) => {
     let dataJson = SoldProduct(JSON.parse(data));
     // console.log("DataJson:", dataJson)
     let sold = [];
+    let salesreporthistory = [];
     let counter = 0;
+    let historycounter = 0;
     let noentry = [];
     let dupentry = [];
-
+    let salesreport = [];
     dataJson.forEach((item) => {
       Check_MasterClient(item.company, item.branch, req)
         .then((result) => {
           let soldto = result;
+
 
           Check_Product(item.serial)
             .then((result) => {
@@ -226,18 +229,16 @@ router.post("/upload", (req, res) => {
                   .then((result) => {
                     let check_sold = Sold(result);
                     counter += 1;
-
                     if (check_sold.length != 0) {
                       dupentry.push(item.serial);
-
-                      let status = GetValue(SLD());
-                      let product_update =
-                        "update product set p_status=? where p_assetcontrol=?";
-                      let product = [status, assetcontrol];
-                      Update(product_update, product, (err, result) => {
-                        if (err) console.error("Error: ", err);
-                        // console.log(result);
-                      });
+                      // let status = GetValue(SLD());
+                      // let product_update =
+                      //   "update product set p_status=? where p_assetcontrol=?";
+                      // let product = [status, assetcontrol];
+                      // Update(product_update, product, (err, result) => {
+                      //   if (err) console.error("Error: ", err);
+                      //   console.log("Status updated: ",result);
+                      // });
                     } else {
                       sold.push([
                         assetcontrol,
@@ -248,41 +249,58 @@ router.post("/upload", (req, res) => {
                         item.referenceno,
                       ]);
 
-                      let salesreport = [[
-                        category, 
-                        itemname, 
-                        convertExcelDate(item.date), 
-                        quantity, 
-                        item.sellingprice, 
-                        item.deliveryfee, 
-                        item.soldby, 
-                        soldto, 
-                        item.paymenttype, 
-                        item.referenceno, 
-                        item.transactionref, 
-                        item.remarks, 
+                      salesreport = [[
+                        category,
+                        itemname,
+                        convertExcelDate(item.date),
+                        quantity,
+                        item.sellingprice,
+                        item.deliveryfee,
+                        item.soldby,
+                        soldto,
+                        item.paymenttype,
+                        item.referenceno,
+                        item.transactionref,
+                        item.remarks,
                         item.transactionstatus
                       ]];
+                      ;
 
                       Upload_sales_report(salesreport)
                         .then((result) => {
-                          let salesreporthistory = [[
-                            result, 
-                            convertExcelDate(item.date), 
-                            item.remarks, 
-                            item.transactionstatus
-                          ]];
+                          historycounter += 1;
+                          console.log("TRIGGERED: ", historycounter)
+                          if (ReferenceNo_Checker(item.referenceno, salesreporthistory)) {
+                            let activities = [{
+                              SOLD: { date: convertExcelDate(item.date), details: item.remarks }
+                            }];
 
-                          Upload_sales_history(salesreporthistory)
-                            .then((result) => {
-                              console.log("Hisotry recorded ID No.: ", result);
-                            }).catch((error) => {
-                              console.error(error, item.serial);
-                            });
+                            salesreporthistory.push([
+                              JSON.stringify(activities),
+                              item.remarks,
+                              item.transactionstatus,
+                              item.referenceno,
+                              "N/A"
+                            ]);
+                            console.log(`Reference number ${item.referenceno} Inserted.`);
+                          } else {
+                            console.log(`Reference number ${item.referenceno} already exists.`);
+                          }
 
+                          if (historycounter === dataJson.length){
+                            console.log("TO BE INSERTED SOLD: ", salesreporthistory)
+
+                            if (salesreporthistory != 0){
+                              InsertTable("sales_report_history", salesreporthistory, (err, result) => {
+                                if (err) console.error("Error: ", err);
+                                console.log(result);
+                              });
+                            }
+                          }
                         }).catch((error) => {
                           console.error(error, item.serial);
                         });
+                      console.log(counter)
 
                       let status = GetValue(SLD());
                       let product_update =
@@ -293,9 +311,9 @@ router.post("/upload", (req, res) => {
                         // console.log(result);
                       });
                     }
-
                     if (counter == dataJson.length) {
-                      // console.log(sold);
+                      console.log("TO BE INSERTED SOLD: ", sold)
+
                       if (sold.length != 0) {
                         InsertTable("sold", sold, (err, result) => {
                           if (err) console.error("Error: ", err);
@@ -304,23 +322,21 @@ router.post("/upload", (req, res) => {
                       }
 
                       let message = "";
-                      if (dupentry.length != 0) {
-                        message += MessageStatus.DUPENTRY;
-                      }
-                      if (noentry.length != 0) {
-                        message += MessageStatus.NOENTRY;
-                      }
+                        if (dupentry.length != 0) {
+                          message += MessageStatus.DUPENTRY;
+                        }
+                        if (noentry.length != 0) {
+                          message += MessageStatus.NOENTRY;
+                        }
 
-                      if (message != "") {
-                        res.json(
-                          JsonWarningResponse(message, [dupentry, noentry])
-                        );
-                        console.log("Task Completed!");
-                      } else {
-                        res.json(JsonSuccess());
-                        console.log("Task Completed!");
+                        if (message != "") {
+                          res.json(
+                            JsonWarningResponse(message, [dupentry, noentry])
+                          );
+                        } else {
+                          res.json(JsonSuccess());
+                        }
                       }
-                    }
                   })
                   .catch((error) => {
                     console.error(error, item.serial);
@@ -356,20 +372,15 @@ function Upload_sales_report(data) {
     InsertTable("sales_report", data, (err, result) => {
       if (err) reject(err);
       let id = result[0].id;
+      console.log("Upload Report: ", id);
       resolve(id);
     });
   });
 }
 
-function Upload_sales_history(data) {
-  return new Promise((resolve, reject) => {
-
-    InsertTable("sales_report_history", data, (err, result) => {
-      if (err) reject(err);
-      let id = result[0].id;
-      resolve(id);
-    });
-  });
+function ReferenceNo_Checker(referenceno, data) {
+  console.log("Inserted");
+  return data.every(record => record[3] !== referenceno);
 }
 
 function Check_Sold(assetcontrol, date, soldto) {

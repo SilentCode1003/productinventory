@@ -29,6 +29,7 @@ const {
   UploadReplaceItemModel,
   SalesReportModel,
   SalesReportHistoryModel,
+  UploadSalesHistoryModel,
 } = require("./model");
 
 exports.MasterItem = (data) => {
@@ -756,10 +757,11 @@ exports.SalesReportHistory = (data) => {
   data.forEach((key, item) => {
     dataResult.push({
       id: key.srh_id,
-      salesreportid: key.srh_salesreportid,
       date: key.srh_date,
       ramarks: key.srh_remarks,
       status: key.srh_status,
+      referenceno: key.srh_referenceno,
+      documents: key.srh_documents,
     });
   });
 
@@ -767,10 +769,11 @@ exports.SalesReportHistory = (data) => {
     (key) =>
       new SalesReportHistoryModel(
         key["id"],
-        key["salesreportid"],
         key["date"],
         key["ramarks"],
-        key["status"]
+        key["status"],
+        key["referenceno"],
+        key["documents"]
       )
   );
 };
@@ -844,6 +847,33 @@ exports.UploadReplaceItem = (data) => {
         key["date"],
         key["replacedby"],
         key["referenceno"],
+      )
+  );
+};
+
+exports.UploadSalesHistory = (data) => {
+  let dataResult = [];
+
+  data.forEach((key, item) => {
+    dataResult.push({
+      salesreportid: key.salesreportid,
+      date: key.date,
+      remarks: key.remarks,
+      status: key.status,
+      referenceno: key.referenceno,
+      documents: key.documents,
+    });
+  });
+
+  return dataResult.map(
+    (key) =>
+      new UploadSalesHistoryModel(
+        key["salesreportid"],
+        key["date"],
+        key["remarks"],
+        key["status"],
+        key["referenceno"],
+        key["documents"],
       )
   );
 };
