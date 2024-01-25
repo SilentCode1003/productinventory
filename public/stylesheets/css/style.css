@@ -203,6 +203,15 @@ table, th, td {
   height: 625px !important;
 }
 
+.document-size{
+  max-height: 325px;
+}
+
+.scrollable-document-size{
+  height: 320px !important;
+  overflow-y: auto !important;
+}
+
 .no-wrap{
   white-space: nowrap;
 }
@@ -718,4 +727,18 @@ CALENDAR
 
 .bg-normal{
   background-color: transparent !important;
+}
+
+.custom-image-class{
+  padding-bottom: .75rem;
+  max-width: 350px;
+  max-height: 350px;
+}
+
+#downloadLinks {
+  text-align: center;
+}
+
+.custom-download-link-class{
+  color: var(--clr-text);
 }

@@ -615,15 +615,38 @@
             let downloadLinksDiv = document.getElementById('downloadLinks');
             downloadLinksDiv.innerHTML = '';
             dataArray.forEach((item, index) => {
+                // Ensure data URI prefix is removed before decoding
                 let base64Data = item.data.split(',')[1];
                 let blob = b64toBlob(base64Data);
-                let link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = item.filename;
-                link.textContent = `Download ${item.filename}`;
-                downloadLinksDiv.appendChild(link);
-                downloadLinksDiv.appendChild(document.createElement("br"));
 
+                if (item.filename.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                    let img = document.createElement('img');
+                    img.src = URL.createObjectURL(blob);
+                    img.alt = `Image ${index + 1}`;
+                    img.classList.add('custom-image-class');
+
+                    downloadLinksDiv.appendChild(img);
+
+                    downloadLinksDiv.appendChild(document.createElement('br'));
+
+                    let link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = item.filename;
+                    link.classList.add('custom-download-link-class');
+                    link.textContent = `${item.filename}`;
+
+                    downloadLinksDiv.appendChild(link);
+                } else {
+                    let link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = item.filename;
+                    link.classList.add('custom-download-link-class');
+                    link.textContent = `${item.filename}`;
+
+                    downloadLinksDiv.appendChild(link);
+                }
+
+                downloadLinksDiv.appendChild(document.createElement('br'));
             });
 
             function b64toBlob(b64Data) {
@@ -636,7 +659,7 @@
 
                 let byteArray = new Uint8Array(byteNumbers);
 
-                return new Blob([byteArray], { type: "application/octet-stream" });
+                return new Blob([byteArray], { type: 'application/octet-stream' });
             }
         }
 
