@@ -343,12 +343,13 @@ class SalesReportModel {
 }
 
 class SalesReportHistoryModel {
-  constructor(id, salesreportid, date, remarks, status) {
+  constructor(id, date, remarks, status, referenceno, documents) {
     this.id = id;
-    this.salesreportid = salesreportid;
     this.date = date;
     this.remarks = remarks;
     this.status = status;
+    this.referenceno = referenceno;
+    this.documents = documents;
   }
 }
 
@@ -377,6 +378,17 @@ class UploadReplaceItemModel {
     this.date = date;
     this.replacedby = replacedby;
     this.referenceno = referenceno;
+  }
+}
+
+class UploadSalesHistoryModel {
+  constructor(salesreportid, date, remarks, status, referenceno, documents) {
+    this.salesreportid = salesreportid;
+    this.date = date;
+    this.remarks = remarks;
+    this.status = status;
+    this.referenceno = referenceno;
+    this.documents = documents;
   }
 }
 
@@ -477,4 +489,5 @@ module.exports = {
   UploadReplaceItemModel,
   SalesReportModel,
   SalesReportHistoryModel,
+  UploadSalesHistoryModel
 };

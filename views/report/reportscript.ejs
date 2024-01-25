@@ -43,20 +43,6 @@
 
         LoadTable();
 
-        const loader = `  
-          <tr>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-          </tr>`;
         const historyloader = `  
           <tr>
             <td><div class="custom-loader"></div></td>
@@ -66,14 +52,16 @@
             <td><div class="custom-loader"></div></td>
           </tr>`;
 
-        const salesreport = $('#salesreport-table tbody');
+        $(document).on("click", "#editBtn", function () {
+            $(".id-edit").text(id);
+        });
+
         const saleshistory = $('#salesreporthistory-table tbody');
         for (let i = 0; i < 5; i++) {
-            salesreport.append(loader);
             saleshistory.append(historyloader);
         }
 
-        $("#salesreport-table tbody").on("click", "tr", function () {
+        $("#salesreporthistory-table tbody").on("click", "tr", function () {
             var dataRow = [];
             $(this)
                 .closest("tr")
@@ -81,9 +69,9 @@
                 .each(function () {
                     dataRow.push($(this).text());
                 });
-            // console.log(dataRow);
+            console.log(dataRow);
             id = dataRow[0];
-            name = dataRow[1];
+            referenceno = dataRow[1];
             status = dataRow[4];
         });
 
@@ -118,117 +106,130 @@
 
         $("#search").on("input", filterTableRows);
 
-        function populatesalesreport(data) {
-            // console.log(data);
-            const tableBody = $("#salesreport-table tbody");
-            tableBody.empty();
 
-            if (data.length === 0) {
-                const tr = $("<tr>").append(
-                    $("<td>", {
-                        colspan: 6,
-                        class: "text-center",
-                        text: "No Data Matched",
-                    })
-                );
-                tableBody.append(tr);
-            } else {
-                data.forEach((item) => {
-                    let action = "";
-                    // if (item.status === "ACTIVE") {
-                    //   action = `
-                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
-                    //         <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
-                    // } else if (item.status === "INACTIVE") {
-                    //   action = `
-                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
-                    //         <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
-                    // }
-                    const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
-                    const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
+        $(document).on('click', '.cbi-link', function () {
+            // console.log(referenceno);
+            let downloadLinksDiv = document.getElementById('downloadLinks');
+            downloadLinksDiv.innerHTML = '';
+            $.ajax({
+                type: 'POST',
+                url: '/report/salesreport',
+                data: {
+                    referenceno: referenceno,
+                },
+                success: function (result) {
+                    var data = result.data;
 
-                    const tr = $("<tr>").append(
-                        $("<td>", {
-                            text: item.id,
-                            "data-label": "ID",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.category,
-                            "data-label": "department",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.item,
-                            "data-label": "Created By",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.date,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align no-wrap",
-                        }),
-                        $("<td>", {
-                            text: item.quantity,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: formatCurrency(item.sellingprice),
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: formatCurrency(item.deliveryfee),
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.soldby,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align no-wrap",
-                        }),
-                        $("<td>", {
-                            text: item.soldto,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.paymenttype,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.soldrefno,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.transacrefno,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.remarks,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align no wrap",
-                        }),
-                        $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
-                            $('<div>', { class: containerBackground }).append(
-                                $('<span>', { text: item.status, class: statusBackground })
-                            )
-                        ),
-                        // $("<td>", {
-                        //     html: action,
-                        //     "data-label": "Action",
-                        //     class: "actionWidth",
-                        // })
-                    );
+                    let processeddata = salesreportdata(data)
 
-                    tableBody.append(tr);
-                });
-            }
-        }
+                    const tableBody = $("#salesreport-table tbody");
+                    tableBody.empty();
+                    Object.keys(processeddata).forEach((key, index) => {
+                        const itemsForDate = processeddata[key];
+                        // console.log(itemsForDate);
+                        itemsForDate.forEach(item => {
+
+                            const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
+                            const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
+
+                            const tr = $("<tr>").append(
+                                $("<td>", { text: key, "data-label": "Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.soldrefno, "data-label": "department", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.category, "data-label": "Created By", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.item, "data-label": "Created Date", class: "custom-mobile-align no-wrap", }),
+                                $("<td>", { text: item.sellingprice, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.deliveryfee, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.quantity, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.paymenttype, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.transacrefno, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+                                    $('<div>', { class: containerBackground }).append(
+                                        $('<span>', { text: item.status, class: statusBackground })
+                                    )
+                                )
+                            );
+
+                            tableBody.append(tr);
+
+                        });
+                    });
+
+                    $(".id").text(id);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/report/historydetails',
+                        data: {
+                            id: id,
+                        },
+                        success: function (result) {
+                            var myDiv = document.getElementById('historydata');
+                            myDiv.innerHTML = '';
+
+                            let data = result.data;
+                            let base64docu = data[0].documents;
+                            if (base64docu != "N/A") {
+                                let downloadLinksDiv = document.getElementById('downloadLinks');
+                                downloadLinksDiv.innerHTML = '';
+                                let parsedData = JSON.parse(base64docu);
+                                console.log(parsedData);
+                                displayLinks(parsedData);
+                            }
+                            if (data.length == 0) {
+                                let historydiv = $(`
+                                    <div class="row justify-content-center">
+                                        <h5 class="">NO CURRENT HISTORY</h5>
+                                    </div>
+                                    <hr class="sidebar-divider">`);
+                                $('#historydata').append(historydiv);
+                            } else {
+                                let historydata = JSON.parse(data[0].date);
+                                // console.log("all data: ", historydata)
+                                let jsonData = {};
+
+                                for (let item of historydata) {
+                                    let key = Object.keys(item)[0];
+                                    jsonData[key] = item[key];
+                                }
+                                // console.log("JSON Data: ", jsonData)
+
+                                for (let key in jsonData) {
+                                    let item = jsonData[key];
+
+                                    let historydiv = $(`
+                                        <div class="row">
+                                            <div class="col-4 text-center">
+                                                <div>
+                                                    <span class="">${item.date}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-4 text-center">
+                                                <span class="">${key}</span>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="row ml-1">
+                                                    <span class="">${item.details}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr class="sidebar-divider">`);
+
+                                    $('#historydata').append(historydiv);
+                                }
+                            }
+
+
+
+                        },
+                        error: function (err) {
+                            errormsg(err);
+                        }
+                    });
+                },
+                error: function (err) {
+                    errormsg(err);
+                }
+            });
+        });
 
         function populatesalesreporthistory(data) {
             // console.log(data);
@@ -247,15 +248,10 @@
             } else {
                 data.forEach((item) => {
                     let action = "";
-                    // if (item.status === "ACTIVE") {
-                    //   action = `
-                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
-                    //         <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
-                    // } else if (item.status === "INACTIVE") {
-                    //   action = `
-                    //         <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
-                    //         <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
-                    // }
+                    if (item.status != 'PAID') {
+                        action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span> `;
+                    }
+
                     const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
                     const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
 
@@ -266,30 +262,22 @@
                             class: "custom-mobile-align",
                         }),
                         $("<td>", {
-                            text: item.salesreportid,
+                            text: item.referenceno,
                             "data-label": "department",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.date,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.remarks,
-                            "data-label": "Created Date",
-                            class: "custom-mobile-align",
+                            class: "custom-mobile-align cbi-link",
+                            "data-toggle": "modal",
+                            "data-target": "#salesreportmodal",
                         }),
                         $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
                             $('<div>', { class: containerBackground }).append(
                                 $('<span>', { text: item.status, class: statusBackground })
                             )
                         ),
-                        // $("<td>", {
-                        //     html: action,
-                        //     "data-label": "Action",
-                        //     class: "actionWidth",
-                        // })
+                        $("<td>", {
+                            html: action,
+                            "data-label": "Action",
+                            class: "actionWidth",
+                        })
                     );
 
                     tableBody.append(tr);
@@ -298,24 +286,6 @@
         }
 
         function LoadTable() {
-
-            $.ajax({
-                url: "/report/salesreport",
-                method: "GET",
-                dataType: "json",
-                success: function (data) {
-                    // console.log("Data: ", data.data)
-                    if (data.msg === "success") {
-                        populatesalesreport(data.data);
-                    } else {
-                        console.error(data.msg);
-                    }
-                },
-                error: function (error) {
-                    console.error(error);
-                },
-            });
-
             $.ajax({
                 url: "/report/salesreporthistory",
                 method: "GET",
@@ -432,7 +402,6 @@
 
                 if (matchingEntry) {
                     matchingEntry.quantity += current.quantity;
-                    matchingEntry.price += current.price;
                 } else {
                     result[date].push({ ...current });
                 }
@@ -532,6 +501,167 @@
 
         setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
         LoadList();
+
+        function getBase64() {
+            const inputElement = document.getElementById('fileinput');
+            const fileList = inputElement.files;
+            let documents = [];
+
+            function handleFileProcessed() {
+                if (documents.length === fileList.length) {
+                    // console.log(documents);
+                    displaySelectedFiles();
+                }
+            }
+
+            function displaySelectedFiles() {
+                const selectedFilesList = document.getElementById('selectedFilesList');
+                selectedFilesList.innerHTML = '<p><strong>Selected Files:</strong></p>';
+
+                for (const doc of documents) {
+                    const fileItem = document.createElement('div');
+                    fileItem.textContent = `${doc.filename}: ${doc.data.substring(0, 20)}...`;
+                    selectedFilesList.appendChild(fileItem);
+                }
+            }
+
+            for (const file of fileList) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const base64String = e.target.result;
+                    documents.push({
+                        filename: file.name,
+                        data: base64String
+                    });
+
+                    handleFileProcessed();
+                };
+
+                reader.readAsDataURL(file);
+            }
+            return documents;
+        }
+
+
+        $(document).on("click", "#updateBtn", function () {
+            $(".id").text(id);
+
+            let dateupdate = $("#date").val();
+            let remarks = $("#remarks").val();
+            let transactionstatus = $("#transactionstatus").val();
+            let documents = getBase64();
+            let historydata = [];
+            var message = "";
+
+            if ((dateupdate !== "" || remarks !== "" || transactionstatus !== "") &&
+                (dateupdate === "" || remarks === "" || transactionstatus === "")) {
+                message = "If one of Status, Remarks, or Date is not empty, all three should be filled.";
+            }
+
+            if (message != "") {
+                warning("Required", `Please fill up ${message}`);
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/report/historydetails',
+                    data: {
+                        id: id,
+                    },
+                    success: function (result) {
+                        let data = result.data;
+                        historydata = JSON.parse(data[0].date);
+                        let newdata = {
+                            [transactionstatus]: { date: dateupdate, details: remarks }
+                        };
+                        historydata.push(newdata);
+                        // console.log("appended date", historydata)
+                        // console.log(historydata, documents, id, transactionstatus);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/report/updatehistory",
+                            data: {
+                                details: historydata,
+                                documents: documents,
+                                id: id,
+                                status: transactionstatus,
+                            },
+                            success: function (result) {
+                                if (result.msg == "success") {
+                                    $("#date").val("");
+                                    $("#remarks").val("");
+                                    $("#transactionstatus").val("");
+                                    $("#editModal").modal("hide");
+                                    success("Saved", "Successfully");
+                                    LoadTable();
+                                }
+                            },
+                            error: function (err) {
+                                errormsg(err);
+                            },
+                        });
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    }
+                });
+
+
+            }
+        });
+
+        function displayLinks(dataArray) {
+            let downloadLinksDiv = document.getElementById('downloadLinks');
+            downloadLinksDiv.innerHTML = '';
+            dataArray.forEach((item, index) => {
+                // Ensure data URI prefix is removed before decoding
+                let base64Data = item.data.split(',')[1];
+                let blob = b64toBlob(base64Data);
+
+                if (item.filename.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                    let img = document.createElement('img');
+                    img.src = URL.createObjectURL(blob);
+                    img.alt = `Image ${index + 1}`;
+                    img.classList.add('custom-image-class');
+
+                    downloadLinksDiv.appendChild(img);
+
+                    downloadLinksDiv.appendChild(document.createElement('br'));
+
+                    let link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = item.filename;
+                    link.classList.add('custom-download-link-class');
+                    link.textContent = `${item.filename}`;
+
+                    downloadLinksDiv.appendChild(link);
+                } else {
+                    let link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = item.filename;
+                    link.classList.add('custom-download-link-class');
+                    link.textContent = `${item.filename}`;
+
+                    downloadLinksDiv.appendChild(link);
+                }
+
+                downloadLinksDiv.appendChild(document.createElement('br'));
+            });
+
+            function b64toBlob(b64Data) {
+                let byteCharacters = atob(b64Data);
+                let byteNumbers = new Array(byteCharacters.length);
+
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+
+                let byteArray = new Uint8Array(byteNumbers);
+
+                return new Blob([byteArray], { type: 'application/octet-stream' });
+            }
+        }
 
     });
 </script>

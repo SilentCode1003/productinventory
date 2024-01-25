@@ -1,8 +1,7 @@
 var express = require("express");
 const { Validator } = require("./controller/middleware");
 var router = express.Router();
-
-const { JsonErrorResponse } = require("./repository/responce");
+const { JsonErrorResponse, JsonSuccess } = require("./repository/responce");
 const { GeneratePDF } = require("./repository/pdf");
 const { SalesReport, SalesReportHistory } = require("./model/spimodel");
 const {
@@ -41,8 +40,9 @@ router.get("/pdf", (req, res) => {
   }
 });
 
-router.get("/salesreport", (req, res) => {
+router.post("/salesreport", (req, res) => {
   try {
+    let referenceno = req.body.referenceno;
     let sql = `SELECT 
             sr_id AS id, mc_name AS category, mi_name as item, sr_date as date,sr_quantity as quantity, sr_sellingprice as sellingprice,
             e_fullname as soldby, sr_soldto as soldto ,sr_paymenttype as paymenttype, sr_soldrefno as soldrefno, 
@@ -50,7 +50,8 @@ router.get("/salesreport", (req, res) => {
           FROM sales_report
           INNER JOIN master_item ON sr_item = mi_id
           INNER JOIN master_category ON sr_category = mc_id
-          INNER JOIN employee ON sr_soldby = e_id;`;
+          INNER JOIN employee ON sr_soldby = e_id
+          WHERE sr_soldrefno = '${referenceno}';`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -102,6 +103,78 @@ router.get("/salesreporthistory", (req, res) => {
           data: result,
         });
       }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/historydetails", (req, res) => {
+  try {
+    let id = req.body.id;
+    let sql = `select * from sales_report_history WHERE srh_id = '${id}'`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      // console.log("Data: ", result);
+
+      if (result.length != 0) {
+        let data = SalesReportHistory(result);
+
+        // console.log(data);
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/updatehistory", (req, res) => {
+  try {
+    const { details, documents, id, status} = req.body;
+    console.log(details, documents, id, status);
+    let data = [];
+    let sql_update = "update sales_report_history set";
+
+    if (documents) {
+      sql_update += " srh_documents=?,";
+      data.push(JSON.stringify(documents));
+    }
+    if (details) {
+      sql_update += " srh_date=?,";
+      data.push(JSON.stringify(details) );
+    }
+    if (status) {
+      sql_update += " srh_status=?,";
+      data.push(status);
+    }
+
+    sql_update = sql_update.slice(0, -1);
+    sql_update += " where srh_id=?";
+
+    data.push(id);
+
+    console.log(sql_update)
+
+    Update(sql_update, data, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      console.log(result);
+      res.json(JsonSuccess());
     });
   } catch (error) {
     res.json({
