@@ -208,7 +208,7 @@ table, th, td {
 }
 
 .scrollable-document-size{
-  height: 320px !important;
+  height: 310px !important;
   overflow-y: auto !important;
 }
 

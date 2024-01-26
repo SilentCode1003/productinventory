@@ -291,7 +291,7 @@ router.post("/upload", (req, res) => {
     let duplicate = "";
     let product = [];
 
-    console.log(dataJSon);
+    // console.log(dataJSon);
 
     Product_Count()
       .then((result) => {
@@ -308,13 +308,13 @@ router.post("/upload", (req, res) => {
               } else {
                 Get_Category(item.category)
                   .then((result) => {
-                    // console.log(result);
+                    console.log(result);
                     let category = MasterCategory(result);
                     let categoryid = category[0].id;
                     Get_Item(item.itemname, categoryid)
                       .then((result) => {
                         let dataitems = MasterItem(result);
-                        // console.log(dataitems);
+                        console.log("item names data: ", dataitems);
                         let itemid = dataitems[0].id;
 
                         counter += 1;
