@@ -72,7 +72,7 @@
             console.log(dataRow);
             id = dataRow[0];
             referenceno = dataRow[1];
-            status = dataRow[4];
+            status = dataRow[2];
         });
 
         function filterTableRows() {
@@ -190,7 +190,7 @@
                                     let key = Object.keys(item)[0];
                                     jsonData[key] = item[key];
                                 }
-                                // console.log("JSON Data: ", jsonData)
+                                console.log("JSON Data: ", jsonData)
 
                                 for (let key in jsonData) {
                                     let item = jsonData[key];
@@ -546,7 +546,6 @@
 
         $(document).on("click", "#updateBtn", function () {
             $(".id").text(id);
-
             let dateupdate = $("#date").val();
             let remarks = $("#remarks").val();
             let transactionstatus = $("#transactionstatus").val();
@@ -591,6 +590,7 @@
                                 documents: documents,
                                 id: id,
                                 status: transactionstatus,
+                                referenceno: referenceno,
                             },
                             success: function (result) {
                                 if (result.msg == "success") {
