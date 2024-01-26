@@ -145,8 +145,8 @@ router.post("/historydetails", (req, res) => {
 
 router.post("/updatehistory", (req, res) => {
   try {
-    const { details, documents, id, status} = req.body;
-    console.log(details, documents, id, status);
+    const { details, documents, id, status, referenceno} = req.body;
+    // console.log(details, documents, id, status);
     let data = [];
     let sql_update = "update sales_report_history set";
 
@@ -168,12 +168,31 @@ router.post("/updatehistory", (req, res) => {
 
     data.push(id);
 
-    console.log(sql_update)
+    // console.log(sql_update)
 
     Update(sql_update, data, (err, result) => {
       if (err) console.error("Error: ", err);
 
       console.log(result);
+      select_sales_product = `SELECT * FROM sales_report WHERE sr_soldrefno = '${referenceno}'`;
+      Select(select_sales_product, (err, result) => {
+        if (err) console.error("Error: ", err);
+        let salesreport = SalesReport(result);
+
+        salesreport.forEach((item) => {
+          let id = item.id;
+          let sales_report_update =
+
+            "update sales_report set sr_status=? where sr_id=?";
+          let report_update = [status, id];
+          console.log("ID: ", id, " Update Data: ", sales_report_update, report_update)
+          Update(sales_report_update, report_update, (err, result) => {
+            if (err) console.error("Error: ", err);
+          });
+
+        });
+      });
+      
       res.json(JsonSuccess());
     });
   } catch (error) {

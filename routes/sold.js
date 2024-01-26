@@ -85,7 +85,7 @@ router.post("/save", (req, res) => {
       req.body;
     let sold = [[assetcontrol, serial, date, soldby, soldto, referenceno]];
     // console.log("Sold data: ", sold);
-
+    let salesreporthistory = [];
     Check_Product(serial)
       .then((result) => {
         let product = Product(result);
@@ -97,12 +97,35 @@ router.post("/save", (req, res) => {
         InsertTable("sales_report", salesreport, (err, result) => {
           if (err) console.error("Error: ", err);
           // console.log(result);
-          let salesreportid = result[0].id;
 
-          let salesreporthistory = [[salesreportid, date, remarks, transactionstatus]]
-          InsertTable("sales_report_history", salesreporthistory, (err, result) => {
-            if (err) console.error("Error: ", err);
-            // console.log(result);
+          let sql =
+            "select * from sales_report_history where srh_referenceno=?";
+          let command = SelectStatement(sql, [referenceno]);
+
+          Select(command, (err, result) => {
+            if (err) {
+              console.log(err)
+            };
+
+            let activities = [{
+              SOLD: { date: date, details: remarks }
+            }];
+
+            salesreporthistory.push([
+              JSON.stringify(activities),
+              remarks,
+              transactionstatus,
+              referenceno,
+              "N/A"
+            ]);
+
+            if (result.length == 0) {
+              InsertTable("sales_report_history", salesreporthistory, (err, result) => {
+                if (err) console.error("Error: ", err);
+                // console.log(result);
+              });
+            }
+
           });
 
         });
@@ -287,10 +310,10 @@ router.post("/upload", (req, res) => {
                             console.log(`Reference number ${item.referenceno} already exists.`);
                           }
 
-                          if (historycounter === dataJson.length){
+                          if (historycounter === dataJson.length) {
                             console.log("TO BE INSERTED SOLD: ", salesreporthistory)
 
-                            if (salesreporthistory != 0){
+                            if (salesreporthistory != 0) {
                               InsertTable("sales_report_history", salesreporthistory, (err, result) => {
                                 if (err) console.error("Error: ", err);
                                 console.log(result);
@@ -322,21 +345,21 @@ router.post("/upload", (req, res) => {
                       }
 
                       let message = "";
-                        if (dupentry.length != 0) {
-                          message += MessageStatus.DUPENTRY;
-                        }
-                        if (noentry.length != 0) {
-                          message += MessageStatus.NOENTRY;
-                        }
-
-                        if (message != "") {
-                          res.json(
-                            JsonWarningResponse(message, [dupentry, noentry])
-                          );
-                        } else {
-                          res.json(JsonSuccess());
-                        }
+                      if (dupentry.length != 0) {
+                        message += MessageStatus.DUPENTRY;
                       }
+                      if (noentry.length != 0) {
+                        message += MessageStatus.NOENTRY;
+                      }
+
+                      if (message != "") {
+                        res.json(
+                          JsonWarningResponse(message, [dupentry, noentry])
+                        );
+                      } else {
+                        res.json(JsonSuccess());
+                      }
+                    }
                   })
                   .catch((error) => {
                     console.error(error, item.serial);
