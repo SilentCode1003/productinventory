@@ -197,15 +197,15 @@
 
                                     let historydiv = $(`
                                         <div class="row">
-                                            <div class="col-4 text-center">
+                                            <div class="col-3 text-center">
                                                 <div>
                                                     <span class="">${item.date}</span>
                                                 </div>
                                             </div>
-                                            <div class="col-4 text-center">
+                                            <div class="col-3 text-center">
                                                 <span class="">${key}</span>
                                             </div>
-                                            <div class="col-4">
+                                            <div class="col-6">
                                                 <div class="row ml-1">
                                                     <span class="">${item.details}</span>
                                                 </div>
@@ -383,31 +383,37 @@
         });
 
         function salesreportdata(data) {
-            // console.log(data);
             return data.reduce((result, current) => {
-                const date = current.date;
+                console.log(current.status);
+                if (current.status === 'PAID' || current.status === 'PARTIALLY PAID' || current.status === 'NOT PAID') {
 
-                if (!result[date]) {
-                    result[date] = [];
-                }
+                    const date = current.date;
 
-                const matchingEntry = result[date].find(entry =>
-                    entry.soldrefno === current.soldrefno &&
-                    entry.transacrefno === current.transacrefno &&
-                    entry.itemname === current.itemname &&
-                    entry.category === current.category &&
-                    entry.price === current.price &&
-                    entry.deliveryfee === current.deliveryfee
-                );
+                    if (!result[date]) {
+                        result[date] = [];
+                    }
 
-                if (matchingEntry) {
-                    matchingEntry.quantity += current.quantity;
+                    const matchingEntry = result[date].find(entry =>
+                        entry.soldrefno === current.soldrefno &&
+                        entry.transacrefno === current.transacrefno &&
+                        entry.itemname === current.itemname &&
+                        entry.category === current.category &&
+                        entry.price === current.price &&
+                        entry.deliveryfee === current.deliveryfee
+                    );
+
+                    if (matchingEntry) {
+                        matchingEntry.quantity += current.quantity;
+                    } else {
+                        result[date].push({ ...current });
+                    }
+
+                    return result;
                 } else {
-                    result[date].push({ ...current });
+                    return result;
                 }
-
-                return result;
             }, {});
+
         }
 
         let activeEmployee = [];
@@ -553,13 +559,13 @@
             let historydata = [];
             var message = "";
 
-            if (dateupdate === "" ) {
+            if (dateupdate === "") {
                 message += "Empty Date, ";
             }
-            if (remarks === "" ) {
+            if (remarks === "") {
                 message += "Empty Remarks, ";
             }
-            if (transactionstatus === "" ) {
+            if (transactionstatus === "") {
                 message += "Empty Status ";
             }
 
