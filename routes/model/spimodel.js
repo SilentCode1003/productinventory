@@ -727,6 +727,7 @@ exports.SalesReport = (data) => {
       referenceno: key.sr_referenceno,
       remarks: key.sr_remarks,
       status: key.sr_status,
+      assetcontrol: key.sr_assetcontrol,
     });
   });
 
