@@ -120,7 +120,7 @@
                 success: function (result) {
                     var data = result.data;
 
-                    let processeddata = salesreportdata(data)
+                    let processeddata = displayReport(data)
 
                     const tableBody = $("#salesreport-table tbody");
                     tableBody.empty();
@@ -412,6 +412,38 @@
                 } else {
                     return result;
                 }
+            }, {});
+
+        }
+
+        function displayReport(data) {
+            return data.reduce((result, current) => {
+                console.log(current.status);
+
+
+                const date = current.date;
+
+                if (!result[date]) {
+                    result[date] = [];
+                }
+
+                const matchingEntry = result[date].find(entry =>
+                    entry.soldrefno === current.soldrefno &&
+                    entry.transacrefno === current.transacrefno &&
+                    entry.itemname === current.itemname &&
+                    entry.category === current.category &&
+                    entry.price === current.price &&
+                    entry.deliveryfee === current.deliveryfee &&
+                    entry.status === current.status
+                );
+
+                if (matchingEntry) {
+                    matchingEntry.quantity += current.quantity;
+                } else {
+                    result[date].push({ ...current });
+                }
+
+                return result;
             }, {});
 
         }

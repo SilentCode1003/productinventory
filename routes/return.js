@@ -1,6 +1,6 @@
 var express = require("express");
 const { Select, InsertTable, Update, SelectParameter } = require("./repository/spidb");
-const { Return, ReturnProduct, Product } = require("./model/spimodel");
+const { Return, ReturnProduct, Product, SalesReportHistory, SalesReport } = require("./model/spimodel");
 const { SelectStatement, convertExcelDate } = require("./repository/customhelper");
 const { GetValue, RET } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
@@ -67,6 +67,24 @@ router.post("/save", (req, res) => {
         } else {
           Return_Product(assetcontrol)
             .then((result) => {
+              Check_SalesReport(assetcontrol)
+                .then((salesResult) => {
+                  if(salesResult != 0){
+                    let status = GetValue(RET());
+                    let update_product =
+                      "update sales_report set sr_status=? where sr_assetcontrol=?";
+                    let update_product_data = [status, assetcontrol];
+
+                    Update(update_product, update_product_data, (err, result) => {
+                      if (err) console.error("Error: ", err);
+                      // console.log(result);
+                    });
+                  }
+                }).catch((error) => {
+                  res.json({
+                    msg: error,
+                  });
+                });
               InsertTable("returnitem", returnitem, (err, result) => {
                 if (err) console.error("Error: ", err);
                 console.log(result);
@@ -103,14 +121,14 @@ router.post("/upload", (req, res) => {
     let returndata = [];
     let counter = 0;
     let noentry = [];
+    let duplicate = []
+    let historycounter = 0;
 
     dataJson.forEach((item) => {
       Check_Product(item.serial)
         .then((result) => {
-          counter += 1;
           let data = Product(result);
           // console.log(data);
-
           if (data.length != 0) {
             let assetcontrol = data[0].assetcontrol;
             let status = GetValue(RET());
@@ -118,35 +136,81 @@ router.post("/upload", (req, res) => {
               "update product set p_status=? where p_assetcontrol=?";
             let update_product_data = [status, assetcontrol];
 
-            returndata.push([
-              assetcontrol,
-              item.serial,
-              convertExcelDate(item.date),
-              item.returnby,
-              item.returnfrom,
-              item.referenceno,
-            ]);
+            Check_Return(assetcontrol, convertExcelDate(item.date))
+            .then((result) => {
+              let data = Return(result);
+              counter += 1;
 
-            Update(update_product, update_product_data, (err, result) => {
-              if (err) console.error("Error: ", err);
-              // console.log(result);
+              if (data.length != 0) {
+                duplicate.push(item.serial);
+              } else {
+                returndata.push([
+                  assetcontrol,
+                  item.serial,
+                  convertExcelDate(item.date),
+                  item.returnby,
+                  item.returnfrom,
+                  item.referenceno,
+                ]);
+
+                Check_SalesReport(assetcontrol)
+                  .then((salesResult) => {
+                    let sales = SalesReport(salesResult);
+                    if (salesResult != 0) {
+                      let soldrefno = sales[0].soldrefno;
+                      let status = GetValue(RET());
+                      let report =
+                        "update sales_report set sr_status=? where sr_assetcontrol=?";
+                      let report_data = [status, assetcontrol];
+
+                      Record_SalesHistory(soldrefno, convertExcelDate(item.date), assetcontrol)
+                        .then((historyResult) => {
+                          console.log("Updated Details: ", historyResult);
+                        })
+
+                      Update(report, report_data, (err, result) => {
+                        if (err) console.error("Error: ", err);
+                        // console.log(result);
+                      });
+                    }
+                    
+                  }).catch((error) => {
+                    res.json({
+                      msg: error,
+                    });
+                  });
+                
+                Update(update_product, update_product_data, (err, result) => {
+                  if (err) console.error("Error: ", err);
+                  // console.log(result);
+                });
+              }
+              console.log("counter: ", counter)
+              if (counter == dataJson.length) {
+                console.log("No Entry: ", noentry);
+                console.log("Done: ");
+                if (returndata.length != 0) {
+                  InsertTable("returnitem", returndata, (err, result) => {
+                    if (err) console.error("Error: ", err);
+                    console.log(result);
+
+                    return res.json({
+                      msg: "success",
+                    });
+                  });
+                } else {
+                  return res.json({
+                    msg: "duplicate",
+                  });
+                }
+              }
             });
+            
+
           } else {
             noentry.push(item.serial);
           }
 
-          if (counter == dataJson.length) {
-            console.log("No Entry: ", noentry);
-            console.log("Done: ");
-            InsertTable("returnitem", returndata, (err, result) => {
-              if (err) console.error("Error: ", err);
-              console.log(result);
-
-              return res.json({
-                msg: "success",
-              });
-            });
-          }
         })
         .catch((error) => {
           console.error(error);
@@ -204,6 +268,58 @@ function Check_Product(serial) {
 
       resolve(result);
     });
+  });
+}
+
+function Check_SalesReport(assetcontrol) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from sales_report where sr_assetcontrol=?";
+    // console.log(assetcontrol);
+    SelectParameter(sql, [assetcontrol], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+
+function Record_SalesHistory(soldrefno, date, assetcontrol) {
+  return new Promise((resolve, reject) => {
+
+    let sql =
+      "select * from sales_report_history where srh_referenceno=?";
+    let command = SelectStatement(sql, [soldrefno]);
+    let salesreporthistory = [];
+
+    Select(command, (err, result) => {
+      if (err) {
+        reject(err)
+      };
+      let salesHistory = SalesReportHistory(result);
+      let details = JSON.parse(salesHistory[0].date);
+      let id = salesHistory[0].id;
+      // console.log("History Details: ", details);
+
+      let newHistory = {
+        RETURNED: { date: date, details: "Returned: " + assetcontrol }
+      };
+
+      details.push(newHistory);
+
+      let update_history =
+      "update sales_report_history set srh_date=? where srh_referenceno=?";
+      let update_history_data = [JSON.stringify(details), soldrefno];
+
+      Update(update_history, update_history_data, (err, result) => {
+        if (err) console.error("Error: ", err);
+        // console.log(result);
+      });
+
+      resolve(details);
+
+    });
+
   });
 }
 //#endregion
