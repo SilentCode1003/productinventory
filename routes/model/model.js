@@ -324,7 +324,7 @@ class ReturnProductModel {
 }
 
 class SalesReportModel {
-  constructor(id, category, item, date, quantity, sellingprice, deliveryfee, soldby, soldto, paymenttype, soldrefno, referenceno, remarks, status) {
+  constructor(id, category, item, date, quantity, sellingprice, deliveryfee, soldby, soldto, paymenttype, soldrefno, referenceno, remarks, status, assetcontrol) {
     this.id = id;
     this.category = category;
     this.item = item;
@@ -339,6 +339,7 @@ class SalesReportModel {
     this.referenceno = referenceno;
     this.remarks = remarks;
     this.status = status;
+    this.assetcontrol = assetcontrol;
   }
 }
 

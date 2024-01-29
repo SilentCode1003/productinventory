@@ -477,7 +477,8 @@ exports.InsertTable = (tablename, data, callback) => {
       sr_soldrefno,
       sr_referenceno,
       sr_remarks,
-      sr_status) VALUES ?`;
+      sr_status,
+      sr_assetcontrol) VALUES ?`;
 
     this.Insert(sql, data, (err, result) => {
       if (err) {
