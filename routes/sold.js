@@ -92,7 +92,7 @@ router.post("/save", (req, res) => {
         let quantity = 1;
         let category = product[0].category;
         let itemname = product[0].itemname;
-        let salesreport = [[category, itemname, date, quantity, sellingprice, deliveryfee, soldby, soldto, paymenttype, referenceno, transactionref, remarks, transactionstatus]]
+        let salesreport = [[category, itemname, date, quantity, sellingprice, deliveryfee, soldby, soldto, paymenttype, referenceno, transactionref, remarks, transactionstatus, assetcontrol]]
 
         InsertTable("sales_report", salesreport, (err, result) => {
           if (err) console.error("Error: ", err);
@@ -285,9 +285,10 @@ router.post("/upload", (req, res) => {
                         item.referenceno,
                         item.transactionref,
                         item.remarks,
-                        item.transactionstatus
+                        item.transactionstatus,
+                        assetcontrol
                       ]];
-                      ;
+                      console.log("Sales Reports: ", salesreport)
 
                       Upload_sales_report(salesreport)
                         .then((result) => {
