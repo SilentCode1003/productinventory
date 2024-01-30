@@ -205,7 +205,6 @@ router.post("/upload", (req, res) => {
                 }
               }
             });
-            
 
           } else {
             noentry.push(item.serial);
@@ -217,7 +216,7 @@ router.post("/upload", (req, res) => {
           return res.json({
             msg: error,
           });
-        });
+        });1
     });
   } catch (error) {
     res.json({

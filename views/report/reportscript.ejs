@@ -248,7 +248,9 @@
             } else {
                 data.forEach((item) => {
                     let action = "";
-                    if (item.status != 'PAID') {
+                    if (item.status == 'PAID') {
+                        action = `<span class="editbutton" id="editDocs" name="editDocs" data-toggle="modal" data-target="#SupportingDocuments"><i class="fas fa-plus" style="color: rgb(99, 115, 129);"></i></span> `;
+                    } else{
                         action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span> `;
                     }
 
@@ -540,8 +542,8 @@
         setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
         LoadList();
 
-        function getBase64() {
-            const inputElement = document.getElementById('fileinput');
+        function getBase64(inputfield, display) {
+            const inputElement = document.getElementById(inputfield);
             const fileList = inputElement.files;
             let documents = [];
 
@@ -553,7 +555,7 @@
             }
 
             function displaySelectedFiles() {
-                const selectedFilesList = document.getElementById('selectedFilesList');
+                const selectedFilesList = document.getElementById(display);
                 selectedFilesList.innerHTML = '<p><strong>Selected Files:</strong></p>';
 
                 for (const doc of documents) {
@@ -587,7 +589,7 @@
             let dateupdate = $("#date").val();
             let remarks = $("#remarks").val();
             let transactionstatus = $("#transactionstatus").val();
-            let documents = getBase64();
+            let documents = getBase64('fileinput', 'selectedFilesList');
             let historydata = [];
             var message = "";
 
@@ -651,6 +653,42 @@
                 });
 
 
+            }
+        });
+        
+        let updateDocuments;
+        $(document).on("change", "#documentfile", function () {
+            updateDocuments = getBase64('documentfile', 'selectedDocuments');
+        });
+
+        $(document).on("click", "#updateDocs", function () {
+            $(".id-documents").text(id);
+            console.log(updateDocuments)
+            let message = "";
+
+            if (updateDocuments === undefined) {
+                message += "Empty Documents, ";
+            }
+
+            if (message != "") {
+                warning("Required", `Please fill up ${message}`);
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/report/adddocuments',
+                    data: {
+                        id: id,
+                        documents: updateDocuments
+                    },
+                    success: function (result) {
+                        $("#SupportingDocuments").modal("hide");
+                        updateDocuments = "";
+                        success("Saved", "Successfully");
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    }
+                });
             }
         });
 

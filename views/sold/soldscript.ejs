@@ -269,6 +269,10 @@
               hasMoreData = data.data.length > 0;
               if (!hasMoreData) {
                 const tableBody = $("#datatable tbody");
+                var loadingstate = document.querySelectorAll('.loading-row');
+                loadingstate.forEach(function (row) {
+                  row.remove();
+                });
                 const tr = $("<tr>").append(
                   $("<td>", {
                     colspan: 9,
