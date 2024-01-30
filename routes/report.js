@@ -10,6 +10,7 @@ const {
   InsertTable,
   SelectParameter,
 } = require("./repository/spidb");
+const { SelectStatement } = require("./repository/customhelper");
 
 router.get("/", function (req, res, next) {
   // res.render("report", { title: "Express" });
@@ -252,3 +253,79 @@ router.post("/getsalesreport", (req, res) => {
     });
   }
 });
+
+router.post("/adddocuments", (req, res) => {
+  try {
+    let {id, documents} = req.body;
+
+    Check_History(id)
+      .then((result) => {
+        let historydata = SalesReportHistory(result);
+        let existingDocuments = [];
+
+        if(historydata[0].documents != "N/A"){
+          existingDocuments = JSON.parse(historydata[0].documents);
+          existingDocuments.push(...documents);
+          console.log(id, documents)
+
+          console.log(existingDocuments)
+          
+          if (historydata.length != 1) {
+            return res.json({
+              msg: "notexist",
+            });
+          } else {
+            let history_update ="update sales_report_history set srh_documents=? where srh_id=?";
+            let history_data = [JSON.stringify(existingDocuments), id];
+  
+            console.log(history_data);
+  
+            Update(history_update, history_data, (err, result) => {
+              if (err) console.error("Error: ", err);
+              return res.json({
+                msg: "success",
+              });
+            });
+          }
+        }else{
+
+          let history_update ="update sales_report_history set srh_documents=? where srh_id=?";
+          let history_data = [JSON.stringify(documents), id];
+
+          Update(history_update, history_data, (err, result) => {
+            if (err) console.error("Error: ", err);
+            return res.json({
+              msg: "success",
+            });
+          });
+        }
+
+
+      })
+      .catch((error) => {
+        res.json({
+          msg: error,
+        });
+      });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+function Check_History(id) {
+  return new Promise((resolve, reject) => {
+    let sql =
+      "select * from sales_report_history where srh_id=?";
+    let command = SelectStatement(sql, [id]);
+
+    Select(command, (err, result) => {
+      if (err) reject(err);
+
+      console.log(result);
+
+      resolve(result);
+    });
+  });
+}
