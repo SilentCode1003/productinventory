@@ -18,6 +18,7 @@
 
 .sidebar-dark .sidebar-heading {
     color: var(--accent-clr) !important;
+    font-size: .85rem !important;
 }
 
 .sidebar-dark .sidebar-brand {
@@ -31,9 +32,9 @@
     border-right: var(--grey-100) dashed 1px !important;
 }
 
-.sidebar-dark #sidebarToggle {
+/* .sidebar-dark #sidebarToggle {
     background-color: rgb(99, 115, 129) !important;
-}
+} */
 
 .nav-link.collapsed::after {
     color: rgb(99, 115, 129, 0.5) !important;

@@ -11582,7 +11582,7 @@ a:focus {
     text-transform: uppercase;
     font-weight: 800;
     font-size: .65rem;
-    color: #b7b9cc
+    /* color: #b7b9cc */
 }
 
 .sidebar .nav-item .collapse .collapse-inner .collapse-item,
