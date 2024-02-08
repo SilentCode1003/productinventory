@@ -599,7 +599,6 @@
       //   console.log("clicked!");
       let uploaddata = $("#fileinput").val();
       if (uploaddata != "") {
-        showspinner();
         UploadProcess();
       } else {
         warning("Warning!", "No File Chosen!");
@@ -698,7 +697,6 @@
           data: dataraw,
         },
         success: function (result) {
-          hidespinner();
           if (result.msg == "noentry") {
             return warning(
               "Product Not Registered",

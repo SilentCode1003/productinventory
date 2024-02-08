@@ -208,7 +208,8 @@
       if (message != "") {
         warning("Required", `Please fill up ${message}`);
       } else {
-        let refineFobPrice = fobprice.replace(/,|$/g, "");
+        let refineFobPrice = fobprice.replace(/,|\$/g, "")
+        console.log(refineFobPrice);
         $.ajax({
           type: "POST",
           url: "/itemprice/edit",
