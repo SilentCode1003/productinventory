@@ -306,15 +306,26 @@
         success: function (result) {
           let container = result.data;
           $.each(container, (key, item) => {
-            let categoryname = item.name;
-            let categoryid = item.id;
-            console.log(categoryname);
+            // let categoryname = item.name;
+            // let categoryid = item.id;
+            // console.log(categoryname);
 
-            var listItem = $("<li></li>")
-              .text(categoryname)
-              .data("categoryid", categoryid);
+            // var listItem = $("<li></li>")
+            //   .text(categoryname)
+            //   .data("categoryid", categoryid);
 
-            $(".categorylist").append(listItem);
+            // $(".categorylist").append(listItem);
+            if(item.status == "ACTIVE"){
+              let categoryname = item.name;
+              let categoryid = item.id;
+              console.log(categoryname);
+
+              var listItem = $("<li></li>")
+                .text(categoryname)
+                .data("categoryid", categoryid);
+
+              $(".categorylist").append(listItem);
+            }
           });
         },
         error: function (err) {

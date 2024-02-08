@@ -44,31 +44,14 @@ exports.document = (data, template, employee, date) => {
 
         let content = {
             pageSize: "A4", pageOrientation: "landscape", margin: 10,
+            header: {
+                image: imagesample,
+                width: 800,
+                height: 100,
+                alignment: 'center',
+                margin: [0, 0, 0, 0],
+            },
             content: [
-                {
-                    columns: [
-                        {
-                            image: imagesample, width: 80, alignment: 'right'
-                        },
-                        {
-                            stack: [
-                                {
-                                    text: '5L SOLUTION SUPPLIES AND ALLIED SERVICES CORP.',
-                                    style: 'header',
-                                },
-                                {
-                                    text: '39 Macaria Drive, San Pedro, Laguna',
-                                    style: 'subheader'
-                                },
-                                {
-                                    text: 'Tel. # 83-565-810',
-                                    style: 'subheader'
-                                }
-                            ],
-                            width: '*'
-                        }
-                    ],
-                },
                 {
                     layout: "noBorders",
                     text: template,

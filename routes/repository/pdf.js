@@ -31,7 +31,7 @@ exports.Generate = (data, template, employee, date) => {
 
     var reportContent = document(data, template, employee, date)
 
-    // console.log("Content: ", reportContent)
+    console.log("Content: ", reportContent)
     // const pdfPath = path.join(
     //   __dirname,
     //   `/reports/Sales_Report_${GetCurrentDate()}.pdf`
