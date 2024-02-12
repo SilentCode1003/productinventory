@@ -348,7 +348,7 @@ router.post("/upload", (req, res) => {
                                 convertExcelDate(item.warrantydate),
                                 status,
                               ]);
-
+                              uploadProduct();
                               // console.log(product);
                             } else {
                               counter += 1;
