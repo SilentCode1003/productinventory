@@ -222,6 +222,7 @@
                 hasMoreData = data.data.length > 0;
                 if (!hasMoreData) {
                   const tableBody = $("#datatable tbody");
+                  tableBody.empty();
                   const tr = $("<tr>").append(
                     $("<td>", {
                       colspan: 9,

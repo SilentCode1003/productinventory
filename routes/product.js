@@ -292,7 +292,6 @@ router.post("/upload", (req, res) => {
     let product = [];
 
     // console.log(dataJSon);
-
     Product_Count()
       .then((result) => {
         // console.log(result);
