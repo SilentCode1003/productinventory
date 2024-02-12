@@ -290,100 +290,133 @@ router.post("/upload", (req, res) => {
     let sequence = 0;
     let duplicate = "";
     let product = [];
+    let notexist = [];
+    let notice = [];
 
     // console.log(dataJSon);
     Product_Count()
       .then((result) => {
         // console.log(result);
+        console.log("Data Length:", dataJSon.length)
         sequence = parseInt(result[0].total);
         dataJSon.forEach((item) => {
           Product_Check(item.serial)
             .then((result) => {
               // console.log(result);
+              if (result != undefined || result != null) {
+                if (result[0].total != 0) {
+                  counter += 1;
+                  notice.push("SERIAL_"+item.serial + '_DUPLICATE_ENTRY')
+                  console.log("SERIAL_"+item.serial + '_DUPLICATE_ENTRY')
+                  console.log("counter:", counter);
+                  uploadProduct();
+                } else {
+                  Get_Category(item.category)
+                    .then((result) => {
+                      if (result.length != 0 || result == undefined || result == null) {
+                        // console.log(result);
+                        let category = MasterCategory(result);
+                        let categoryid = category[0].id;
+                        Get_Item(item.itemname, categoryid)
+                          .then((result) => {
+                            if (result.length != 0 || result == undefined || result == null) {
+                              let dataitems = MasterItem(result);
+                              console.log("item names data: ", dataitems);
+                              let itemid = dataitems[0].id;
 
-              if (result[0].total != 0) {
-                counter += 1;
-                duplicate += item.serial;
-              } else {
-                Get_Category(item.category)
-                  .then((result) => {
-                    console.log(result);
-                    let category = MasterCategory(result);
-                    let categoryid = category[0].id;
-                    Get_Item(item.itemname, categoryid)
-                      .then((result) => {
-                        let dataitems = MasterItem(result);
-                        console.log("item names data: ", dataitems);
-                        let itemid = dataitems[0].id;
+                              counter += 1;
+                              sequence += 1;
 
-                        counter += 1;
-                        sequence += 1;
+                              console.log(
+                                "sequence: ",
+                                sequence,
+                                "counter: ",
+                                counter,
+                                "item serial: ",
+                                item.serial,
+                                "Data Length: ",
+                                dataJSon.length
+                              );
 
-                        console.log(
-                          "sequence: ",
-                          sequence,
-                          "counter: ",
-                          counter,
-                          "item serial: ",
-                          item.serial,
-                          "Data Length: ",
-                          dataJSon.length
-                        );
+                              product.push([
+                                GenerateAssetTag(categoryid, sequence),
+                                item.serial,
+                                itemid,
+                                categoryid,
+                                convertExcelDate(item.podate),
+                                item.ponumber,
+                                convertExcelDate(item.warrantydate),
+                                status,
+                              ]);
 
-                        product.push([
-                          GenerateAssetTag(categoryid, sequence),
-                          item.serial,
-                          itemid,
-                          categoryid,
-                          convertExcelDate(item.podate),
-                          item.ponumber,
-                          convertExcelDate(item.warrantydate),
-                          status,
-                        ]);
-
-                        // console.log(product);
-
-                        if (counter == dataJSon.length) {
-                          console.log(product);
-                          InsertTable("product", product, (err, result) => {
-                            if (err) console.error("Error: ", err);
-                            console.log(result);
+                              // console.log(product);
+                            } else {
+                              counter += 1;
+                              notice.push("SERIAL_"+item.serial + '_INVALID_ITEM_NAME_('+item.itemname+")")
+                              console.log("SERIAL_"+item.serial + '_INVALID_ITEM_NAME_('+item.itemname+")")
+                              console.log("counter:", counter);
+                              uploadProduct();
+                            }
+                          })
+                          .catch((error) => {
+                            console.log("Get Items: ", error);
+                            res.json({
+                              msg: error,
+                            });
                           });
-
-                          if (duplicate != "") {
-                            return res.json({
-                              msg: "exist",
-                              data: duplicate,
-                            });
-                          } else {
-                            return res.json({
-                              msg: "success",
-                            });
-                          }
-                        }
-                      })
-                      .catch((error) => {
-                        console.log("Get Items: ", error);
-                        res.json({
-                          msg: error,
-                        });
+                      } else {
+                        counter += 1;
+                        notice.push("SERIAL_"+item.serial + "_INVALID_CATEGORY_("+ item.category +")")
+                        console.log("SERIAL_"+item.serial + "_INVALID_CATEGORY_("+ item.category +")")
+                        console.log("counter:", counter)
+                        uploadProduct();
+                      }
+                    })
+                    .catch((error) => {
+                      console.log("Get Category: ", error);
+                      return res.json({
+                        msg: error,
                       });
-                  })
-                  .catch((error) => {
-                    console.log("Get Category: ", error);
-                    return res.json({
-                      msg: error,
                     });
-                  });
+                }
+              } else {
+                counter += 1;
+                notexist.push(item.serial)
+                uploadProduct();
               }
 
-              if (counter == dataJSon.length) {
-                console.log("Duplicate!");
-                if (duplicate != "") {
-                  return res.json({
-                    msg: "exist",
-                    data: duplicate,
-                  });
+              // if (counter == dataJSon.length) {
+              //   console.log("Duplicate!");
+              //   console.log("counter measures:", notice)
+              //   if (duplicate != "") {
+              //     return res.json({
+              //       msg: "exist",
+              //       data: duplicate,
+              //     });
+              //   }
+              // }
+
+              function uploadProduct(){
+                if (counter == dataJSon.length) {
+                  console.log(product);
+                  if(product.length != 0){
+                    InsertTable("product", product, (err, result) => {
+                      if (err) console.error("Error: ", err);
+                      console.log(result);
+                    });
+                  }else{
+                    console.log("NO DATA PUSHED");
+                  }
+                  if (notice != 0) {
+                    return res.json({
+                      msg: "notice",
+                      data: notice,
+                    });
+                  } else {
+                    return res.json({
+                      msg: "success",
+                    });
+                  }
                 }
               }
             })

@@ -714,17 +714,14 @@
         success: function (result) {
           hideLoading();
           if (result.msg != "success") {
-            warning(
+            warningRegister(
               "Duplicate",
-              `Some data already exist on the database. ID[${result.data}]`
+              `Some data are invalid or already exist in the database <br><button class="btn btn-sm btn-primary" id="txtBtn">Download</button>`
             );
-
-            // swal({
-            //   title: "Exist",
-            //   text: "Some data already exist on the database. ID[${result.data}]",
-            //   icon: "warning",
-            //   button: "OK!",
-            // });
+            
+            $(document).on("click", "#txtBtn", function () {
+              downloadTxtFile(result.data, 'existing_invalid_data.txt');
+            });
           } else {
             success("Saved!", "Data saved!");
             resettable()
@@ -743,6 +740,25 @@
         },
       });
 
+    }
+
+    function downloadTxtFile(data, filename) {
+      data = data.toString().replace(/,/g, '\n');
+
+      const blob = new Blob([data], { type: 'text/plain' });
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      URL.revokeObjectURL(url);
+      document.body.removeChild(link);
     }
     //#endregion
   });
