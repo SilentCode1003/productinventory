@@ -659,8 +659,9 @@
           if (result.msg != "success") {
             warning(
               "Duplicate",
-              `Some data already exist on the database. ID[${result.data}]`
+              `Some data already exist or does not exist on the database. ID[${result.data}]`
             );
+            resettable();
           } else{
             success("Saved!", "Data saved!");
             resettable();
