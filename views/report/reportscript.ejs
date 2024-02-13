@@ -731,7 +731,7 @@
                                 return buf;
                             }
 
-                            saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), "products.xlsx");
+                            saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `PRODUCTS_${status}.xlsx`);
                         } else {
                             console.error("Export failed:", result.msg);
                         }

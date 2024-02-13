@@ -228,10 +228,11 @@ router.post("/upload", (req, res) => {
     let sold = [];
     let salesreporthistory = [];
     let counter = 0;
-    let noentry = [];
-    let dupentry = [];
+    let success = 0;
+    let failed = 0;
     let salesreport = [];
-    let notexistClient = [];
+    let notice = [];
+
     dataJson.forEach((item) => {
       Check_MasterClient(item.company, item.branch, req)
         .then((result) => {
@@ -241,7 +242,7 @@ router.post("/upload", (req, res) => {
             .then((result) => {
               let product = Product(result);
               console.log("product details:", product)
-              if (product.length != 0 || product == undefined || product == null) {
+              if (product.length != 0) {
                 let quantity = 1;
                 let category = product[0].category;
                 let itemname = product[0].itemname;
@@ -252,8 +253,10 @@ router.post("/upload", (req, res) => {
                     let check_sold = Sold(result);
                     counter += 1;
                     if (check_sold.length != 0) {
-                      dupentry.push(item.serial);
+                      notice.push("SERIAL_"+item.serial+"_ALREADY_EXISTS");
+                      failed += 1;
                     } else {
+                      success += 1;
                       sold.push([
                         assetcontrol,
                         item.serial,
@@ -317,9 +320,9 @@ router.post("/upload", (req, res) => {
                   });
 
               } else {
+                failed += 1;
                 counter += 1;
-                noentry.push(item.serial);
-                console.log("No Entry: ", item.serial, "Counter:", counter);
+                notice.push("SERIAL_"+item.serial+"_DOES_NOT_EXISTS");
                 if(counter == dataJson.length){
                   UploadSold();
                 }
@@ -339,6 +342,12 @@ router.post("/upload", (req, res) => {
     function UploadSold(){
       // console.log("TO BE INSERTED SOLD: ", sold)
       // console.log(salesreporthistory, salesreport);
+      console.log("total data:", dataJson.length,"succeeded:", success, "failed:", failed);
+
+      let info = {
+        completed: success,
+        failed: failed
+      }
 
       if (salesreporthistory.length != 0) {
         InsertTable("sales_report_history", salesreporthistory, (err, result) => {
@@ -363,17 +372,16 @@ router.post("/upload", (req, res) => {
       }
     
       let message = "";
-      if (dupentry.length != 0) {
-        message += MessageStatus.DUPENTRY;
-      }
-      if (noentry.length != 0) {
+      if (notice.length != 0) {
         message += MessageStatus.NOENTRY;
       }
     
       if (message != "") {
-        res.json(
-          JsonWarningResponse(message, [dupentry, noentry])
-        );
+        res.json({
+            msg: message,
+            data: notice,
+            info: info
+          });
       } else {
         res.json(JsonSuccess());
       }
