@@ -346,7 +346,6 @@ router.post("/upload", (req, res) => {
     let status = GetValue(WH());
     let counter = 0;
     let sequence = 0;
-    let duplicate = "";
     let product = [];
     let notexist = [];
     let notice = [];
@@ -371,13 +370,13 @@ router.post("/upload", (req, res) => {
                 } else {
                   Get_Category(item.category)
                     .then((result) => {
-                      if (result.length != 0 || result == undefined || result == null) {
+                      if (result.length != 0) {
                         // console.log(result);
                         let category = MasterCategory(result);
                         let categoryid = category[0].id;
                         Get_Item(item.itemname, categoryid)
                           .then((result) => {
-                            if (result.length != 0 || result == undefined || result == null) {
+                            if (result.length != 0) {
                               let dataitems = MasterItem(result);
                               console.log("item names data: ", dataitems);
                               let itemid = dataitems[0].id;
