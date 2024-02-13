@@ -6,6 +6,7 @@ const {
   InsertTable,
   SelectParameter,
   StoredProcedure,
+  SelectResult,
 } = require("./repository/spidb");
 const {
   Product,
@@ -66,6 +67,63 @@ router.get("/load", (req, res) => {
       } else {
         res.json({
           msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.get("/getproductstatus", (req, res) => {
+  try {
+    let sql = `SELECT DISTINCT p_status as status FROM product`;
+
+    SelectResult(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      if (result.length != 0) {
+        // console.log(data);
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/getProductbyCategory", (req, res) => {
+  try {
+    let {category, status} = req.body;
+    let sql = `SELECT * FROM product WHERE p_category = '${category}' AND p_status = '${status}'`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      let product = Product(result);
+      
+      if (result.length != 0) {
+        // console.log(data);
+        res.json({
+          msg: "success",
+          data: product,
+        });
+      } else {
+        console.log(sql)
+        res.json({
+          msg: "NODATA",
           data: result,
         });
       }
