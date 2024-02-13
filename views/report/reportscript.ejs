@@ -451,6 +451,8 @@
         }
 
         let activeEmployee = [];
+        let activeCategory = [];
+        let activeStatus = [];
 
         function LoadList() {
 
@@ -474,12 +476,67 @@
                     errormsg(err);
                 },
             });
+
+            $.ajax({
+                type: "GET",
+                url: "/category/load",
+                success: function (result) {
+                    let container = result.data;
+                    console.log('category:',container)
+                    $.each(container, (key, item) => {
+                        let displayname = item.name;
+                        let dataid = item.id;
+                        activeCategory.push({
+                            display: displayname,
+                            value: dataid,
+                        });
+                    });
+                    populateCategoryDropdown();
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "/product/getproductstatus",
+                success: function (result) {
+                    let container = result.data;
+                    console.log('product:',container)
+                    $.each(container, (key, item) => {
+                        let displayname = item.status;
+                        // let dataid = item.id;
+                        activeStatus.push({
+                            display: displayname,
+                            value: displayname,
+                        });
+                    });
+                    populateStatusDropdown()
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
         }
 
         function populateCustomDropdown() {
             for (const employee of activeEmployee) {
                 addOption("employeeDropdown", employee.display, employee.value);
             }
+        }
+
+        function populateCategoryDropdown() {
+            for (const category of activeCategory) {
+                addCategoryOption("categoryDropdown", category.display, category.value);
+            }
+        }
+
+        function populateStatusDropdown() {
+            for (const status of activeStatus) {
+                addStatusOption("statusDropdown", status.display, status.value);
+            }
+            console.log(activeStatus)
         }
 
         function addOption(dropdownId, displayText, actualValue) {
@@ -493,6 +550,44 @@
 
             newOption.addEventListener("click", function () {
                 const inputElement = document.getElementById("employee");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        function addCategoryOption(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddencategoryvalue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("category");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        function addStatusOption(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenstatusvalue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("status");
                 inputElement.value = displayText;
                 hiddenInput.value = actualValue;
                 dropdownElement.style.display = "none";
@@ -540,6 +635,8 @@
         }
 
         setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
+        setupCustomDropdown("category", "categoryDropdown", "dropdown-option");
+        setupCustomDropdown("status", "statusDropdown", "dropdown-option");
         LoadList();
 
         function getBase64(inputfield, display) {
@@ -583,6 +680,68 @@
             return documents;
         }
 
+        $(document).on("input", "#category", function () {
+            $("#hiddencategoryvalue").val("");
+        });
+
+        $(document).on("input", "#status", function () {
+            $("#hiddenstatusvalue").val("");
+        });
+
+        $(document).on("click", "#prdExcel", function () {
+            let category = $("#hiddencategoryvalue").val();
+            let status = $("#hiddenstatusvalue").val();
+            console.log("category:", category, "status:", status)
+
+            let message = '';
+            if(category == ''){
+                message += "Product Category, ";
+            }
+
+            if(status == ''){
+                message += "Product Status ";
+            }
+
+            if (message !== '') { 
+                warning('Warning!', `${message} is Empty`)
+            }else{
+                let data = {
+                    category: category,
+                    status: status,
+                }
+                console.log(data)
+                $.ajax({
+                    url: '/product/getProductbyCategory',
+                    type: 'POST',
+                    data: data,
+                    success: function (result) {
+                        if (result.msg === "success" && result.data.length > 0) {
+                            let wb = XLSX.utils.book_new();
+                            let ws = XLSX.utils.json_to_sheet(result.data);
+                            XLSX.utils.book_append_sheet(wb, ws, "Products");
+
+                            let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+                            function s2ab(s) {
+                                let buf = new ArrayBuffer(s.length);
+                                let view = new Uint8Array(buf);
+                                for (let i = 0; i < s.length; i++) {
+                                    view[i] = s.charCodeAt(i) & 0xFF;
+                                }
+                                return buf;
+                            }
+
+                            saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), "products.xlsx");
+                        } else {
+                            console.error("Export failed:", result.msg);
+                        }
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    },
+                });
+            }
+        });
 
         $(document).on("click", "#updateBtn", function () {
             $(".id").text(id);

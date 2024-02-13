@@ -9,6 +9,8 @@
   --txt-500: 2rem;
   --txt-600: 2.5rem;
   --txt-700: 3rem;
+
+  --dropdown-menu: calc(100% - 1.5rem)
 }
 
 .t-500{
@@ -516,15 +518,16 @@ body {
 
 .custom-dropdown {
   display: none;
-  width: inherit;
+  width: var(--dropdown-menu);
   /* border: 1px solid var(--clr-card); */
   max-height: 250px;
   overflow-y: auto;
   position: absolute;
   background-color: white;
-  width: 36.7vw;
   z-index: 1000;
   border-radius: 0.275rem;
+  border: solid 1px var(--clr-text);
+  border-top: none;
 }
 
 .custom-dropdown-modal {

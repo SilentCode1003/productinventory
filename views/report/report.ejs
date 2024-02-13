@@ -236,9 +236,9 @@
                             Report</a>
                     </li>
                     <li class="nav-item col text-center mb-1">
-                        <a class="nav-link btn btn-outline-cyberpower" id="sales-per-employee-tab" data-toggle="pill"
+                        <a class="nav-link btn btn-outline-cyberpower" id="othersreport-tab" data-toggle="pill"
                             href="#sales-per-employee" role="tab" aria-controls="sales-per-employee"
-                            aria-selected="false">Employee</a>
+                            aria-selected="false">Others</a>
                     </li>
                 </ul>
             </div>
@@ -252,30 +252,20 @@
                                     <div class="card-header card-bg align-content-center">
                                         <div class="row">
                                             <div class="col">
-                                                <h4 class="m-0 card-title">Sales History</h4>
+                                                <h4 class="mt-1">Sales History</h4>
                                             </div>
                                             <% if (access==="Admin" ) { %>
-                                                <div class="col-md-6 mb-2">
-                                                    <div class="input-group">
-                                                        <input class="form-control text-center custom-input"
-                                                            placeholder="Select Employee" name="employee"
-                                                            id="employee" />
-                                                        <input type="hidden" id="hiddenemmployeevalue"
-                                                            name="hiddenemmployeevalue" />
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text">Employee</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="custom-dropdown custom-dropdown-margin-left"
-                                                        id="employeeDropdown"></div>
+                                                <div class="col-md-4 mb-2">
+                                                    <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee" />
+                                                    <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+                                                    <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
                                                 </div>
                                                 <% } %>
-                                                    <div class="col">
-                                                        <button class="custom-btn" id="convertopdf" type="button"
-                                                            style="border-radius: 0.2rem;">
-                                                            <i class="fas fa-file-export"></i>
-                                                        </button>
-                                                    </div>
+                                                <div class="col">
+                                                    <button class="custom-btn" id="convertopdf" type="button">
+                                                        <i class="fas fa-file-export"></i>
+                                                    </button>
+                                                </div>
                                         </div>
                                     </div>
                                     <div class="table-responsive scrollable-table-size">
@@ -300,9 +290,40 @@
                     </div>
 
                     <div class="tab-pane fade" id="sales-per-employee" role="tabpanel"
-                        aria-labelledby="sales-per-employee-tab">
-                        <div class="row">
-
+                        aria-labelledby="othersreport-tab">
+                        <div class="row" style="height: 580px;">
+                            <div class="col-6">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="card-bg align-content-center h5 mt-1">
+                                                    Registered Product Export to Excel
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-5">
+                                                        <input class="form-control text-center custom-input" placeholder="Select Category"
+                                                                name="category" id="category" />
+                                                        <input type="hidden" id="hiddencategoryvalue" name="hiddencategoryvalue" />
+                                                        <div class="custom-dropdown custom-dropdown-margin-left" id="categoryDropdown"></div>
+                                                    </div>
+                                                    <div class="col-5">
+                                                        <input class="form-control text-center custom-input" placeholder="Select Product Status"
+                                                                name="status" id="status" />
+                                                        <input type="hidden" id="hiddenstatusvalue" name="hiddenstatusvalue" />
+                                                        <div class="custom-dropdown custom-dropdown-margin-left" id="statusDropdown"></div>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <div class="custom-btn" id="prdExcel"><i class="fas fa-file-export"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
