@@ -9,6 +9,26 @@
         let ponumber = "";
         let warrantydate = "";
         let status = "";
+
+        const loader = `  
+            <tr class="loading-row">
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            </tr>`;
+
+        const tbody = $('#datatable tbody');
+        for (let i = 0; i < 7; i++) {
+            tbody.append(loader);
+        }
+
+        loadlist();
         $('#datatable tbody').on('click', 'tr', function () {
             var dataRow = [];
             $(this).closest('tr').find('td').each(function () {
@@ -38,88 +58,110 @@
         } else {
             $.ajax({
                 type: "POST",
-                url: "/product/search",
+                url: "/items/getitemid",
                 data: {
-                    keyword: searchdata,
+                    itemname: searchdata,
                 },
                 success: function (result) {
-                    console.log(result.data);
-                    let data = result.data;
-                    const tableBody = $("#datatable tbody");
-                    tableBody.empty();
-
-                    if (data.length === 0) {
-                        const tr = $("<tr>").append(
-                            $("<td>", {
-                                colspan: 8,
-                                class: "text-center",
-                                text: "No Data Matched",
-                            })
-                        );
-                        tableBody.append(tr);
+                    let search = '';
+                    if (result.msg != "success") {
+                        search = {
+                            keyword: searchdata
+                        }
+                        console.log('no match');
                     } else {
-                        data.forEach((item) => {
-                            let action = "";
-                            if (item.status === "ACTIVE") {
-                                action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
-                            } else if (item.status === "INACTIVE") {
-                                action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
-                            }
-
-                            const tr = $("<tr>").append(
-                                $("<td>", {
-                                    text: item.assetcontrol,
-                                    "data-label": "Asset Control",
-                                    class: "custom-mobile-align cbi-link",
-                                    "data-toggle": "modal",
-                                    "data-target": "#editModal",
-                                }),
-                                $("<td>", {
-                                    text: item.serial,
-                                    "data-label": "Serial",
-                                    class: "custom-mobile-align no-wrap",
-                                }),
-                                $("<td>", {
-                                    text: item.itemname,
-                                    "data-label": "Item Name",
-                                    class: "custom-mobile-align no-wrap",
-                                }),
-                                $("<td>", {
-                                    text: item.category,
-                                    "data-label": "Category",
-                                    class: "custom-mobile-align no-wrap",
-                                }),
-                                $("<td>", {
-                                    text: item.podate,
-                                    "data-label": "PO Date",
-                                    class: "custom-mobile-align",
-                                }),
-                                $("<td>", {
-                                    text: item.ponumber,
-                                    "data-label": "PO Number",
-                                    class: "custom-mobile-align",
-                                }),
-                                $("<td>", {
-                                    text: item.warrantydate,
-                                    "data-label": "Warranty Date",
-                                    class: "custom-mobile-align",
-                                }),
-                                $("<td>", {
-                                    text: item.status,
-                                    "data-label": "Status",
-                                    class: "custom-mobile-align",
-                                })
-                            );
-
-                            tableBody.append(tr);
-                        });
+                        let resultData = result.data;
+                        // console.log(resultData[0].id);
+                        search = {
+                            keyword: resultData[0].id
+                        }
                     }
-                    // localStorage.removeItem('searchdata');
-                },
-                error: function (err) {
-                    errormsg(err);
-                },
+                    // console.log(search)
+                    $.ajax({
+                        type: "POST",
+                        url: "/product/search",
+                        data: search,
+                        success: function (result) {
+                            // console.log(result.data);
+                            let data = result.data;
+                            const tableBody = $("#datatable tbody");
+                            tableBody.empty();
+
+                            if (data === undefined || data.length === 0) {
+                                const tr = $("<tr>").append(
+                                    $("<td>", {
+                                        colspan: 8,
+                                        class: "text-center",
+                                        text: "No Data Matched",
+                                    })
+                                );
+                                tableBody.append(tr);
+                            } else {
+                                data.forEach((item) => {
+                                    let action = "";
+                                    if (item.status === "ACTIVE") {
+                                        action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                                    } else if (item.status === "INACTIVE") {
+                                        action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                                    }
+
+                                    const tr = $("<tr>").append(
+                                        $("<td>", {
+                                            text: item.assetcontrol,
+                                            "data-label": "Asset Control",
+                                            class: "custom-mobile-align cbi-link",
+                                            "data-toggle": "modal",
+                                            "data-target": "#editModal",
+                                        }),
+                                        $("<td>", {
+                                            text: item.serial,
+                                            "data-label": "Serial",
+                                            class: "custom-mobile-align no-wrap",
+                                        }),
+                                        $("<td>", {
+                                            text: item.itemname,
+                                            "data-label": "Item Name",
+                                            class: "custom-mobile-align no-wrap",
+                                        }),
+                                        $("<td>", {
+                                            text: item.category,
+                                            "data-label": "Category",
+                                            class: "custom-mobile-align no-wrap",
+                                        }),
+                                        $("<td>", {
+                                            text: item.podate,
+                                            "data-label": "PO Date",
+                                            class: "custom-mobile-align",
+                                        }),
+                                        $("<td>", {
+                                            text: item.ponumber,
+                                            "data-label": "PO Number",
+                                            class: "custom-mobile-align",
+                                        }),
+                                        $("<td>", {
+                                            text: item.warrantydate,
+                                            "data-label": "Warranty Date",
+                                            class: "custom-mobile-align",
+                                        }),
+                                        $("<td>", {
+                                            text: item.status,
+                                            "data-label": "Status",
+                                            class: "custom-mobile-align",
+                                        })
+                                    );
+
+                                    tableBody.append(tr);
+                                });
+                            }
+                            // localStorage.removeItem('searchdata');
+                        },
+                        error: function (err) {
+                            errormsg(err);
+                        },
+                    });
+                }
             });
+
         }
 
         $(document).on('click', '.cbi-link', function () {
@@ -357,5 +399,97 @@
                 }
             });
         })
+
+        $('#statusid').on('change', function () {
+            var selectedStatusId = $('#statusid').val();
+
+            $('#datatable tbody tr').each(function () {
+                var statusCell = $(this).find('td:nth-child(8)').text().trim();
+                // console.log(statusCell);
+                if (selectedStatusId === 'All' || selectedStatusId === statusCell) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        function filterTableRows() {
+            const searchQuery = $("#search").val().trim().toLowerCase();
+            let foundMatches = false;
+
+            $("#no-match-row").remove();
+
+            $("#datatable tbody tr").each(function () {
+                const rowData = $(this).text().toLowerCase();
+                if (rowData.includes(searchQuery)) {
+                    $(this).show();
+                    foundMatches = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (!foundMatches) {
+                const noMatchRow = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 8,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                $("#datatable tbody").append(noMatchRow);
+                noMatchRow.attr("id", "no-match-row");
+            }
+        }
+
+        $("#search").on("input", filterTableRows);
+
+        function loadlist(){
+            $.ajax({
+                type: "GET",
+                url: "/product/getproductstatus",
+                success: function (result) {
+                    var data = result.data;
+                    // console.log("status: ", data)
+
+                    var allStatusitem = $('<li></li>')
+                        .text("All")
+                        .data('statusid', 'All');
+                    $('.statuslist').append(allStatusitem);
+
+                    $.each(data, function (key, item) {
+                                                    
+                        var listItem = $('<li></li>')
+                            .text(item.status )
+                            .data('statusid', item.status);
+
+                            $('.statuslist').append(listItem);
+                    });
+
+                    $('.statuslist').on('click', 'li', function () {
+                        var selectedOption = $(this).text();
+                        var selectedstatusId = $(this).data('statusid');
+
+                        $('#selectedstatus').text(selectedOption);
+                        $('#statusid').val(selectedstatusId).change();
+                    });
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        }
+
+        $("#export-button").click(function() {
+            var table = $("#datatable")[0];
+            var ws = XLSX.utils.table_to_sheet(table);
+
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+            XLSX.writeFile(wb, "exported_data.xlsx");
+        });
+
     });
 </script>

@@ -501,6 +501,7 @@ router.post("/upload", (req, res) => {
 router.post("/search", (req, res) => {
   try {
     const { keyword } = req.body;
+    
     let sql = `select
     p_assetcontrol as assetcontrol,
     mc_name as category,
@@ -539,8 +540,9 @@ router.post("/search", (req, res) => {
     left join repair on p_serial = repair.r_serial
     left join sold on p_serial = s_serial
     where p_serial like ? 
-    or p_assetcontrol like ?`;
-    let command = SelectStatement(sql, [`${keyword}%`, `${keyword}%`]);
+    or p_assetcontrol like ?
+    or p_itemname like ?`;
+    let command = SelectStatement(sql, [`${keyword}%`, `${keyword}%`, `${keyword}%`]);
 
     Select(command, (err, result) => {
       if (err) console.error("Error: ", err);
