@@ -124,14 +124,50 @@
     <div class="col">
         <div class="card shadow mb-4 table-size-lg">
             <div class="card-header card-bg align-content-center">
-                <div class="card-title">
-                    <h1 class="cyber-title mt-2">PRODUCT LIST</h1>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="row">
+                            <h1 class="mt-2 ml-3 font-weight-bold table-title">PRODUCT LIST</h1>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row d-flex justify-content-end pt-3">
+                            <div class="col-3">
+                                <div class="customdropdown">
+                                    <div class="select selectstatus">
+                                        <span id="selectedstatus">Filter by Status</span>
+                                        <i class="fa fa-chevron-left"></i>
+                                    </div>
+                                    <input type="hidden" name="statusid" id="statusid">
+                                    <ul class="customdropdown-menu statuslist">
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="input-group">
+                                    <input type="text" class="form-control small"
+                                        placeholder="Search for Serial/Asset Control" aria-label="Search" aria-describedby="basic-addon2"
+                                        id="search">
+                                    <div class="input-group-append">
+                                        <button class="custom-btn btn-sm" type="button" id="search-button" disabled>
+                                            <i class="fas fa-search fa-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="custom-btn" id="export-button">
+                                    <i class="fas fa-download fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive scrollable-table-container-lg">
                     <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
-                        <thead class="table-header">
+                        <thead class="table-header header-style">
                             <tr>
                                 <th>Asset Control</th>
                                 <th>Serial</th>
