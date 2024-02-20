@@ -58,110 +58,88 @@
         } else {
             $.ajax({
                 type: "POST",
-                url: "/items/getitemid",
+                url: "/product/search",
                 data: {
-                    itemname: searchdata,
+                    keyword:searchdata
                 },
                 success: function (result) {
-                    let search = '';
-                    if (result.msg != "success") {
-                        search = {
-                            keyword: searchdata
-                        }
-                        console.log('no match');
+                    // console.log(result.data);
+                    let data = result.data;
+                    const tableBody = $("#datatable tbody");
+                    tableBody.empty();
+
+                    if (data === undefined || data.length === 0) {
+                        const tr = $("<tr>").append(
+                            $("<td>", {
+                                colspan: 8,
+                                class: "text-center",
+                                text: "No Data Matched",
+                            })
+                        );
+                        tableBody.append(tr);
                     } else {
-                        let resultData = result.data;
-                        // console.log(resultData[0].id);
-                        search = {
-                            keyword: resultData[0].id
-                        }
-                    }
-                    // console.log(search)
-                    $.ajax({
-                        type: "POST",
-                        url: "/product/search",
-                        data: search,
-                        success: function (result) {
-                            // console.log(result.data);
-                            let data = result.data;
-                            const tableBody = $("#datatable tbody");
-                            tableBody.empty();
-
-                            if (data === undefined || data.length === 0) {
-                                const tr = $("<tr>").append(
-                                    $("<td>", {
-                                        colspan: 8,
-                                        class: "text-center",
-                                        text: "No Data Matched",
-                                    })
-                                );
-                                tableBody.append(tr);
-                            } else {
-                                data.forEach((item) => {
-                                    let action = "";
-                                    if (item.status === "ACTIVE") {
-                                        action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
-                                    } else if (item.status === "INACTIVE") {
-                                        action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
-                                    }
-
-                                    const tr = $("<tr>").append(
-                                        $("<td>", {
-                                            text: item.assetcontrol,
-                                            "data-label": "Asset Control",
-                                            class: "custom-mobile-align cbi-link",
-                                            "data-toggle": "modal",
-                                            "data-target": "#editModal",
-                                        }),
-                                        $("<td>", {
-                                            text: item.serial,
-                                            "data-label": "Serial",
-                                            class: "custom-mobile-align no-wrap",
-                                        }),
-                                        $("<td>", {
-                                            text: item.itemname,
-                                            "data-label": "Item Name",
-                                            class: "custom-mobile-align no-wrap",
-                                        }),
-                                        $("<td>", {
-                                            text: item.category,
-                                            "data-label": "Category",
-                                            class: "custom-mobile-align no-wrap",
-                                        }),
-                                        $("<td>", {
-                                            text: item.podate,
-                                            "data-label": "PO Date",
-                                            class: "custom-mobile-align",
-                                        }),
-                                        $("<td>", {
-                                            text: item.ponumber,
-                                            "data-label": "PO Number",
-                                            class: "custom-mobile-align",
-                                        }),
-                                        $("<td>", {
-                                            text: item.warrantydate,
-                                            "data-label": "Warranty Date",
-                                            class: "custom-mobile-align",
-                                        }),
-                                        $("<td>", {
-                                            text: item.status,
-                                            "data-label": "Status",
-                                            class: "custom-mobile-align",
-                                        })
-                                    );
-
-                                    tableBody.append(tr);
-                                });
+                        data.forEach((item) => {
+                            let action = "";
+                            if (item.status === "ACTIVE") {
+                                action = `<span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                            } else if (item.status === "INACTIVE") {
+                                action = `<span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
                             }
-                            // localStorage.removeItem('searchdata');
-                        },
-                        error: function (err) {
-                            errormsg(err);
-                        },
-                    });
-                }
-            });
 
+                            const tr = $("<tr>").append(
+                                $("<td>", {
+                                    text: item.assetcontrol,
+                                    "data-label": "Asset Control",
+                                    class: "custom-mobile-align cbi-link",
+                                    "data-toggle": "modal",
+                                    "data-target": "#editModal",
+                                }),
+                                $("<td>", {
+                                    text: item.serial,
+                                    "data-label": "Serial",
+                                    class: "custom-mobile-align no-wrap",
+                                }),
+                                $("<td>", {
+                                    text: item.itemname,
+                                    "data-label": "Item Name",
+                                    class: "custom-mobile-align no-wrap",
+                                }),
+                                $("<td>", {
+                                    text: item.category,
+                                    "data-label": "Category",
+                                    class: "custom-mobile-align no-wrap",
+                                }),
+                                $("<td>", {
+                                    text: item.podate,
+                                    "data-label": "PO Date",
+                                    class: "custom-mobile-align",
+                                }),
+                                $("<td>", {
+                                    text: item.ponumber,
+                                    "data-label": "PO Number",
+                                    class: "custom-mobile-align",
+                                }),
+                                $("<td>", {
+                                    text: item.warrantydate,
+                                    "data-label": "Warranty Date",
+                                    class: "custom-mobile-align",
+                                }),
+                                $("<td>", {
+                                    text: item.status,
+                                    "data-label": "Status",
+                                    class: "custom-mobile-align",
+                                })
+                            );
+
+                            tableBody.append(tr);
+                        });
+                    }
+                    // localStorage.removeItem('searchdata');
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
         }
 
         $(document).on('click', '.cbi-link', function () {
