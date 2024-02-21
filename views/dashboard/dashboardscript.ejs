@@ -325,8 +325,8 @@
     // displayDataInTable(mockData);
 
         function groupDataByItemName(data) {
-            const groupedData = {};
 
+            const groupedData = {};
             data.forEach(item => {
                 const itemName = item.itemname;
                 groupedData[itemName] = groupedData[itemName] || {
@@ -337,6 +337,7 @@
                 groupedData[itemName].stocks += 1;
                 groupedData[itemName].totalPrice += item.price;
             });
+            console.log("sample",groupedData)
 
             return groupedData;
         }
@@ -535,6 +536,7 @@
                     // console.log("stocks: ", container);
 
                     let groupedData = groupDataByItemName(container);
+                    console.log("sample data",groupedData);
                     let template = 'STOCKS REPORT';
                     // console.log("Current Stock: ", groupedData);
                     if(groupedData.length != 0){

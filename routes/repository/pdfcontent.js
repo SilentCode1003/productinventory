@@ -22,9 +22,13 @@ exports.document = (data, template, employee, date) => {
                 text: "Total Price", style: 'tableheader', border: [false, true, false, true],
             },
         ]);
+        let countertester = 0;
+
         Object.keys(data).forEach((key, index) => {
             const item = data[key];
             totalsales += parseInt(item.totalPrice);
+            countertester += 1
+            console.log("No.: ",countertester, `"item Name:" ${key}, Category: ${item.category}, stock: ${item.stocks}`)
 
             itemdetails.push([
                 {
@@ -44,6 +48,7 @@ exports.document = (data, template, employee, date) => {
 
         let content = {
             pageSize: "A4", pageOrientation: "landscape", margin: 10,
+            pageMargins: [35, 85, 35, 35],
             header: {
                 image: imagesample,
                 width: 800,
