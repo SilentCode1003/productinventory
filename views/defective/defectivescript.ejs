@@ -177,7 +177,7 @@
                             hasMoreData = data.data.length > 0;
                             if (!hasMoreData) {
                                 const tableBody = $("#datatable tbody");
-                                tableBody.empty();
+                                // tableBody.empty();
                                 const tr = $("<tr>").append(
                                     $("<td>", {
                                         colspan: 9,
@@ -462,35 +462,26 @@
                 success: function (result) {
                     hideLoading();
                     console.log(result.msg)
-                    if (result.msg == "noentry") {
-                        return warning(
-                            "Product Not Registered",
-                            `List of serials not yet registered [${result.data.noentry}]`
+                    if (result.msg != "success") {
+                        let info = result.data;
+                        console.log(info)
+                        warningInfo(
+                            "Info",
+                            `Completed: ${info.completed} Failed: ${info.failed}<br>Some data are invalid or already exist in the database. <br> <div class="row justify-content-center mt-1">
+                                <button class="btn btn-sm btn-success" id="txtBtn">Download</button>
+                            </div>`
                         );
 
-                        // swal({
-                        //   title: "Exist",
-                        //   text: "Some data already exist on the database. ID[${result.data}]",
-                        //   icon: "warning",
-                        //   button: "OK!",
-                        // });
-                    }
-                    if (result.msg == "exist") {
-                        return warning(
-                            "Already Exist",
-                            `List of serials that already Exist: [${result.data}]`
-                        );
+                        $(document).on("click", "#txtBtn", function () {
+                            downloadTxtFile(info.existing, 'existing_invalid_data.txt');
+                        });
+
+                        resettable();
+                    }else{
+                        success("Saved!", "Data saved!");
+                        resettable();
                     }
 
-                    if (result.msg == "noentrydupentry") {
-                        return warning(
-                            "Warning",
-                            `List of serials that are not yet register [${result.data.noentry}]\nList of serials that already dployed [${result.data.dupentry}]`
-                        );
-                    }
-
-                    success("Saved!", "Data saved!");
-                    resettable();
                     // swal({
                     //   title: "Success",
                     //   text: "Data saved!",
@@ -504,6 +495,25 @@
                     console.error(result);
                 },
             });
+        }
+
+        function downloadTxtFile(data, filename) {
+            data = data.toString().replace(/,/g, '\n');
+
+            const blob = new Blob([data], { type: 'text/plain' });
+
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            URL.revokeObjectURL(url);
+            document.body.removeChild(link);
         }
         //#endregion
     });
