@@ -79,6 +79,16 @@ router.post("/save", (req, res) => {
             [assetcontrol, itemserial, remarks, date, referenceno],
           ];
 
+          let status = GetValue(DFCT());
+          let update_product =
+            "update product set p_status=? where p_assetcontrol=?";
+          let update_product_data = [status, assetcontrol];
+
+          Update(update_product, update_product_data, (err, result) => {
+            if (err) console.error("Error: ", err);
+            // console.log(result);
+          });
+
           InsertTable("deffectiveitem", deffectiveitem, (err, result) => {
             if (err) console.error("Error: ", err);
             console.log(result);
