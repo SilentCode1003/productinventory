@@ -24,6 +24,7 @@ const {
   JsonSuccess,
   JsonNoEntryResponse,
   MessageStatus,
+  JsonDataResponse,
 } = require("./repository/responce");
 var router = express.Router();
 
@@ -104,12 +105,13 @@ router.post("/save", (req, res) => {
   }
 });
 
-
 router.post("/upload", (req, res) => {
   try {
     const { data } = req.body;
     let dataJson = UploadDefectiveItem(JSON.parse(data));
     console.log(dataJson);
+    let failed = 0;
+    let completed = 0;
     let defective = [];
     let counter = 0;
     let existing = [];
@@ -119,11 +121,7 @@ router.post("/upload", (req, res) => {
         .then((result) => {
           counter += 1;
           if(result.length == 0){
-            let status = GetValue(DFCT());
-            let update_product =
-              "update product set p_status=? where p_assetcontrol=?";
-            let update_product_data = [status, item.assetcontrol];
-
+            completed += 1;
             defective.push([
               item.assetcontrol,
               item.itemserial,
@@ -131,35 +129,56 @@ router.post("/upload", (req, res) => {
               convertExcelDate(item.date),
               item.referenceno,
             ]);
+            
+            let status = GetValue(DFCT());
+            let update_product =
+              "update product set p_status=? where p_assetcontrol=?";
+            let update_product_data = [status, item.assetcontrol];
 
             Update(update_product, update_product_data, (err, result) => {
               if (err) console.error("Error: ", err);
               // console.log(result);
             });
+
+            if (counter == dataJson.length) {
+              Insert();
+            }
           }else {
-            existing.push(item.itemserial);
-          }
-          
-          if (counter == dataJson.length) {
-            console.log("Existing: ", existing);
-            console.log("Done: ");
-            if(defective.length != 0){
-              InsertTable("deffectiveitem", defective, (err, result) => {
-                if (err) console.error("Error: ", err);
-                console.log("success?", result);
-  
-                return res.json(JsonSuccess());
-              });
-            }else{
-              return res.json(JsonWarningResponse(MessageStatus.EXIST, existing));
+            failed += 1;
+            existing.push("SERIAL_"+item.itemserial+"_ALREADY_EXISTS");
+            if (counter == dataJson.length) {
+              Insert();
             }
           }
+          
         })
         .catch((error) => {
           console.error(error);
           return res.json(JsonErrorResponse(error));
         });
     });
+
+    function Insert(){
+      let info = {
+        completed: completed,
+        failed: failed,
+        existing: existing
+      }
+      
+      console.log("Existing: ", existing);
+      console.log("Done: ");
+      if(defective.length != 0){
+        InsertTable("deffectiveitem", defective, (err, result) => {
+          if (err) console.error("Error: ", err);
+          console.log("success?", result);
+
+          return res.json(JsonDataResponse(info));
+        });
+      }else{
+        return res.json(JsonWarningResponse(MessageStatus.EXIST, info));
+      }
+    }
+    
   } catch (error) {
     res.json(JsonErrorResponse(error));
   }
