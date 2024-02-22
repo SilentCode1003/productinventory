@@ -195,7 +195,7 @@ router.post("/upload", (req, res) => {
                         });
 
                         //Record the replacement to sales report history
-                        Record_SalesHistory(repSoldRefNo, repDate, repAssetControl, assetcontrol)
+                        Record_SalesHistory(repSoldRefNo, redDate, repAssetControl, assetcontrol)
                           .then((historyResult) => {
                             console.log("Update Record History: Success!", historyResult);
                           }).catch((error) => {
@@ -204,7 +204,6 @@ router.post("/upload", (req, res) => {
                               msg: error,
                             });
                           });
-
                       });
 
                       //Replacement Sales Report
@@ -448,7 +447,7 @@ function Check_SalesReport(assetcontrol) {
 
 function Record_SalesHistory(soldrefno, date, assetcontrol, replacedAssetcontrol) {
   return new Promise((resolve, reject) => {
-
+    console.log("sales history date recorded:", date)
     let sql =
       "select * from sales_report_history where srh_referenceno=?";
     let command = SelectStatement(sql, [soldrefno]);
@@ -465,7 +464,7 @@ function Record_SalesHistory(soldrefno, date, assetcontrol, replacedAssetcontrol
       const replacementID = uuid.v4();
 
       let newHistory = {
-        [replacementID]: { date: date, details:"Replaced: "+ replacedAssetcontrol + " Replacement: " + assetcontrol }
+        REPLACEMENT: { date: date, details:"Replaced: SERIAL_"+ replacedAssetcontrol + ", Replacement: SERIAL_" + assetcontrol }
       };
 
       details.push(newHistory);
