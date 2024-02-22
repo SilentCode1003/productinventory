@@ -222,7 +222,7 @@
                 hasMoreData = data.data.length > 0;
                 if (!hasMoreData) {
                   const tableBody = $("#datatable tbody");
-                  tableBody.empty();
+                  // tableBody.empty();
                   const tr = $("<tr>").append(
                     $("<td>", {
                       colspan: 9,
@@ -569,6 +569,7 @@
             remarks: data[3].item,
             date: data[4].item,
             referenceno: data[5].item,
+            replacementmode: data[6].item,
           });
         }
         excelDataSave(dataExcelArr);
