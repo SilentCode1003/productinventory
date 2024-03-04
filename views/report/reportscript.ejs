@@ -178,47 +178,42 @@
                                 let historydiv = $(`
                                     <div class="row justify-content-center">
                                         <h5 class="">NO CURRENT HISTORY</h5>
-                                    </div>
-                                    <hr class="sidebar-divider">`);
+                                    </div>`);
                                 $('#historydata').append(historydiv);
                             } else {
                                 let historydata = JSON.parse(data[0].date);
                                 // console.log("all data: ", historydata)
                                 let jsonData = {};
 
-                                for (let item of historydata) {
-                                    let key = Object.keys(item)[0];
-                                    jsonData[key] = item[key];
-                                }
-                                console.log("JSON Data: ", jsonData)
+                                for( var key in historydata){
+                                    if(historydata.hasOwnProperty){
+                                        console.log(historydata[key]);
+                                        for(index in historydata[key]){
+                                            console.log(historydata[key][index]);
 
-                                for (let key in jsonData) {
-                                    let item = jsonData[key];
-
-                                    let historydiv = $(`
+                                            let historydiv = $(`
                                         <div class="row">
                                             <div class="col-3 text-center">
                                                 <div>
-                                                    <span class="">${item.date}</span>
+                                                    <span class="">${historydata[key][index].date}</span>
                                                 </div>
                                             </div>
                                             <div class="col-3 text-center">
-                                                <span class="">${key}</span>
+                                                <span class="">${index}</span>
                                             </div>
                                             <div class="col-6">
                                                 <div class="row ml-1">
-                                                    <span class="">${item.details}</span>
+                                                    <span class="">${historydata[key][index].details}</span>
                                                 </div>
                                             </div>
                                         </div>
                                         <hr class="sidebar-divider">`);
 
                                     $('#historydata').append(historydiv);
+                                        }
+                                    }
                                 }
                             }
-
-
-
                         },
                         error: function (err) {
                             errormsg(err);
@@ -363,7 +358,7 @@
                                             $("#employee").val("");
                                             $("#hiddenemmployeevalue").val("");
                                         } else {
-                                            info("Notice", "No Data within in the date range.");
+                                            warningInfo("Notice", "No Data within in the date range.");
                                         }
                                     },
                                     error: function (err) {

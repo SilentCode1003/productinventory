@@ -372,13 +372,14 @@ class UploadDefectiveItemModel {
 }
 
 class UploadReplaceItemModel {
-  constructor(itemserial, replacedserial, remarks, date, replacedby, referenceno) {
+  constructor(itemserial, replacedserial, remarks, date, replacedby, referenceno, replacementmode) {
     this.itemserial = itemserial;
     this.replacedserial = replacedserial;
     this.remarks = remarks;
     this.date = date;
     this.replacedby = replacedby;
     this.referenceno = referenceno;
+    this.replacementmode = replacementmode;
   }
 }
 

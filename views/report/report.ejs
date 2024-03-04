@@ -164,22 +164,19 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-body document-size">
-                                <div class="row">
-                                    <div class="col-3 text-center">
-                                        <h5 class="cyber-title">DATE</h5>
-                                    </div>
-                                    <div class="col-3 text-center">
-                                        <h5 class="cyber-title">DETAILS</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <h5 class="cyber-title">REMARKS</h5>
-                                    </div>
+                            <div class="row mt-4 mb-2">
+                                <div class="col-3 text-center">
+                                    <h5 class="cyber-title">DATE</h5>
                                 </div>
-                                <hr class="sidebar-divider">
-                                <div id="historydata">
-    
+                                <div class="col-3 text-center">
+                                    <h5 class="cyber-title">DETAILS</h5>
                                 </div>
+                                <div class="col-6">
+                                    <h5 class="cyber-title">REMARKS</h5>
+                                </div>
+                            </div>
+                            <div id="historydata" class="scrollable-document-size-sm">
+
                             </div>
                         </div>
                     </div>
@@ -254,15 +251,15 @@
                                             <div class="col">
                                                 <h4 class="mt-1">Sales History</h4>
                                             </div>
-                                            <% if (access==="Admin" ) { %>
-                                                <div class="col-md-4 mb-2">
-                                                    <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee" />
-                                                    <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
-                                                    <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
-                                                </div>
+                                                <% if (access==="Admin" ) { %>
+                                                    <div class="col-md-4 mb-2">
+                                                        <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee" />
+                                                        <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+                                                        <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
+                                                    </div>
                                                 <% } %>
                                                 <div class="col">
-                                                    <button class="custom-btn" id="convertopdf" type="button">
+                                                    <button class="btn btn-outline-cyberpower w-50" id="convertopdf" type="button">
                                                         <i class="fas fa-file-export"></i>
                                                     </button>
                                                 </div>
