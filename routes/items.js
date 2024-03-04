@@ -34,7 +34,7 @@ router.get("/load", (req, res) => {
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
-      console.log(result);
+      // console.log(result);
 
       if (result.length != 0) {
         let data = MasterItem(result);
@@ -210,6 +210,38 @@ router.post("/status", (req, res) => {
       res.json({
         msg: "success",
       });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/getitemid", (req, res) => {
+  try {
+    let itemname = req.body.itemname;
+
+    let sql = `SELECT * FROM master_item WHERE mi_name = '${itemname}'`;
+
+    // console.log(data);
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      // console.log("itemsearch", result);
+
+      if (result.length != 0) {
+        let data = MasterItem(result);
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "nomatch",
+          data: result,
+        });
+      }
     });
   } catch (error) {
     res.json({

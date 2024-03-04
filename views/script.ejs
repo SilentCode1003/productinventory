@@ -1,11 +1,10 @@
-<!-- LOADER -->
-<div class="loader-wrapper">
+<!-- <div class="loader-wrapper">
   <div class="spinner"></div>
-</div>
+</div> -->
 <!-- LOADER -->
-<div class="loader-wrapper">
+<!-- <div class="loader-wrapper">
   <span class="loader"><span class="loader-inner"></span></span>
-</div>
+</div> -->
 
 <!-- Logout Modal-->
 <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -43,13 +42,6 @@
 <!-- Custom scripts for all pCreated bys-->
 <script src="/javascripts/js/sb-admin-2.min.js"></script>
 
-<!-- PCreated by level plugins -->
-<script src="/vendor/datatables/jquery.dataTables.min.js"></script>
-<script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-<!-- PCreated by level custom scripts -->
-<script src="/javascripts/js/demo/datatables-demo.js"></script>
-
 <!-- DATE RANGE PICKER -->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -72,7 +64,50 @@
 <!--CHART-->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<script src="https://unpkg.com/scrollreveal"></script>
+
 <script>
+  // const sr = ScrollReveal();
+
+  // const revealConfig = {
+  //   duration: 500,
+  //   delay: 200, 
+  //   origin: 'bottom',
+  //   easing: 'linear',
+  //   reset: true
+  // };
+
+  // function applyScrollReveal() {
+  //   $('.custom-mobile-align').each(function (index) {
+  //     sr.reveal(this, { ...revealConfig, delay: index * 100 }); 
+  //   });
+  // }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(function () {
+      // Specify the IDs of the collapsible sections
+      var collapseSectionIds = ['#ProductCollapse', '#EmplopyeeCollapse', '#ClientCollapse', '#ProductRequestCollapse'];
+
+      collapseSectionIds.forEach(function (sectionId) {
+        var collapseItems = document.querySelectorAll(sectionId + ' .collapse-item');
+
+        collapseItems.forEach(function (item) {
+          var iconElement = item.querySelector('i');
+
+          if (iconElement) {
+            if (item.classList.contains('active')) {
+              iconElement.classList.remove('far');
+              iconElement.classList.add('fas');
+            } else {
+              iconElement.classList.remove('fas');
+              iconElement.classList.add('far');
+            }
+          }
+        });
+      });
+    }, 100);
+  });
+
   $("#searchproduct").on("click", function () {
     let searchdata = $("#searchdata").val();
     if (searchdata != '') {
@@ -83,20 +118,20 @@
     }
   })
 
-  hidespinner();
+  // hidespinner();
 
-  function showspinner() {
-    console.log("show loader");
-    $(".loader-wrapper").show();
-  }
+  // function showspinner() {
+  //   console.log("show loader");
+  //   $(".loader-wrapper").show();
+  // }
 
-  function hidespinner() {
-    console.log("hide loader");
+  // function hidespinner() {
+  //   console.log("hide loader");
 
-    setTimeout(() => {
-      $(".loader-wrapper").hide();
-    }, 1500);
-  }
+  //   setTimeout(() => {
+  //     $(".loader-wrapper").hide();
+  //   }, 1500);
+  // }
 
   function successlogin(title, text) {
     return swal({
@@ -120,6 +155,35 @@
         }
       });
     });
+  }
+
+  function Loading(title) {
+    toastr.info(
+      `<strong>${title}</strong> <br>
+        <div style="text-align: center; margin-top: 5px;">
+          <div class="spinner-border" role="status" style="display: inline-block;">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>`,
+      null,  // No title for the notification itself
+      {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": false,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "0",  // Set to 0 to make it indefinite until manually cleared
+        "timeOut": "0",      // Set to 0 to make it indefinite until manually cleared
+        "extendedTimeOut": "0",  // Set to 0 to make it indefinite until manually cleared
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "hide"
+      }
+    );
   }
 
   function success(title, text) {
@@ -158,71 +222,11 @@
       "showEasing": "swing",
       "hideEasing": "linear",
       "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
+      "hideMethod": "hide"
     });
   }
 
-  function info(title, text) {
-    toastr.info(text, title, {
-      "closeButton": false,
-      "debug": false,
-      "newestOnTop": true,
-      "progressBar": true,
-      "positionClass": "toast-top-right",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    });
-  }
-
-  function errormsg(err) {
-    toastr.error(err, "Error!", {
-      "closeButton": false,
-      "debug": false,
-      "newestOnTop": true,
-      "progressBar": true,
-      "positionClass": "toast-top-right",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    });
-  }
-
-  function success(title, text) {
-    toastr.success(text, title, {
-      "closeButton": false,
-      "debug": false,
-      "newestOnTop": true,
-      "progressBar": true,
-      "positionClass": "toast-top-right",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    });
-  }
-
-  function warning(title, text) {
+  function warningRegister(title, text) {
     toastr.warning(text, title, {
       "closeButton": false,
       "debug": false,
@@ -233,16 +237,16 @@
       "onclick": null,
       "showDuration": "300",
       "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
+      "timeOut": "0",
+      "extendedTimeOut": "0",
       "showEasing": "swing",
       "hideEasing": "linear",
       "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
+      "hideMethod": "hide"
     });
   }
 
-  function info(title, text) {
+  function warningInfo(title, text) {
     toastr.info(text, title, {
       "closeButton": false,
       "debug": false,
@@ -253,33 +257,18 @@
       "onclick": null,
       "showDuration": "300",
       "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
+      "timeOut": "0",
+      "extendedTimeOut": "0",
       "showEasing": "swing",
       "hideEasing": "linear",
       "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
+      "hideMethod": "hide"
     });
   }
 
-  function errormsg(err) {
-    toastr.error(err, "Error!", {
-      "closeButton": false,
-      "debug": false,
-      "newestOnTop": true,
-      "progressBar": true,
-      "positionClass": "toast-top-right",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
-    });
+  function hideLoading() {
+    toastr.clear();
+    console.log("Toastr Cleared!")
   }
 
   $(document).on("click", "#logoutBtn", function () {
@@ -324,15 +313,31 @@
     return val.replace(/[^\d.-]/g, "");
   }
 
-  function formatCurrency(value) {
+  function formatCurrencyUsd(value) {
     if (!value) {
-      return '₱0.00';
+      return '$0.00';
+    }
+    var formattedValue = parseFloat(value).toFixed(2);
+    return '$' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  }
+
+  function formatCurrencyPhp(value) {
+    if (!value) {
+      return '$0.00';
     }
     var formattedValue = parseFloat(value).toFixed(2);
     return '₱' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
   }
 
-  $(document).ready(function () {
+  function formatCurrency(value) {
+    if (!value) {
+      return '$0.00';
+    }
+    var formattedValue = parseFloat(value).toFixed(2);
+    return '$' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  }
+
+  $(document).ready(function () {  
     if ($('.collapse-item.active').length > 0) {
       $('.collapse-item.active').closest('.collapse').addClass('show');
     }
@@ -434,10 +439,40 @@
         setTimeout(() => {
           toggleView.style.display = "none";
         }, 500);
-        toggleButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        toggleButton.innerHTML = '<i class="fas fa-plus"></i>';
       }
 
       isOpen = !isOpen;
     });
+  }
+
+  function formatPrice(event, input) {
+    event.preventDefault();
+
+    const cursorPosition = input.selectionStart;
+    const originalValue = input.value;
+    const defaultValue = '$0.00';
+    const currentValue = originalValue || defaultValue;
+
+    let value = currentValue.replace(/[^0-9.]/g, '');
+    let number = parseFloat(value);
+
+    if (!isNaN(number)) {
+      const formattedValue = number.toLocaleString('en-PH', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      input.value = formattedValue;
+
+      let newPosition = cursorPosition + (formattedValue.indexOf('.') > currentValue.indexOf('.') ? 1 : 0);
+
+      // Set the new cursor position
+      input.setSelectionRange(newPosition, newPosition);
+    } else {
+      input.value = defaultValue;
+    }
   }
 </script>

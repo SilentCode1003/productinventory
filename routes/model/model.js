@@ -187,6 +187,61 @@ class MasterClientModel {
   }
 }
 
+class MasterItemPriceModel {
+  constructor(id, itemid, fobprice, status, createdby, createddate) {
+    this.id = id;
+    this.itemid = itemid;
+    this.fobprice = fobprice;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
+
+class PriceHistoryModel {
+  constructor(id, itempriceid, fobprice, status, createdby, createddate) {
+    this.id = id;
+    this.itempriceid = itempriceid;
+    this.fobprice = fobprice;
+    this.status = status;
+    this.createdby = createdby;
+    this.createddate = createddate;
+  }
+}
+
+class ReplaceItemModel {
+  constructor(
+    id,
+    assetcontrol,
+    itemserial,
+    replacedserial,
+    remarks,
+    date,
+    replacedby,
+    referenceno
+  ) {
+    this.id = id;
+    this.assetcontrol = assetcontrol;
+    this.itemserial = itemserial;
+    this.replacedserial = replacedserial;
+    this.remarks = remarks;
+    this.date = date;
+    this.replacedby = replacedby;
+    this.referenceno = referenceno;
+  }
+}
+
+class DeffectiveItemModel {
+  constructor(id, assetcontrol, itemserial, remarks, date, referenceno) {
+    this.id = id;
+    this.assetcontrol = assetcontrol;
+    this.itemserial = itemserial;
+    this.remarks = remarks;
+    this.date = date;
+    this.referenceno = referenceno;
+  }
+}
+
 //#region Excel Model
 class ProductUploadModel {
   constructor(category, itemname, serial, podate, ponumber, warrantydate) {
@@ -220,6 +275,126 @@ class DeployProductModel {
     this.referenceno = referenceno;
   }
 }
+
+class EmployeeUploadModel {
+  constructor(lastname, middlename, firstname, department, position, access) {
+    this.lastname = lastname;
+    this.middlename = middlename;
+    this.firstname = firstname;
+    this.department = department;
+    this.position = position;
+    this.access = access;
+  }
+}
+
+class SoldProductModel {
+  constructor(serial, date, company, branch, soldby, referenceno, sellingprice, paymenttype, deliveryfee, transactionref, transactionstatus, remarks) {
+    this.serial = serial;
+    this.date = date;
+    this.company = company;
+    this.branch = branch;
+    this.soldby = soldby;
+    this.referenceno = referenceno;
+    this.sellingprice = sellingprice;
+    this.deliveryfee = deliveryfee;
+    this.paymenttype = paymenttype;
+    this.transactionref = transactionref;
+    this.transactionstatus = transactionstatus;
+    this.remarks = remarks;
+  }
+}
+
+class RepairProductModel {
+  constructor(serial, date, repairby, referenceno) {
+    this.serial = serial;
+    this.date = date;
+    this.repairby = repairby;
+    this.referenceno = referenceno;
+  }
+}
+
+class ReturnProductModel {
+  constructor(serial, date, returnby, returnfrom, referenceno) {
+    this.serial = serial;
+    this.date = date;
+    this.returnby = returnby;
+    this.returnfrom = returnfrom;
+    this.referenceno = referenceno;
+  }
+}
+
+class SalesReportModel {
+  constructor(id, category, item, date, quantity, sellingprice, deliveryfee, soldby, soldto, paymenttype, soldrefno, referenceno, remarks, status, assetcontrol) {
+    this.id = id;
+    this.category = category;
+    this.item = item;
+    this.date = date;
+    this.quantity = quantity;
+    this.sellingprice = sellingprice;
+    this.deliveryfee = deliveryfee;
+    this.soldby = soldby;
+    this.soldto = soldto;
+    this.paymenttype = paymenttype;
+    this.soldrefno = soldrefno;
+    this.referenceno = referenceno;
+    this.remarks = remarks;
+    this.status = status;
+    this.assetcontrol = assetcontrol;
+  }
+}
+
+class SalesReportHistoryModel {
+  constructor(id, date, remarks, status, referenceno, documents) {
+    this.id = id;
+    this.date = date;
+    this.remarks = remarks;
+    this.status = status;
+    this.referenceno = referenceno;
+    this.documents = documents;
+  }
+}
+
+class UploadItemPriceModel {
+  constructor(itemname, fobprice) {
+    this.itemname = itemname;
+    this.fobprice = fobprice;
+  }
+}
+
+class UploadDefectiveItemModel {
+  constructor(assetcontrol, itemserial, remarks, date, referenceno) {
+    this.assetcontrol = assetcontrol;
+    this.itemserial = itemserial;
+    this.remarks = remarks;
+    this.date = date;
+    this.referenceno = referenceno;
+  }
+}
+
+class UploadReplaceItemModel {
+  constructor(itemserial, replacedserial, remarks, date, replacedby, referenceno, replacementmode) {
+    this.itemserial = itemserial;
+    this.replacedserial = replacedserial;
+    this.remarks = remarks;
+    this.date = date;
+    this.replacedby = replacedby;
+    this.referenceno = referenceno;
+    this.replacementmode = replacementmode;
+  }
+}
+
+class UploadSalesHistoryModel {
+  constructor(salesreportid, date, remarks, status, referenceno, documents) {
+    this.salesreportid = salesreportid;
+    this.date = date;
+    this.remarks = remarks;
+    this.status = status;
+    this.referenceno = referenceno;
+    this.documents = documents;
+  }
+}
+
+
 //#endregion
 
 //#region Search
@@ -300,7 +475,21 @@ module.exports = {
   MasterPositionModel,
   MasterClientModel,
   ProductUploadModel,
+  RepairProductModel,
   TransferProductModel,
   SearchModel,
-  DeployProductModel
+  DeployProductModel,
+  EmployeeUploadModel,
+  MasterItemPriceModel,
+  PriceHistoryModel,
+  SoldProductModel,
+  ReplaceItemModel,
+  DeffectiveItemModel,
+  ReturnProductModel,
+  UploadItemPriceModel,
+  UploadDefectiveItemModel,
+  UploadReplaceItemModel,
+  SalesReportModel,
+  SalesReportHistoryModel,
+  UploadSalesHistoryModel
 };

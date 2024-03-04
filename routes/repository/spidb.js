@@ -67,9 +67,10 @@ exports.Select = (sql, callback) => {
     });
     connection.query(sql, (error, results, fields) => {
       if (error) {
+        console.log(error)
+
         return callback(error, null);
       }
-
       callback(null, results);
     });
   } catch (error) {
@@ -120,7 +121,7 @@ exports.Update = async (sql, data, callback) => {
       if (error) {
         callback(error, null);
       }
-      console.log("Rows affected:", results.affectedRows);
+      // console.log("Rows affected:", results.affectedRows);
 
       callback(null, `Rows affected: ${results.affectedRows}`);
     });
@@ -387,6 +388,113 @@ exports.InsertTable = (tablename, data, callback) => {
       mc_status,
       mc_createdby,
       mc_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "master_item_price") {
+    let sql = `INSERT INTO master_item_price(
+    mip_itemid,
+    mip_fobprice,
+    mip_status,
+    mip_createdby,
+    mip_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "price_history") {
+    let sql = `INSERT INTO price_history(
+      ph_itempriceid,
+      ph_fobprice,
+      ph_status,
+      ph_createdby,
+      ph_createddate) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "deffectiveitem") {
+    let sql = `INSERT INTO deffectiveitem(
+      d_assetcontrol,
+      d_itemserial,
+      d_remarks,
+      d_date,
+      d_referenceno) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "replaceitem") {
+    let sql = `INSERT INTO replaceitem(
+      r_assetcontrol,
+      r_itemserial,
+      r_replacedserial,
+      r_remarks,
+      r_date,
+      r_replacedby,
+      r_referenceno) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "sales_report") {
+    let sql = `INSERT INTO sales_report(
+      sr_category,
+      sr_item,
+      sr_date,
+      sr_quantity,
+      sr_sellingprice,
+      sr_deliveryfee,
+      sr_soldby,
+      sr_soldto,
+      sr_paymenttype,
+      sr_soldrefno,
+      sr_referenceno,
+      sr_remarks,
+      sr_status,
+      sr_assetcontrol) VALUES ?`;
+
+    this.Insert(sql, data, (err, result) => {
+      if (err) {
+        callback(err, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  if (tablename == "sales_report_history") {
+    let sql = `INSERT INTO sales_report_history(
+      srh_date,
+      srh_remarks,
+      srh_status,
+      srh_referenceno,
+      srh_documents) VALUES ?`;
 
     this.Insert(sql, data, (err, result) => {
       if (err) {

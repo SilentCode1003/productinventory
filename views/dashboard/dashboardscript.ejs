@@ -1,10 +1,13 @@
 <script>
     $(document).ready(function () {
         LoadList();
+        Loadtable();
         let myChart;
+        let categorylist = [];
+
         $('#dateRange').daterangepicker({
             opens: 'right',
-            startDate: moment().subtract(7, 'days'),
+            startDate: moment().startOf('month'),
             endDate: moment(),
             maxDate: moment(),
             ranges: {
@@ -38,28 +41,31 @@
         });
 
         let initialdate = $('#dateRange').val();
-        // getData(initialdate);
+        getsoldcount(initialdate);
 
-        $(document).on('change', '#categoryid', function() {    
+        $(document).on('change', '#categoryid', function () {
             let category = $(this).val();
+            console.log(category)
             let dateRange = $('#dateRange').val();
+
             if (myChart) {
                 myChart.destroy();
             }
-            console.log(category)
+            // console.log(category)
             getData(dateRange, category);
         });
 
-        $(document).on('change', '#dateRange', function() {
+        $(document).on('change', '#dateRange', function () {
             let dateRange = $(this).val();
             let category = $('#categoryid').val();
+            getsoldcount(dateRange)
             if (myChart) {
                 myChart.destroy();
             }
-            console.log(dateRange)
-            if(category != ''){
+            // console.log(dateRange)
+            if (category != '') {
                 getData(dateRange, category);
-            }else{
+            } else {
                 warning('Select Category', 'No Category Selected!')
             }
         });
@@ -70,10 +76,18 @@
                 url: "/category/load",
                 success: function (result) {
                     let container = result.data;
+
+                    categorylist = container.map(item => item.name);
+                    let index = Math.floor(Math.random() * categorylist.length);
+                    let randomCategory = categorylist[index];
+                    if (myChart) {
+                        myChart.destroy();
+                    }
+                    getData(initialdate, randomCategory);
+
                     $.each(container, (key, item) => {
                         let categoryname = item.name;
                         let categoryid = item.id;
-                        console.log(categoryname);
 
                         var listItem = $("<li></li>")
                             .text(categoryname)
@@ -94,7 +108,6 @@
                     errormsg(err);
                 },
             });
-
         }
 
         function getData(daterange, category) {
@@ -103,8 +116,8 @@
             let formattedStartDate = startDate.format('MM/DD/YYYY');
             let formattedEndDate = endDate.format('MM/DD/YYYY');
             let formattedDate = formattedStartDate + ' - ' + formattedEndDate;
-            console.log(formattedDate)
-            console.log("Paylaod: ", daterange, category)
+            // console.log(formattedDate)
+            // console.log("Paylaod: ", daterange, category)
             $.ajax({
                 url: '/sold/getsold',
                 method: 'POST',
@@ -115,12 +128,56 @@
                 },
                 success: function (data) {
                     if (data.msg === 'success') {
-                        console.log("Data: ", data.data)
-                        if (data.data.length != 0){
-                            var productByDate = {};
+                        // console.log("Data: ", data.data)
+                        if (data.data.length != 0) {
+                            let filteredData = data.data.filter(function (item) {
+                                let itemDate = moment(item.date, 'YYYY-MM-DD');
+                                return itemDate.isSameOrAfter(startDate) && itemDate.isSameOrBefore(endDate);
+                            });
 
-                            var allProducts = getAllProducts(data.data);
-                            var allDates = getAllDatesInRange(startDate, endDate);
+                            let producByDateTable = {};
+
+                            filteredData.forEach(function (item) {
+                                let date = item.date;
+                                let productName = item.productname;
+                                let quantity = 1;
+                                let totalPrice = item.price;
+
+                                producByDateTable[date] = producByDateTable[date] || {};
+                                producByDateTable[date][productName] = producByDateTable[date][productName] || { quantity: 0, totalPrice: 0 };
+                                producByDateTable[date][productName].quantity += quantity;
+                                producByDateTable[date][productName].totalPrice += totalPrice;
+                            });
+
+                            let tableHtml = '<thead class="table-header header-style" style="background-color: white;"><tr>' +
+                                '<th class="text-center">Date</th>' +
+                                '<th class="text-center">Product Name</th>' +
+                                '<th class="text-center">Quantity</th>' +
+                                '<th class="text-center">Total Price</th>' +
+                                '</tr></thead><tbody>';
+
+                            Object.keys(producByDateTable).forEach(function (date) {
+                                Object.keys(producByDateTable[date]).forEach(function (productName) {
+                                    let quantity = producByDateTable[date][productName].quantity;
+                                    let totalPrice = producByDateTable[date][productName].totalPrice;
+
+                                    tableHtml += '<tr>' +
+                                        '<td class="text-center">' + date + '</td>' +
+                                        '<td class="text-center">' + productName + '</td>' +
+                                        '<td class="text-center">' + quantity + '</td>' +
+                                        '<td class="text-center">' + formatCurrency(totalPrice) + '</td>' +
+                                        '</tr>';
+                                });
+                            });
+
+                            tableHtml += '</tbody>';
+
+                            $('#datatable').empty().html(tableHtml);
+
+                            let productByDate = {};
+
+                            let allProducts = getAllProducts(data.data);
+                            let allDates = getAllDatesInRange(startDate, endDate);
 
                             allDates.forEach(function (date) {
                                 productByDate[date] = {};
@@ -130,25 +187,25 @@
                             });
 
                             data.data.forEach(function (item) {
-                                var date = item.date;
-                                var productName = item.productname;
+                                let date = item.date;
+                                let productName = item.productname;
+                                let productprice = item.price;
 
                                 productByDate[date] = productByDate[date] || {};
                                 productByDate[date][productName] = (productByDate[date][productName] || 0) + 1;
                             });
 
-                            console.log("data: ",productByDate);
 
                             const dates = Object.keys(productByDate);
-                            const products = getAllProducts(data.data);
+                            // console.log("data: ", productByDate);
 
                             const chartData = {
                                 labels: dates,
-                                datasets: products.map(product => ({
+                                datasets: allProducts.map(product => ({
                                     label: product,
                                     data: dates.map(date => productByDate[date][product] || 0),
-                                    backgroundColor: 'rgb(69, 237, 242)', 
-                                    borderColor: 'rgb(87, 125, 134)',
+                                    backgroundColor: 'rgb(216, 42, 39, 0.65)',
+                                    borderColor: 'rgb(216, 42, 39, 0.65)',
                                     borderWidth: 2,
                                     fill: false,
                                     lineTension: 0.4
@@ -185,37 +242,20 @@
                                         legend: {
                                             labels: {
                                                 font: {
-                                                    family: 'Manrope',
+                                                    family: 'Share Tech',
                                                     size: 14, // Set the font size here
                                                 },
                                             },
-                                        },
-                                        scales: {
-                                            x: {
-                                                ticks: {
-                                                    font: {
-                                                        family: 'Manrope',
-                                                        size: 12,
-                                                    },
-                                                },
-                                            },
-                                            y: {
-                                                ticks: {
-                                                    font: {
-                                                        family: 'Manrope',
-                                                        size: 12,
-                                                    },
-                                                },
-                                            },
-                                        },
+                                        }
                                     },
                                 },
                             };
 
                             myChart = new Chart(ctx, config);
                             $('#noDataMessage').hide();
-                        }else{
+                        } else {
                             $('#noDataMessage').show();
+                            $('#datatable').empty();
                         }
 
                     } else {
@@ -256,6 +296,286 @@
             });
             return Array.from(dates);
         }
+
+        $.ajax({
+            type: "GET",
+            url: "/product/getstocks",
+            success: function (result) {
+                let container = result.data;
+                $("#totalstocks").text(container.length);
+                // console.log("stocks: ", container);
+
+                let groupedData = groupDataByItemName(container);
+
+                displayDataInTable(groupedData);
+
+                // generatePDF();
+
+                createChart(container);
+            },
+            error: function (err) {
+                errormsg(err);
+            },
+        });
+        // const mockData = {
+        //     item1: { category: 'Category1', stocks: 10, totalPrice: 100 },
+        //     item2: { category: 'Category2', stocks: 20, totalPrice: 200 },
+        // };
+
+    // displayDataInTable(mockData);
+
+        function groupDataByItemName(data) {
+
+            const groupedData = {};
+            data.forEach(item => {
+                const itemName = item.itemname;
+                groupedData[itemName] = groupedData[itemName] || {
+                    category: item.category,
+                    stocks: 0,
+                    totalPrice: 0,
+                };
+                groupedData[itemName].stocks += 1;
+                groupedData[itemName].totalPrice += item.price;
+            });
+            console.log("sample",groupedData)
+
+            return groupedData;
+        }
+
+        function displayDataInTable(groupedData) {
+            var tableHtml = '<thead class="table-header header-style"><tr>' +
+                '<th class="text-center">Item Name</th>' +
+                '<th class="text-center">Category</th>' +
+                '<th class="text-center">Stocks</th>' +
+                '<th class="text-center">Total Price</th>' +
+                '</tr></thead><tbody class="no-border">';
+
+            Object.keys(groupedData).forEach(itemName => {
+                const { category, stocks, totalPrice } = groupedData[itemName];
+                tableHtml += '<tr>' +
+                    '<td class="text-center">' + itemName + '</td>' +
+                    '<td class="text-center">' + category + '</td>' +
+                    '<td class="text-center">' + stocks + '</td>' +
+                    '<td class="text-center">' + formatCurrency(totalPrice) + '</td>' +
+                    '</tr>';
+            });
+
+            tableHtml += '</tbody>';
+
+            $('#datatable2').empty().html(tableHtml);
+        }
+
+        function createChart(data) {
+            let allCategories = [...new Set(data.map(item => item.category.toUpperCase()))];
+
+            let stocks = [];
+
+            allCategories.forEach(category => {
+                let count = data.filter(item => item.category.toUpperCase() === category).length;
+                stocks.push({ category, count });
+            });
+
+            let labels = stocks.map(entry => entry.category);
+            let chartData = stocks.map(entry => entry.count);
+
+            let ctx = document.getElementById('myChart1').getContext('2d');
+            let myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stock Counts',
+                        data: chartData,
+                        backgroundColor: 'rgb(216, 42, 39, 0.65)',
+                        borderColor: 'rgb(216, 42, 39',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        labels: {
+                             font: {
+                                family: 'Share Tech',
+                                size: 14,
+                            },
+                        },
+                    }
+                }
+            });
+        }
+
+        function Loadtable () {
+            $.ajax({
+                url: '/index/deployed',
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.msg === 'success') {
+                        populatedeploytable(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+
+            $.ajax({
+                url: '/index/sold',
+                method: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.msg === 'success') {
+                        populatesoldtable(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        function populatedeploytable(data) {
+            console.log(data);
+            const tableBody = $('#deploytable tbody');
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $('<tr>').append($('<td>', {
+                    colspan: 3,
+                    class: 'text-center',
+                    text: 'No Data'
+                }));
+                tableBody.append(tr);
+            } else {
+                data.forEach(item => {
+                    const tr = $('<tr>').append(
+                        $('<td>', { text: item.assetcontrol, 'data-label': 'ID', class: 'custom-mobile-align cbi-link' }),
+                        $('<td>', { text: item.date, 'data-label': 'Item', class: 'custom-mobile-align' }),
+                        $('<td>', { text: item.referenceno, 'data-label': 'Category', class: 'custom-mobile-align' }),
+                    );
+
+                    tableBody.append(tr);
+                });
+            }
+        }
+
+        function populatesoldtable(data) {
+            console.log(data);
+            const tableBody = $('#soldtable tbody');
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $('<tr>').append($('<td>', {
+                    colspan: 3,
+                    class: 'text-center',
+                    text: 'No Data'
+                }));
+                tableBody.append(tr);
+            } else {
+                data.forEach(item => {
+                    const tr = $('<tr>').append(
+                        $('<td>', { text: item.assetcontrol, 'data-label': 'ID', class: 'custom-mobile-align cbi-link' }),
+                        $('<td>', { text: item.date, 'data-label': 'Item', class: 'custom-mobile-align ' }),
+                        $('<td>', { text: item.referenceno, 'data-label': 'Category', class: 'custom-mobile-align ' }),
+                    );
+
+                    tableBody.append(tr);
+                });
+            }
+        }
+
+        function getsoldcount(date){
+            let startDate = moment(date.split(' - ')[0], 'MMM D, YYYY');
+            let endDate = moment(date.split(' - ')[1], 'MMM D, YYYY');
+            let formattedStartDate = startDate.format('MM/DD/YYYY');
+            let formattedEndDate = endDate.format('MM/DD/YYYY');
+            let formattedDate = formattedStartDate + ' - ' + formattedEndDate;
+
+            $.ajax({
+                url: '/index/getsoldcount',
+                method: 'POST',
+                dataType: 'json',
+                data:{
+                    daterange: formattedDate
+                },
+                success: function (data) {
+                    if (data.msg === 'success') {
+                        let container = data.data;
+                        console.log("Data: ", container)
+                        let totalprice = 0;
+                        // console.log("sold total: ", container.length)
+                        container.forEach(item => {
+                            console.log("Price: ", item.price)
+                            totalprice += item.price;
+                        });
+                        $("#totalsold").text(formatCurrency(totalprice));
+                        $("#date").text(" ("+ date + ")");
+                        
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        $('#convertopdf').on('click', function () {
+            $.ajax({
+                type: "GET",
+                url: "/product/getstocks",
+                success: function (result) {
+                    let container = result.data;
+                    $("#totalstocks").text(container.length);
+                    // console.log("stocks: ", container);
+
+                    let groupedData = groupDataByItemName(container);
+                    console.log("sample data",groupedData);
+                    let template = 'STOCKS REPORT';
+                    // console.log("Current Stock: ", groupedData);
+                    if(groupedData.length != 0){
+                        $.ajax({
+                            type: "POST",
+                            url: "/index/processpdfdata",
+                            data: {
+                                processeddata: groupedData,
+                                template: template
+                            },
+                            success: function (result) {
+                                window.open(`/index/generatepdf`, "_blank");
+                                success("Success", "PDF generate successfully!");
+                            },
+                            error: function (err) {
+                                errormsg(err);
+                            },
+                        });
+                    }
+
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        });
+
+        // function generatePDF() {
+        //     const element = document.getElementById('datatable2');
+        //     const pdfOptions = {
+        //         margin: 10,
+        //         filename: 'table.pdf',
+        //         image: { type: 'jpeg', quality: 0.98 },
+        //         html2canvas: { scale: 2 },
+        //         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        //     };
+
+        //     html2pdf(element, pdfOptions);
+        // }
 
     });
 </script>

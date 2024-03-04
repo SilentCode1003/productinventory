@@ -29,16 +29,22 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
+    const page = req.query.page || 1;
+    const itemsPerPage = 500;
+    const offset = (page - 1) * itemsPerPage;
+
     let sql = `select 
-    d_id,
-    d_assetcontrol,
-    d_serial,
-    d_date,
-    e_fullname as d_deployby,
-    d_deployto,
-    d_referenceno
-    from deploy
-    inner join employee on e_id = d_deployby`;
+      d_id,
+      d_assetcontrol,
+      d_serial,
+      d_date,
+      e_fullname as d_deployby,
+      d_deployto,
+      d_referenceno
+      from deploy
+      inner join employee on e_id = d_deployby
+      LIMIT ${itemsPerPage} OFFSET ${offset}`;
+
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
 
@@ -112,15 +118,18 @@ router.post("/upload", (req, res) => {
     let counter = 0;
     let noentry = [];
     let dupentry = [];
+
     dataJson.forEach((item) => {
       // console.log(item.serial);
       Check_Product(item.serial)
         .then((result) => {
-          // console.log(item.serial, "Result: ", result);
           let product = Product(result);
+          // console.log(product[0].assetcontrol);
+
           Check_Employee(item.deployby)
             .then((result) => {
               let employee = Employee(result);
+              // console.log(employee[0].fullname);
               let deployby = employee[0].id;
 
               Check_Deploy(
@@ -129,14 +138,21 @@ router.post("/upload", (req, res) => {
                 item.deployto
               )
                 .then((result) => {
-                  counter += 1;
                   let deploydup = Deploy(result);
-                  // console.log(deploydup[0].assetcontrol);
+                  counter += 1;
+
+                  // console.log(deploydup.length);
+
                   if (deploydup.length != 0) {
+                    // console.log("Duplicate: ", item.serial);
                     dupentry.push(item.serial);
                   } else {
                     if (product.length != 0) {
                       let assetcontrol = product[0].assetcontrol;
+                      let status = GetValue(DLY());
+                      let update_product =
+                        "update product set p_status=? where p_assetcontrol=?";
+                      let update_product_data = [status, assetcontrol];
 
                       deploy.push([
                         assetcontrol,
@@ -146,20 +162,24 @@ router.post("/upload", (req, res) => {
                         item.deployto,
                         item.referenceno,
                       ]);
+
+                      Update(
+                        update_product,
+                        update_product_data,
+                        (err, result) => {
+                          if (err) console.error("Error: ", err);
+                          // console.log(result);
+                        }
+                      );
                     } else {
                       noentry.push(item.serial);
                     }
-
-                    // console.log("Counter: ", counter, "Current: ", dataJson.length);
                   }
 
                   if (counter == dataJson.length) {
-                    console.log(noentry);
-
                     if (deploy.length != 0) {
                       InsertTable("deploy", deploy, (err, result) => {
                         if (err) console.error("Error: ", err);
-
                         console.log(result);
                       });
                     }
@@ -173,6 +193,7 @@ router.post("/upload", (req, res) => {
                       message += "dupentry";
                     }
 
+                    console.log(message);
                     if (message != "") {
                       return res.json({
                         msg: message,
@@ -189,14 +210,27 @@ router.post("/upload", (req, res) => {
                   }
                 })
                 .catch((error) => {
-                  console.error("Error: ", error);
+                  console.error(
+                    "Error: ",
+                    error,
+                    item.deployby,
+                    item.serial,
+                    product[0].assetcontrol,
+                    "Check Deploy"
+                  );
                   return res.json({
                     msg: error,
                   });
                 });
             })
             .catch((error) => {
-              console.error("Error: ", error);
+              console.error(
+                "Error: ",
+                error,
+                "Name:",
+                item.deployby,
+                item.serial
+              );
               return res.json({
                 msg: error,
               });
@@ -215,31 +249,6 @@ router.post("/upload", (req, res) => {
     });
   }
 });
-
-function Check_Product(serial) {
-  return new Promise((resolve, reject) => {
-    let sql = "select * from product where p_serial=?";
-    // console.log(serial);
-    SelectParameter(sql, [serial], (err, result) => {
-      if (err) reject(err);
-      // console.log(result);
-
-      resolve(result);
-    });
-  });
-}
-
-function Check_Employee(fullname) {
-  return new Promise((resolve, reject) => {
-    let sql = "select * from employee where e_fullname=?";
-    SelectParameter(sql, [fullname], (err, result) => {
-      if (err) reject(err);
-      // console.log(result);
-
-      resolve(result);
-    });
-  });
-}
 
 //#region
 function Check_Deploy(assetcontrol, date, deployto) {
@@ -270,6 +279,31 @@ function Deploy_Product(assetcontrol) {
       }
 
       console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+
+function Check_Product(serial) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from product where p_serial=?";
+    // console.log(serial);
+    SelectParameter(sql, [serial], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
+
+      resolve(result);
+    });
+  });
+}
+
+function Check_Employee(fullname) {
+  return new Promise((resolve, reject) => {
+    let sql = "select * from employee where e_fullname like ?";
+    SelectParameter(sql, [`%${fullname}%`], (err, result) => {
+      if (err) reject(err);
+      // console.log(result);
 
       resolve(result);
     });

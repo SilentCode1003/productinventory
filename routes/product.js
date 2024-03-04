@@ -6,6 +6,7 @@ const {
   InsertTable,
   SelectParameter,
   StoredProcedure,
+  SelectResult,
 } = require("./repository/spidb");
 const {
   Product,
@@ -34,8 +35,156 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
+    let sql = `
+      SELECT 
+        p.p_assetcontrol as p_assetcontrol,
+        p.p_serial as p_serial,
+        mi.mi_name as p_itemname,
+        mc.mc_name as p_category,
+        p.p_podate as p_podate,
+        p.p_ponumber as p_ponumber,
+        p.p_warrantydate as p_warrantydate,
+        p.p_status as p_status
+      FROM 
+        product p
+      INNER JOIN 
+        master_item mi ON p.p_itemname = mi.mi_id
+      INNER JOIN 
+        master_category mc ON p.p_category = mc.mc_id;
+    `;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      if (result.length != 0) {
+        let data = Product(result);
+
+        // console.log(data);
+        res.json({
+          msg: "success",
+          data: data,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.get("/getproductstatus", (req, res) => {
+  try {
+    let sql = `SELECT DISTINCT p_status as status FROM product`;
+
+    SelectResult(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      if (result.length != 0) {
+        // console.log(data);
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/getProductbyCategory", (req, res) => {
+  try {
+    let {category, status} = req.body;
+    let sql = `SELECT * FROM product WHERE p_category = '${category}' AND p_status = '${status}'`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      let product = Product(result);
+      
+      if (result.length != 0) {
+        // console.log(data);
+        res.json({
+          msg: "success",
+          data: product,
+        });
+      } else {
+        console.log(sql)
+        res.json({
+          msg: "NODATA",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.get("/getstocks", (req, res) => {
+  try {
+    let sql = `
+      SELECT
+        p_assetcontrol as assetcontrol,
+        p_serial as serial,
+        mi_name as itemname,
+        mc_name as category,
+        p_podate as podate,
+        p_ponumber as ponumber,
+        p_warrantydate as warrantydate,
+        p_status as status,
+        mip_fobprice as price
+      FROM
+        product p
+      INNER JOIN
+        master_item  ON p_itemname = mi_id
+      INNER JOIN
+        master_category mc ON p_category = mc_id
+      INNER JOIN
+        master_item_price ON  mip_itemid = p_itemname
+      WHERE p_status in ('WAREHOUSE', 'RETURNED');`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      if (result.length != 0) {
+
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      } else {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.get("/loadproduct", (req, res) => {
+  try {
     const page = req.query.page || 1;
-    const itemsPerPage = 50;
+    const itemsPerPage = 500;
     const offset = (page - 1) * itemsPerPage;
 
     let sql = `
@@ -197,96 +346,134 @@ router.post("/upload", (req, res) => {
     let status = GetValue(WH());
     let counter = 0;
     let sequence = 0;
-    let duplicate = "";
     let product = [];
+    let notexist = [];
+    let notice = [];
 
+    // console.log(dataJSon);
     Product_Count()
       .then((result) => {
         // console.log(result);
+        console.log("Data Length:", dataJSon.length)
         sequence = parseInt(result[0].total);
         dataJSon.forEach((item) => {
           Product_Check(item.serial)
             .then((result) => {
               // console.log(result);
-              if (result[0].total != 0) {
-                duplicate += item.serial;
-              } else {
-                Get_Category(item.category)
-                  .then((result) => {
-                    // console.log(result);
-                    let category = MasterCategory(result);
-                    let categoryid = category[0].id;
-                    Get_Item(item.itemname, categoryid)
-                      .then((result) => {
-                        let dataitems = MasterItem(result);
-                        // console.log(dataitems);
-                        let itemid = dataitems[0].id;
+              if (result != undefined || result != null) {
+                if (result[0].total != 0) {
+                  counter += 1;
+                  notice.push("SERIAL_"+item.serial + '_DUPLICATE_ENTRY')
+                  console.log("SERIAL_"+item.serial + '_DUPLICATE_ENTRY')
+                  console.log("counter:", counter);
+                  uploadProduct();
+                } else {
+                  Get_Category(item.category)
+                    .then((result) => {
+                      if (result.length != 0) {
+                        // console.log(result);
+                        let category = MasterCategory(result);
+                        let categoryid = category[0].id;
+                        Get_Item(item.itemname, categoryid)
+                          .then((result) => {
+                            if (result.length != 0) {
+                              let dataitems = MasterItem(result);
+                              console.log("item names data: ", dataitems);
+                              let itemid = dataitems[0].id;
 
-                        counter += 1;
-                        sequence += 1;
-                        console.log(
-                          "sequence: ",
-                          sequence,
-                          "counter: ",
-                          counter,
-                          "item serial: ",
-                          item.serial
-                        );
+                              counter += 1;
+                              sequence += 1;
 
-                        product.push([
-                          GenerateAssetTag(categoryid, sequence),
-                          item.serial,
-                          itemid,
-                          categoryid,
-                          convertExcelDate(item.podate),
-                          item.ponumber,
-                          convertExcelDate(item.warrantydate),
-                          status,
-                        ]);
+                              console.log(
+                                "sequence: ",
+                                sequence,
+                                "counter: ",
+                                counter,
+                                "item serial: ",
+                                item.serial,
+                                "Data Length: ",
+                                dataJSon.length
+                              );
 
-                        // console.log(product);
-
-                        if (counter == dataJSon.length) {
-                          console.log(product);
-                          InsertTable("product", product, (err, result) => {
-                            if (err) console.error("Error: ", err);
-                            console.log(result);
+                              product.push([
+                                GenerateAssetTag(categoryid, sequence),
+                                item.serial,
+                                itemid,
+                                categoryid,
+                                convertExcelDate(item.podate),
+                                item.ponumber,
+                                convertExcelDate(item.warrantydate),
+                                status,
+                              ]);
+                              uploadProduct();
+                              // console.log(product);
+                            } else {
+                              counter += 1;
+                              notice.push("SERIAL_"+item.serial + '_INVALID_ITEM_NAME_('+item.itemname+")")
+                              console.log("SERIAL_"+item.serial + '_INVALID_ITEM_NAME_('+item.itemname+")")
+                              console.log("counter:", counter);
+                              uploadProduct();
+                            }
+                          })
+                          .catch((error) => {
+                            console.log("Get Items: ", error);
+                            res.json({
+                              msg: error,
+                            });
                           });
-
-                          if (duplicate != "") {
-                            return res.json({
-                              msg: "exist",
-                              data: duplicate,
-                            });
-                          } else {
-                            return res.json({
-                              msg: "success",
-                            });
-                          }
-                        }
-                      })
-                      .catch((error) => {
-                        console.log("Get Items: ", error);
-                        res.json({
-                          msg: error,
-                        });
+                      } else {
+                        counter += 1;
+                        notice.push("SERIAL_"+item.serial + "_INVALID_CATEGORY_("+ item.category +")")
+                        console.log("SERIAL_"+item.serial + "_INVALID_CATEGORY_("+ item.category +")")
+                        console.log("counter:", counter)
+                        uploadProduct();
+                      }
+                    })
+                    .catch((error) => {
+                      console.log("Get Category: ", error);
+                      return res.json({
+                        msg: error,
                       });
-                  })
-                  .catch((error) => {
-                    console.log("Get Category: ", error);
-                    return res.json({
-                      msg: error,
                     });
-                  });
+                }
+              } else {
+                counter += 1;
+                notexist.push(item.serial)
+                uploadProduct();
               }
 
-              if (counter == dataJSon.length) {
-                console.log("DUplicate!");
-                if (duplicate != "") {
-                  return res.json({
-                    msg: "exist",
-                    data: duplicate,
-                  });
+              // if (counter == dataJSon.length) {
+              //   console.log("Duplicate!");
+              //   console.log("counter measures:", notice)
+              //   if (duplicate != "") {
+              //     return res.json({
+              //       msg: "exist",
+              //       data: duplicate,
+              //     });
+              //   }
+              // }
+
+              function uploadProduct(){
+                if (counter == dataJSon.length) {
+                  console.log(product);
+                  if(product.length != 0){
+                    InsertTable("product", product, (err, result) => {
+                      if (err) console.error("Error: ", err);
+                      console.log(result);
+                    });
+                  }else{
+                    console.log("NO DATA PUSHED");
+                  }
+                  if (notice != 0) {
+                    return res.json({
+                      msg: "notice",
+                      data: notice,
+                    });
+                  } else {
+                    return res.json({
+                      msg: "success",
+                    });
+                  }
                 }
               }
             })
@@ -314,6 +501,7 @@ router.post("/upload", (req, res) => {
 router.post("/search", (req, res) => {
   try {
     const { keyword } = req.body;
+    console.log(keyword);
     let sql = `select
     p_assetcontrol as assetcontrol,
     mc_name as category,
@@ -352,9 +540,10 @@ router.post("/search", (req, res) => {
     left join repair on p_serial = repair.r_serial
     left join sold on p_serial = s_serial
     where p_serial like ? 
-    or p_assetcontrol like ?`;
-    let command = SelectStatement(sql, [`${keyword}%`, `${keyword}%`]);
-
+    or p_assetcontrol like ? 
+    or mi_name like ?`;
+    let command = SelectStatement(sql, [`${keyword}%`, `${keyword}%`, `${keyword}%`]);
+    console.log(command);
     Select(command, (err, result) => {
       if (err) console.error("Error: ", err);
       let data = Search(result);

@@ -9,6 +9,21 @@
     let id = "";
     let name = "";
     let status = "";
+    
+    const loader = `  
+        <tr class="loading-row">
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+        </tr>`;
+
+    const tbody = $('#datatable tbody');
+    for(let i = 0; i < 7; i++){
+      tbody.append(loader);
+    }
 
     LoadTable();
 
@@ -24,7 +39,7 @@
       id = dataRow[0];
       company = dataRow[1];
       branch = dataRow[2];
-      status = dataRow[3];
+      status = dataRow[5];
     });
 
     $(document).on("click", "#addBtn", function () {
@@ -172,24 +187,36 @@
     //#endregion EDIT/STATUS/UPDATE
 
     //#region SEARCH
-    $("#search").on("keyup", function () {
-      var input, filter, table, tr, td, i, txtValue;
-      input = document.getElementById("search");
-      filter = input.value.toUpperCase();
-      table = document.getElementById("datatable");
-      tr = table.getElementsByTagName("tr");
-      for (i = 0; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName("td")[1];
-        if (td) {
-          txtValue = td.textContent || td.innerText;
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            tr[i].style.display = "";
-          } else {
-            tr[i].style.display = "none";
-          }
+    function filterTableRows() {
+      const searchQuery = $("#search").val().trim().toLowerCase();
+      let foundMatches = false;
+
+      $("#no-match-row").remove();
+
+      $("#datatable tbody tr").each(function () {
+        const rowData = $(this).text().toLowerCase();
+        if (rowData.includes(searchQuery)) {
+          $(this).show();
+          foundMatches = true;
+        } else {
+          $(this).hide();
         }
+      });
+
+      if (!foundMatches) {
+        const noMatchRow = $("<tr>").append(
+          $("<td>", {
+            colspan: 7,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        $("#datatable tbody").append(noMatchRow);
+        noMatchRow.attr("id", "no-match-row");
       }
-    });
+    }
+
+    $("#search").on("input", filterTableRows);
     //#endregion SEARCH
 
     //#region LOAD TABLE
@@ -209,22 +236,28 @@
           let action = '';
           if (item.status === 'ACTIVE') {
             action = `
-                        <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                        <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: #45edf2;"></i></span>`;
+                        <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                        <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
           } else if (item.status === 'INACTIVE') {
             action = `
-                        <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: #45edf2;"></i></span>
-                        <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: #45edf2;"></i></span>`;
+                        <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                        <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
           }
+          const statusBackground = item.status === 'ACTIVE' ? 'status-success' : 'status-warning';
+          const containerBackground = item.status === 'ACTIVE' ? 'status-container-sc' : 'status-container-wr';
 
           const tr = $('<tr>').append(
             $('<td>', { text: item.id, 'data-label': 'ID', class: 'custom-mobile-align' }),
             $('<td>', { text: item.company, 'data-label': 'Company', class: 'custom-mobile-align' }),
             $('<td>', { text: item.branch, 'data-label': 'Branch', class: 'custom-mobile-align' }),
-            $('<td>', { text: item.status, 'data-label': 'Status', class: 'custom-mobile-align' }),
             $('<td>', { text: item.createdby, 'data-label': 'Created By', class: 'custom-mobile-align' }),
             $('<td>', { text: item.createddate, 'data-label': 'Created Date', class: 'custom-mobile-align' }),
-            $('<td>', { html: action, 'data-label': 'Action', class: 'actionWidth' })
+            $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status'}).append(
+              $('<div>', { class: containerBackground }).append(
+                $('<span>', { text: item.status, class: statusBackground })
+              )
+            ),
+            $('<td>', { html: action, 'data-label': 'Action', class: 'custom-mobile-align' })
           );
 
           tableBody.append(tr);
@@ -268,6 +301,11 @@
                 tableBody.append(tr);
               }else{
                 if (data.msg === 'success') {
+                  var loadingstate = document.querySelectorAll('.loading-row');
+                  loadingstate.forEach(function (row) {
+                    row.remove();
+                  });
+                  
                   populatedatatable(data.data);
                   currentPage++;
                 } else {

@@ -1,20 +1,70 @@
+<div class="modal fade bd-example-modal-lg" id="deploymodal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-xlg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">Product Info</h3>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i> Close
+                </button>
+                <button type="button" id="printBtn"
+                    class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                    <i class="fa fa-check" aria-hidden="true"></i> Print
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="soldmodal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-xlg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="exampleModalLabel">Product Info</h3>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm"
+                    data-dismiss="modal">
+                    <i class="fa fa-times" aria-hidden="true"></i> Close
+                </button>
+                <button type="button" id="printBtn"
+                    class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm">
+                    <i class="fa fa-check" aria-hidden="true"></i> Print
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Begin PCreated by Content -->
 <div class="container-fluid">
     <!-- Content Row -->
     <div class="row">
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-6 col-md-6 mb-3">
-            <div class="card border-left-teal h-100 py-2">
+        <div class="col-xl-6 col-md-6 mb-3 mt-3">
+            <div class="card  card1-bg  h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="font-weight-bold text-primary text-uppercase mb-1">
+                            <div class="h5 mb-0 font-weight-bold t-500 white-text"><span id="totalstocks"></span></div>
+                            <div class="font-weight-bold text-uppercase mb-1 white-text">
                                 Total Stocks</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="monthlyearning"></span></div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            <div class="icon-container green-bg">
+                                <i class="fas fa-calendar fa-2x white-text"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -22,17 +72,20 @@
         </div>
 
         <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-6 col-md-6 mb-3">
-            <div class="card border-left-teal h-100 py-2">
+        <div class="col-xl-6 col-md-6 mb-3 mt-3">
+            <div class="card card2-bg h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="font-weight-bold text-success text-uppercase mb-1">
-                                Total Sold</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="annualearning"></span></div>
+                            <div class="h5 mb-0 font-weight-bold t-500 white-text "><span id="totalsold"></span></div>
+                            <div class="font-weight-bold text-uppercase mb-1 white-text">
+                                Total Sold <span class="" id="date"></span>
+                            </div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            <div class="icon-container blue-bg">
+                                <i class="fas fa-dollar-sign fa-2x white-text"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -40,14 +93,17 @@
         </div>
 
     </div>
-    
+
     <div class="row mb-2 ml-1">
         <div class="responsive-col">
             <div class="input-group">
-                <button id="adjustDateBackward" class="btn btn-outline-cyberpower custom-br-left"><i class="fas fa-caret-left"></i></button>
-                <input id="dateRange" name="dateRange" type="text" class="form-control text-center" placeholder="Select Date Range" aria-describedby="basic-addon1" readonly>
-                <button id="adjustDateForward" class="btn btn-outline-cyberpower custom-br-right"><i class="fas fa-caret-right"></i></button>
-            </div> 
+                <button id="adjustDateBackward" class="custom-btn btn-sm custom-br-left"><i
+                        class="fas fa-caret-left"></i></button>
+                <input id="dateRange" name="dateRange" type="text" class="form-control text-center bg-normal"
+                    placeholder="Select Date Range" aria-describedby="basic-addon1" readonly>
+                <button id="adjustDateForward" class="custom-btn btn-sm custom-br-right"><i
+                        class="fas fa-caret-right"></i></button>
+            </div>
         </div>
         <div class="col-2">
             <div class="customdropdown">
@@ -59,10 +115,54 @@
                 <ul class="customdropdown-menu categorylist">
                 </ul>
             </div>
-        </div>   
+        </div>
     </div>
+
     <div class="row mb-2">
-        <div class="col padding-fix">
+        <div class="col-7 padding-fix">
+            <div class="asvesti-border">
+                <div class="card dashboard-size">
+                    <div class="card-header card-bg align-content-center">
+                        <h4 class="m-0 card-title">Current Stocks</h4>
+                    </div>
+                    <div class="card-body">
+                        <div style="width: 100%; margin: auto; height: 300px;" id="chartContainer"
+                            class="chartContainer">
+                            <canvas class="chartbox" id="myChart1"></canvas>
+                        </div>
+                        <div class="text-center w-100" id="noDataMessage1" style="display: none;">
+                            <p>No Current Sales.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="card dashboard-size">
+                <div class="card-header card-bg align-content-center">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="m-0 card-title">Current Stock Table</h4>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-cyberpower w-50" id="convertopdf" type="button" style="border-radius: 0.2rem;">
+                                <i class="fas fa-file-export"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive scrollable-dashboard-size">
+                    <table class="table custom-mobile-table" id="datatable2" width="100%" cellspacing="10">
+
+                        <tbody class="no-border"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-2">
+        <div class="col-7 padding-fix">
             <div class="asvesti-border">
                 <div class="card dashboard-size">
                     <div class="card-header card-bg align-content-center">
@@ -72,29 +172,85 @@
                         <div class="text-center w-100" id="noDataMessage" style="display: none;">
                             <p>No Available Data.</p>
                         </div>
-                        <div style="width: 100%; margin: auto; height: 300px;" id="chartContainer" class="chartContainer">
+                        <div style="width: 100%; margin: auto; height: 300px;" id="chartContainer"
+                            class="chartContainer">
                             <canvas class="chartbox" id="myChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="col-5">
+            <div class="card dashboard-size">
+                <div class="card-header card-bg align-content-center">
+                    <h4 class="m-0 card-title">Sold Items Details</h4>
+                </div>
+                <div class="table-responsive scrollable-dashboard-size">
+                    <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+                        <tbody class="no-border"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="row">
-        <div class="col padding-fix">
-            <div class="asvesti-border">
-                <div class="card dashboard-size">
-                    <div class="card-header card-bg align-content-center">
-                        <h4 class="m-0 card-title">Current Stocks</h4>
-                    </div>
-                    <div class="card-body">
-                        <div style="width: 100%; margin: auto; height: 300px;" id="chartContainer" class="chartContainer">
-                            <canvas class="chartbox" id="myChart1"></canvas>
+
+    <div class="row mt-2">
+        <div class="col">
+            <div class="card shadow mb-4 table-size-sm">
+                <div class="card-header card-bg align-content-center">
+                    <div class="row">
+                        <div class="col-md-4 mt-2">
+                            <h5 class="m-0 font-weight-bold card-title mt-2">Sold This Month</h5>
                         </div>
-                        <div class="text-center w-100" id="noDataMessage1" style="display: none;">
-                            <p>No Current Sales.</p>
+                        <div class="col-md-8 mt-2">
+                            <input id="search" name="search" type="text" class="form-control" placeholder="Search Asset Control"
+                                aria-label="search" aria-describedby="basic-addon1" />
                         </div>
                     </div>
+                </div>
+    
+                <div class="table-responsive scrollable-table-container-sm">
+                    <table class="table custom-mobile-table" id="soldtable" width="100%" cellspacing="10">
+                        <thead class="table-header header-style">
+                            <tr>
+                                <th>Asset Control</th>
+                                <th>Date</th>
+                                <th>Ref. No.</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="no-border"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card shadow mb-4 table-size-sm">
+                <div class="card-header card-bg align-content-center">
+                    <div class="row">
+                        <div class="col-md-4 mt-2">
+                            <h5 class="m-0 font-weight-bold card-title mt-2">Deployed This Month</h5>
+                        </div>
+                        <div class="col-md-8 mt-2">
+                            <input id="search" name="search" type="text" class="form-control" placeholder="Search Asset Control"
+                                aria-label="search" aria-describedby="basic-addon1" />
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="table-responsive scrollable-table-container-sm">
+                    <table class="table custom-mobile-table" id="deploytable" width="100%" cellspacing="10">
+                        <thead class="table-header header-style">
+                            <tr>
+                                <th>Asset Control</th>
+                                <th>Date</th>
+                                <th>Ref. No.</th>
+                            </tr>
+                        </thead>
+        
+                        <tbody class="no-border"></tbody>
+                    </table>
                 </div>
             </div>
         </div>

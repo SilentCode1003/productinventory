@@ -1,7 +1,26 @@
 <script>
   $(document).ready(function () {
     //Functionality
+    let isFetchingData = false;
+    let hasMoreData = true;
+    let currentPage = 1;
     let assetcontrol = "";
+
+    const loader = `  
+        <tr class="loading-row">
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+        </tr>`;
+
+    const tbody = $('#datatable tbody');
+    for(let i = 0; i < 7; i++){
+      tbody.append(loader);
+    }
 
     LoadTable();
 
@@ -21,34 +40,47 @@
       $("#hiddenValue").val("");
     });
 
+    $(document).on("input", "#employee", function () {
+      $("#hiddenemmployeevalue").val("");
+    });
+
+    $(document).on("input", "#serialname", function () {
+      $("#hiddenSerialValue").val("");
+    });
+
     $(document).on("click", "#addBtn", function () {
       let location = $("#hiddenValue").val();
+      let serialasset = $("#hiddenSerialValue").val();
       let data = $("#serialname").val();
       let deployto = $("#location").val();
-      let deployby = $("#employeeid").val();
+      let deployby = $("#hiddenemmployeevalue").val();
       let referenceno = $("#referenceno").val();
       let date = $("#date").val();
-
+      let employee = $("#employee").val();
+      
       var message = "";
-      if (data == "") {
-        message += "Serial and Asset Control, ";
+
+      if (serialasset == "") {
+        message += "Serial and Asset Control does not Exist " + `${data}, `;
       }
       if (deployto == "") {
-        message += "Deploy To, ";
+        message += "Empty Deploy To, ";
       }
       if (deployby == "") {
-        message += "Deploy By, ";
+        message += "Employee does not Exist " + `${employee}, `;
       }
       if (referenceno == "") {
-        message += "referenceno, ";
+        message += "Empty Reference Number, ";
       }
       if (date == "") {
-        message += "Date, ";
+        message += "Empty Date, ";
       }
 
       if (message != "") {
-        warning("Required", `Please fill up ${message}`);
-      } else {
+        warning("Required", `${message}`);
+      } 
+      else {
+        console.log("Employee name: ", deployby)
         let splitData = data.split(" ");
         let serial = splitData[0];
         let assetControl = splitData[1].replace("(", "").replace(")", "");
@@ -58,8 +90,8 @@
           let branch = match[1].trim();
           let company = match[2].trim();
 
-          console.log("Branch: ", branch);
-          console.log("Company: ", company);
+          // console.log("Branch: ", branch);
+          // console.log("Company: ", company);
           $.ajax({
             type: "POST",
             url: "/client/checklocation",
@@ -71,7 +103,6 @@
               if (result.msg == "notexist") {
                 warning("Not Exist", `${location} does not exist!`);
               } else {
-                success("Exist", `${location} exist!`);
                 $.ajax({
                   type: "POST",
                   url: "/deploy/save",
@@ -85,11 +116,11 @@
                   },
                   success: function (result) {
                     if (result.msg == "success") {
-                      LoadTable();
+                      resettable();
                       success("Saved", "Successfully");
                       $("#location").val("");
-                      $("#employeeid").val("");
-                      $("#selectedemployee").text("Deploy By");
+                      $("#hiddenemmployeevalue").val("");
+                      $("#Employee").val("");
                       $("#referenceno").val("");
                       $("#serialname").val("");
                       $("#hiddenSerialValue").val("");
@@ -118,9 +149,7 @@
     });
 
     function populatetable(data) {
-      console.log(data);
       const tableBody = $("#datatable tbody");
-      tableBody.empty();
 
       if (data.length === 0) {
         const tr = $("<tr>").append(
@@ -176,12 +205,16 @@
     }
 
     function LoadTable() {
+      if (!hasMoreData) {
+        return;
+      }
       $(".progress").hide();
       $(".progress").slideDown();
       $.ajax({
         url: "/deploy/load",
         method: "GET",
         dataType: "json",
+        data: { page: currentPage },
         xhrFields: {
           onprogress: function (e) {
             if (e.lengthComputable) {
@@ -193,23 +226,69 @@
         success: function (data) {
           setTimeout(function () {
             $(".progress").slideUp(function () {
-              if (data.msg === "success") {
-                populatetable(data.data);
+              hasMoreData = data.data.length > 0;
+              if (!hasMoreData) {
+                const tableBody = $("#datatable tbody");
+                tableBody.empty();
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 9,
+                    class: "text-center",
+                    text: "No More Data",
+                  })
+                );
+                tableBody.append(tr);
               } else {
-                console.error(data.msg);
+                if (data.msg === "success") {
+                  var loadingstate = document.querySelectorAll('.loading-row');
+                  loadingstate.forEach(function (row) {
+                    row.remove();
+                  });
+                  populatetable(data.data);
+                  currentPage++;
+                } else {
+                  console.error(data.msg);
+                }
               }
+              isFetchingData = false;
             });
           }, 1000);
         },
         error: function (error) {
           console.error(error);
+          isFetchingData = false;
+          hasMoreData = false
         },
       });
+    }
+
+    $(".scrollable-table-container").scroll(function () {
+      const container = $(this);
+      if (isFetchingData) {
+        return;
+      }
+      if (
+        container.scrollTop() + container.innerHeight() >=
+        container[0].scrollHeight - 10
+      ) {
+        //console.log("Append Triggered!");
+        isFetchingData = true;
+        LoadTable();
+      }
+    });
+
+    function resettable() {
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+      currentPage = 1;
+      hasMoreData = true;
+      LoadTable();
     }
 
     //#region CUSTOM DROPDOWN INPUT
     let activeSerial = [];
     let activeDeployLocation = [];
+    let activeEmployee = [];
 
     function LoadList() {
       // console.log("triggered");
@@ -218,9 +297,9 @@
         url: "/product/load",
         success: function (result) {
           let container = result.data;
-          console.log("data: ", container);
+          // console.log("data: ", container);
           $.each(container, (key, item) => {
-            if (item.status != "DEPLOYED" && item.status != "SOLD") {
+            if (item.status != "DEPLOYED" && item.status != "SOLD" && item.status != "DEFECTIVE" ) {
               let newname = item.serial + " (" + item.assetcontrol + ")";
               activeSerial.push({ display: newname, value: item.serial });
             }
@@ -257,25 +336,17 @@
         url: "/employee/load",
         success: function (result) {
           let container = result.data;
+          // console.log(container)
           $.each(container, (key, item) => {
             let displayname = item.fullname;
             let dataid = item.id;
-            // console.log(displayname);
-
-            var listItem = $("<li></li>")
-              .text(displayname)
-              .data("dataid", dataid);
-
-            $(".employeelist").append(listItem);
+            activeEmployee.push({
+              display: displayname,
+              value: dataid,
+            });
           });
+          populateCustomDropdown2()
 
-          $(".employeelist").on("click", "li", function () {
-            var selectedOption = $(this).text();
-            var selectedemployeeId = $(this).data("dataid");
-
-            $("#selectedemployee").text(selectedOption);
-            $("#employeeid").val(selectedemployeeId).change();
-          });
         },
         error: function (err) {
           errormsg(err);
@@ -292,6 +363,12 @@
     function populateCustomDropdown() {
       for (const deploy of activeDeployLocation) {
         addOption1("locationDropdown", deploy.display, deploy.value);
+      }
+    }
+
+    function populateCustomDropdown2() {
+      for (const employee of activeEmployee) {
+        addOption3("employeeDropdown", employee.display, employee.value);
       }
     }
 
@@ -331,6 +408,25 @@
           dropdownElement.style.display = "none";
         }
       });
+    }
+    
+    function addOption3(dropdownId, displayText, actualValue) {
+      const dropdownElement = document.getElementById(dropdownId);
+      const hiddenInput = document.getElementById("hiddenemmployeevalue");
+
+      const newOption = document.createElement("div");
+      newOption.className = "dropdown-option";
+      newOption.textContent = displayText;
+      newOption.setAttribute("data-value", actualValue);
+
+      newOption.addEventListener("click", function () {
+        const inputElement = document.getElementById("employee");
+        inputElement.value = displayText;
+        hiddenInput.value = actualValue;
+        dropdownElement.style.display = "none";
+      });
+
+      dropdownElement.appendChild(newOption);
     }
 
     function addOption2(dropdownId, displayText, actualValue) {
@@ -373,6 +469,7 @@
 
     setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
     setupCustomDropdown("location", "locationDropdown", "dropdown-option");
+    setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
     LoadList();
     //#endregion
 
@@ -412,7 +509,7 @@
       //   console.log("clicked!");
       let uploaddata = $("#fileinput").val();
       if (uploaddata != "") {
-        showspinner();
+        Loading('Uploading, Please wait for a moment...');
         UploadProcess();
       } else {
         warning("Warning!", "No File Chosen!");
@@ -510,7 +607,7 @@
           data: dataraw,
         },
         success: function (result) {
-          hidespinner();
+          hideLoading();
           if (result.msg == "noentry") {
             return warning(
               "Product Not Registered",
@@ -539,7 +636,7 @@
           }
 
           success("Saved!", "Data saved!");
-          LoadTable();
+          resettable();
           // swal({
           //   title: "Success",
           //   text: "Data saved!",

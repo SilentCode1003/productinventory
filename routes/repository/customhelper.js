@@ -1,7 +1,7 @@
 const fs = require("fs");
 const moment = require("moment");
 const LINQ = require("node-linq").LINQ;
-const { format } = require('date-fns');
+const { format } = require("date-fns");
 
 //#region READ & WRITE JSON FILES
 exports.ReadJSONFile = function (filepath) {
@@ -478,3 +478,30 @@ exports.convertExcelDate = (serialDate) => {
   return format(resultDate, "yyyy-MM-dd");
 };
 //#endregion
+
+//#region  Remove Special Characters on string
+exports.RemoveSpecialCharacters = (inputString) => {
+  return inputString.replace(/[^\w\s]/gi, "");
+};
+//#endregion
+
+exports.formatCurrency = (value) => {
+  var formattedValue = parseFloat(value).toFixed(2);
+  return "₱" + formattedValue.replace(/\d(?=(\d{3})+\.)/g, "$&,");
+};
+
+//#region Network Information
+
+exports.getNetwork = () => {
+  return new Promise((resolve, reject) => {
+    Object.keys(interfaces).forEach((interfaceName) => {
+      interfaces[interfaceName].forEach((iface) => {
+        // Filter for IPv4 addresses
+        if (iface.family === "IPv4" && !iface.internal) {
+          console.log(`${interfaceName}: ${iface.address}`);
+          resolve(`${iface.address}`);
+        }
+      });
+    });
+  });
+};

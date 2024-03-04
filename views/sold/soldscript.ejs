@@ -1,509 +1,706 @@
 <script>
-    $(document).ready(function () {
-        //Functionality
-        let assetcontrol = "";
-        let activeSerial = [];
-        let activeDeployLocation = [];
+  $(document).ready(function () {
+    //Functionality
+    let isFetchingData = false;
+    let hasMoreData = true;
+    let currentPage = 1;
+    let assetcontrol = "";
+    let activeSerial = [];
+    let activeDeployLocation = [];
+    let activeEmployee = [];
 
-        LoadTable();
+    const loader = `  
+        <tr class="loading-row">
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+        </tr>`;
 
-        $('#data-table tbody').on('click', 'tr', function () {
-            var dataRow = [];
-            $(this).closest('tr').find('td').each(function () {
-                dataRow.push($(this).text());
-            });
-            console.log(dataRow);
-            assetcontrol = dataRow[0];
-        })
+    const tbody = $('#datatable tbody');
+    for(let i = 0; i < 7; i++){
+      tbody.append(loader);
+    }
 
-        $(document).on('input', '#location', function () {
-            $('#hiddenValue').val('');
+    LoadTable();
+
+    $("#data-table tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
         });
+      // console.log(dataRow);
+      assetcontrol = dataRow[0];
+    });
 
-        $(document).on('click', '#addBtn', function () {
-            // const actualValue = $('#hiddenSerialValue').val();
-            let location = $('#hiddenValue').val();
-            let data = $('#serialname').val();
-            let soldto = $('#location').val();
-            let soldby = $('#employeeid').val();
-            let referenceno = $('#referenceno').val();
-            let date = $('#date').val();
+    $(document).on("input", "#location", function () {
+      $("#hiddenValue").val("");
+    });
 
+    $(document).on("input", "#employee", function () {
+      $("#hiddenemmployeevalue").val("");
+    });
 
-            var message = "";
-            if (data == '') { message += 'Serial and Asset Control, ' }
-            if (soldto == '') { message += 'Sold To, ' }
-            if (soldby == '') { message += 'Sold By, ' }
-            if (referenceno == '') { message += 'referenceno, ' }
-            if (date == '') { message += 'Date, ' }
+    $(document).on("input", "#serialname", function () {
+      $("#hiddenSerialValue").val("");
+    });
 
-            if (message != '') {
-                warning('Required', `Please fill up ${message}`);
-            }
-            else {
-                let splitData = data.split(' ');
-                let serial = splitData[0];
-                let assetControl = splitData[1].replace('(', '').replace(')', '');
-                console.log(assetControl, serial, date, soldby, soldto, referenceno,)
-                console.log("locationdata: ", location)
-                if (location != '') {
-                    let match = location.match(/\((.*?)\)\s*\((.*?)\)/);
-                    let branch = match[1].trim();
-                    let company = match[2].trim();
+    $(document).on("click", "#addBtn", function () {
+      // const actualValue = $('#hiddenSerialValue').val();
+      let location = $("#hiddenValue").val();
+      let serialasset = $("#hiddenSerialValue").val();
+      let data = $("#serialname").val();
+      let soldto = $("#location").val();
+      let soldby = $("#hiddenemmployeevalue").val();
+      let employee = $("#employee").val();
+      let referenceno = $("#referenceno").val();
+      let date = $("#date").val();
+      let remarks = $("#remarks").val();
+      let sellingprice = $("#sellingprice").val();
+      let paymenttype = $("#paymenttype").val();
+      let transactionstatus = $("#transactionstatus").val();
+      let transactionref = $("#transactionref").val();
+      let deliveryfee= $("#deliveryfee").val();
 
-                    console.log("Branch: ", branch);
-                    console.log("Company: ", company);
-                    $.ajax({
-                        type: 'POST',
-                        url: '/client/checklocation',
-                        data: {
-                            company: company,
-                            branch: branch,
-                        },
-                        success: function (result) {
-                            if (result.msg == 'notexist') {
-                                warning('Not Exist', `${location} does not exist!`);
-                            } else {
-                                success('Exist', `${location} exist!`)
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '/sold/save',
-                                    data: {
-                                        assetcontrol: assetControl,
-                                        serial: serial,
-                                        date: date,
-                                        soldby: soldby,
-                                        soldto: soldto,
-                                        referenceno: referenceno
-                                    },
-                                    success: function (result) {
-                                        if (result.msg == 'success') {
-                                            success('Saved', 'Successfully');
-                                            LoadTable()
-                                            $('#location').val('');
-                                            $('#employeeid').val('');
-                                            $("#selectedemployee").text('Sold By');
-                                            $('#referenceno').val('');
-                                            $("#serialname").val('');
-                                            $("#hiddenSerialValue").val('');
-                                            $("#date").val('');
-                                            $('#hiddenValue').val('');
-                                        }
+      var message = "";
 
-                                        if (result.msg == 'exist') {
-                                            warning('Exist', `${serial} already exist!`);
-                                        }
+      if (serialasset == "") {
+        message += "Serial and Asset Control does not Exist " + `${data}, `;
+      }
+      if (soldto == "") {
+        message += "Empty Sold To, ";
+      }
+      if (soldby == "") {
+        message += "Employee does not Exist " + `${employee}, `;
+      }
+      if (referenceno == "") {
+        message += "Empty Reference Number, ";
+      }
+      if (date == "") {
+        message += "Empty Date, ";
+      }
+      if (remarks == "") {
+        message += "Empty Remarks, ";
+      }
+      if (sellingprice == "") {
+        message += "Empty Selling Price, ";
+      }
+      if (paymenttype == "") {
+        message += "Empty Payment Type, ";
+      }
+      if (transactionstatus == "") {
+        message += "Empty Transaction Status, ";
+      }
+      if (transactionref == "") {
+        message += "Empty Transaction Reference No., ";
+      }
+      if (deliveryfee == "") {
+        message += "Empty Delivery Fee, ";
+      }
 
-                                    },
-                                    error: function (err) {
-                                        errormsg(err);
-                                    }
-                                })
-                            }
-                        },
-                        error: function (err) {
-                            errormsg(err);
-                        }
-                    });
-                } else {
-                    warning('Not Exist', `Location does not exist!`);
-                }
-            }
-        })
+      if (message != "") {
+        warning("Required", `Please fill up ${message}`);
+      } else {
+        let splitData = data.split(" ");
+        let serial = splitData[0];
+        let assetControl = splitData[1].replace("(", "").replace(")", "");
+        // console.log(assetControl, serial, date, soldby, soldto, referenceno);
+        // console.log("locationdata: ", location);
+      
+        if (location != "") {
+          let match = location.match(/\((.*?)\)\s*\((.*?)\)/);
+          let branch = match[1].trim();
+          let company = match[2].trim();
 
-        function populatetable(data) {
-            console.log(data);
-            const tableBody = $('#datatable tbody');
-            tableBody.empty();
-
-            if (data.length === 0) {
-                const tr = $('<tr>').append($('<td>', {
-                    colspan: 7,
-                    class: 'text-center',
-                    text: 'No Data Matched'
-                }));
-                tableBody.append(tr);
-            } else {
-                data.forEach(item => {
-                    const tr = $('<tr>').append(
-                        $('<td>', { text: item.id, 'data-label': 'ID', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.assetcontrol, 'data-label': 'Asset Control', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.serial, 'data-label': 'Serial', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.date, 'data-label': 'Date', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: item.soldby, 'data-label': 'Sold By', class: 'custom-mobile-align no-wrap' }),
-                        $('<td>', { text: item.soldto, 'data-label': 'Sold To', class: 'custom-mobile-align' }),
-                        $('<td>', { text: item.referenceno, 'data-label': 'Reference No.', class: 'custom-mobile-align' }),
-                    );
-                    tableBody.append(tr);
-                });
-            }
-        }
-
-        function LoadTable() {
-            $(".progress").hide();
-            $(".progress").slideDown();
-            $.ajax({
-                url: '/sold/load',
-                method: 'GET',
-                dataType: 'json',
-                xhrFields: {
-                    onprogress: function (e) {
-                        if (e.lengthComputable) {
-                            var percentComplete = (e.loaded / e.total) * 100;
-                            $(".progress-bar").css("width", percentComplete + "%");
-                        }
+          // console.log("Branch: ", branch);
+          // console.log("Company: ", company);
+          $.ajax({
+            type: "POST",
+            url: "/client/checklocation",
+            data: {
+              company: company,
+              branch: branch,
+            },
+            success: function (result) {
+              if (result.msg == "notexist") {
+                warning("Not Exist", `${location} does not exist!`);
+              } else {
+                success("Exist", `${location} exist!`);
+                $.ajax({
+                  type: "POST",
+                  url: "/sold/save",
+                  data: {
+                    assetcontrol: assetControl,
+                    serial: serial,
+                    date: date,
+                    soldby: soldby,
+                    soldto: soldto,
+                    referenceno: referenceno,
+                    sellingprice: sellingprice,
+                    paymenttype: paymenttype,
+                    transactionref: transactionref,
+                    deliveryfee: deliveryfee,
+                    transactionstatus: transactionstatus,
+                    remarks: remarks,
+                  },
+                  success: function (result) {
+                    if (result.msg == "success") {
+                      success("Saved", "Successfully");
+                      resettable();
+                      $("#location").val("");
+                      $("#employee").val("");
+                      $("#hiddenemmployeevalue").val("");
+                      $("#referenceno").val("");
+                      $("#serialname").val("");
+                      $("#hiddenSerialValue").val("");
+                      $("#date").val("");
+                      $("#sellingprice").val("");
+                      $("#paymenttype").val("");
+                      $("#transactionref").val("");
+                      $("#deliveryfee").val("");
+                      $("#hiddenValue").val("");
                     }
-                },
-                success: function (data) {
-                    setTimeout(function () {
-                        $(".progress").slideUp(function () {
-                            if (data.msg === 'success') {
-                                populatetable(data.data);
-                            } else {
-                                console.error(data.msg);
-                            }
-                        });
-                    }, 1000);
-                },
-                error: function (error) {
-                    console.error(error);
-                }
-            });
-        }
 
-        //#region CUSTOM DROPDOWN INPUT
-
-        function LoadList() {
-            // console.log("triggered");
-            $.ajax({
-                type: "GET",
-                url: "/product/load",
-                success: function (result) {
-                    let container = result.data;
-                    // console.log(container);
-                    $.each(container, (key, item) => {
-                        if (item.status != "DEPLOYED" && item.status != "SOLD") {
-                            let newname = item.serial + " (" + item.assetcontrol + ")";
-                            activeSerial.push({ display: newname, value: item.serial });
-                        }
-                    });
-                    populateCustomDropdown1();
-                },
-                error: function (err) {
-                    errormsg(err);
-                },
-            });
-
-            $.ajax({
-                type: "GET",
-                url: "/client/load",
-                success: function (result) {
-                    let container = result.data;
-                    $.each(container, (key, item) => {
-                        let displayname = item.company + " - " + item.branch;
-                        let hiddenData = "(" + item.branch + ") (" + item.company + ")"
-                        activeDeployLocation.push({ display: displayname, value: hiddenData });
-                    });
-                    populateCustomDropdown();
-                },
-                error: function (err) {
-                    errormsg(err);
-                },
-            });
-
-            $.ajax({
-                type: "GET",
-                url: "/employee/load",
-                success: function (result) {
-                    let container = result.data;
-                    $.each(container, (key, item) => {
-                        let displayname = item.fullname;
-                        let dataid = item.id;
-                        // console.log(displayname);
-
-                        var listItem = $("<li></li>")
-                            .text(displayname)
-                            .data("dataid", dataid);
-
-                        $(".employeelist").append(listItem);
-                    });
-
-                    $(".employeelist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selectedemployeeId = $(this).data("dataid");
-
-                        $("#selectedemployee").text(selectedOption);
-                        $("#employeeid").val(selectedemployeeId).change();
-                    });
-                },
-                error: function (err) {
-                    errormsg(err);
-                },
-            });
-
-        }
-
-        function populateCustomDropdown1() {
-            for (const serial of activeSerial) {
-                addOption2("serialDropdown", serial.display, serial.value);
-            }
-        }
-
-        function populateCustomDropdown() {
-            for (const deploy of activeDeployLocation) {
-                addOption1("locationDropdown", deploy.display, deploy.value);
-            }
-        }
-
-        function setupCustomDropdown(inputId, dropdownId, optionClass) {
-            const inputElement = document.getElementById(inputId);
-            const dropdownElement = document.getElementById(dropdownId);
-            const options = dropdownElement.getElementsByClassName(optionClass);
-
-            inputElement.addEventListener("click", function () {
-                dropdownElement.style.display = "block";
-            });
-
-            for (const option of options) {
-                option.addEventListener("click", function () {
-                    inputElement.value = option.textContent;
-                    const actualValue = option.getAttribute("data-value");
-                    inputElement.setAttribute("data-actual-value", actualValue);
-                    dropdownElement.style.display = "none";
-                });
-            }
-
-            inputElement.addEventListener("input", function () {
-                const value = inputElement.value.toUpperCase();
-                for (const option of options) {
-                    if (option.textContent.toUpperCase().includes(value)) {
-                        option.style.display = "block";
-                    } else {
-                        option.style.display = "none";
+                    if (result.msg == "exist") {
+                      warning("Exist", `${serial} already exist!`);
                     }
-                }
-                dropdownElement.style.display = "block";
-            });
-
-            document.addEventListener("click", function (event) {
-                const target = event.target;
-                if (!dropdownElement.contains(target) && target !== inputElement) {
-                    dropdownElement.style.display = "none";
-                }
-            });
+                  },
+                  error: function (err) {
+                    errormsg(err);
+                  },
+                });
+              }
+            },
+            error: function (err) {
+              errormsg(err);
+            },
+          });
+        } else {
+          warning("Not Exist", `Location does not exist!`);
         }
+      }
+    });
 
-        function addOption2(dropdownId, displayText, actualValue) {
-            const dropdownElement = document.getElementById(dropdownId);
-            const hiddenInput = document.getElementById("hiddenSerialValue");
+    function populatetable(data) {
+      // console.log(data);
+      const tableBody = $("#datatable tbody");
 
-            const newOption = document.createElement("div");
-            newOption.className = "dropdown-option";
-            newOption.textContent = displayText;
-            newOption.setAttribute("data-value", actualValue);
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 7,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.assetcontrol,
+              "data-label": "Asset Control",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.serial,
+              "data-label": "Serial",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.date,
+              "data-label": "Date",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.soldby,
+              "data-label": "Sold By",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.soldto,
+              "data-label": "Sold To",
+              class: "custom-mobile-align no-wrap",
+            }),
+            $("<td>", {
+              text: item.referenceno,
+              "data-label": "Reference No.",
+              class: "custom-mobile-align",
+            })
+          );
+          tableBody.append(tr);
+        });
+        // applyScrollReveal();
+      }
+    }
 
-            newOption.addEventListener("click", function () {
-                const inputElement = document.getElementById("serialname");
-                inputElement.value = displayText;
-                hiddenInput.value = actualValue;
-                dropdownElement.style.display = "none";
-            });
-
-            dropdownElement.appendChild(newOption);
-        }
-
-        function addOption1(dropdownId, displayText, actualValue) {
-            const dropdownElement = document.getElementById(dropdownId);
-            const hiddenInput = document.getElementById("hiddenValue");
-
-            const newOption = document.createElement("div");
-            newOption.className = "dropdown-option";
-            newOption.textContent = displayText;
-            newOption.setAttribute("data-value", actualValue);
-
-            newOption.addEventListener("click", function () {
-                const inputElement = document.getElementById("location");
-                inputElement.value = displayText;
-                hiddenInput.value = actualValue;
-                dropdownElement.style.display = "none";
-            });
-
-            dropdownElement.appendChild(newOption);
-        }
-
-        setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
-        setupCustomDropdown("location", "locationDropdown", "dropdown-option");
-        LoadList()
-        //#endregion
-
-        function filterTableRows() {
-            const searchQuery = $('#search').val().trim().toLowerCase();
-            let foundMatches = false;
-
-            $('#no-match-row').remove();
-
-            $('#datatable tbody tr').each(function () {
-                const rowData = $(this).text().toLowerCase();
-                if (rowData.includes(searchQuery)) {
-                    $(this).show();
-                    foundMatches = true;
-                } else {
-                    $(this).hide();
-                }
-            });
-
-            if (!foundMatches) {
-                const noMatchRow = $('<tr>').append(
-                    $('<td>', {
-                        colspan: 9,
-                        class: 'text-center',
-                        text: 'No Data Matched'
-                    })
+    function LoadTable() {
+      if (!hasMoreData) {
+        return;
+      }
+      $(".progress").hide();
+      $(".progress").slideDown();
+      $.ajax({
+        url: "/sold/load",
+        method: "GET",
+        dataType: "json",
+        data: { page: currentPage },
+        xhrFields: {
+          onprogress: function (e) {
+            if (e.lengthComputable) {
+              var percentComplete = (e.loaded / e.total) * 100;
+              $(".progress-bar").css("width", percentComplete + "%");
+            }
+          },
+        },
+        success: function (data) {
+          setTimeout(function () {
+            $(".progress").slideUp(function () {
+              hasMoreData = data.data.length > 0;
+              if (!hasMoreData) {
+                const tableBody = $("#datatable tbody");
+                var loadingstate = document.querySelectorAll('.loading-row');
+                loadingstate.forEach(function (row) {
+                  row.remove();
+                });
+                const tr = $("<tr>").append(
+                  $("<td>", {
+                    colspan: 9,
+                    class: "text-center",
+                    text: "No More Data",
+                  })
                 );
-                $('#datatable tbody').append(noMatchRow);
-                noMatchRow.attr('id', 'no-match-row');
-            }
-        }
-
-        $('#search').on('input', filterTableRows);
-
-        //#region Upload
-        $(document).on("click", "#uploadButton", function () {
-            //   console.log("clicked!");
-            let uploaddata = $("#fileinput").val();
-            if (uploaddata != '') {
-                showspinner();
-                UploadProcess();
-            } else {
-                warning('Warning!', "No File Chosen!")
-            }
-
-        });
-
-        function UploadProcess() {
-            //Reference the FileUpload element.
-            var fileUpload = document.getElementById("fileinput");
-
-            //Validate whether File is valid Excel file.
-            var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx|.csv|.ods)$/;
-            if (regex.test(fileUpload.value.toLowerCase())) {
-                if (typeof FileReader != "undefined") {
-                    var reader = new FileReader();
-
-                    //For Browsers other than IE.
-                    if (reader.readAsBinaryString) {
-                        reader.onload = function (e) {
-                            GetTableFromExcel(e.target.result);
-                        };
-                        reader.readAsBinaryString(fileUpload.files[0]);
-                    } else {
-                        //For IE Browser.
-                        reader.onload = function (e) {
-                            var data = "";
-                            var bytes = new Uint8Array(e.target.result);
-                            for (var i = 0; i < bytes.byteLength; i++) {
-                                data += String.fromCharCode(bytes[i]);
-                            }
-                            GetTableFromExcel(data);
-                        };
-                        reader.readAsArrayBuffer(fileUpload.files[0]);
-                    }
+                tableBody.append(tr);
+              } else {
+                if (data.msg === "success") {
+                  var loadingstate = document.querySelectorAll('.loading-row');
+                  loadingstate.forEach(function (row) {
+                    row.remove();
+                  });
+                  populatetable(data.data);
+                  currentPage++;
                 } else {
-                    warning("Upload", "This browser does not support HTML5.");
+                  console.error(data.msg);
                 }
-            } else {
-                warning("Upload", "Please upload a valid Excel file.");
-            }
-        }
-
-        function GetTableFromExcel(data) {
-            //Read the Excel File data in binary
-            var workbook = XLSX.read(data, {
-                type: "binary",
+              }
+              isFetchingData = false;
             });
+          }, 1000);
+        },
+        error: function (error) {
+          console.error(error);
+          isFetchingData = false;
+          hasMoreData = false;
+        },
+      });
+    }
 
-            //get the name of First Sheet.
-            var Sheet = workbook.SheetNames[0];
+    $(".scrollable-table-container").scroll(function () {
+      const container = $(this);
+      if (isFetchingData) {
+        return;
+      }
+      if (
+        container.scrollTop() + container.innerHeight() >=
+        container[0].scrollHeight - 10
+      ) {
+        //console.log("Append Triggered!");
+        isFetchingData = true;
+        LoadTable();
+      }
+    });
 
-            //Read all rows from First Sheet into an JSON array.
-            var excelRows = XLSX.utils.sheet_to_row_object_array(
-                workbook.Sheets[Sheet]
+    function resettable() {
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+      currentPage = 1;
+      hasMoreData = true;
+      LoadTable();
+    }
+    //#region CUSTOM DROPDOWN INPUT
+
+    function LoadList() {
+      // console.log("triggered");
+      $.ajax({
+        type: "GET",
+        url: "/product/load",
+        success: function (result) {
+          let container = result.data;
+          // console.log(container);
+          $.each(container, (key, item) => {
+            if (item.status != "DEPLOYED" && item.status != "SOLD" && item.status != "DEFECTIVE") {
+              let newname = item.serial + " (" + item.assetcontrol + ")";
+              activeSerial.push({ display: newname, value: item.serial });
+            }
+          });
+          populateCustomDropdown1();
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "/client/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let displayname = item.company + " - " + item.branch;
+            let hiddenData = "(" + item.branch + ") (" + item.company + ")";
+            activeDeployLocation.push({
+              display: displayname,
+              value: hiddenData,
+            });
+          });
+          populateCustomDropdown();
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "/employee/load",
+        success: function (result) {
+          let container = result.data;
+          // console.log(container)
+          $.each(container, (key, item) => {
+            let displayname = item.fullname;
+            let dataid = item.id;
+            activeEmployee.push({
+              display: displayname,
+              value: dataid,
+            });
+          });
+          populateCustomDropdown2();
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    }
+
+    function populateCustomDropdown2() {
+      for (const employee of activeEmployee) {
+        addOption3("employeeDropdown", employee.display, employee.value);
+      }
+    }
+
+    function populateCustomDropdown1() {
+      for (const serial of activeSerial) {
+        addOption2("serialDropdown", serial.display, serial.value);
+      }
+    }
+
+    function populateCustomDropdown() {
+      for (const deploy of activeDeployLocation) {
+        addOption1("locationDropdown", deploy.display, deploy.value);
+      }
+    }
+
+    function setupCustomDropdown(inputId, dropdownId, optionClass) {
+      const inputElement = document.getElementById(inputId);
+      const dropdownElement = document.getElementById(dropdownId);
+      const options = dropdownElement.getElementsByClassName(optionClass);
+
+      inputElement.addEventListener("click", function () {
+        dropdownElement.style.display = "block";
+      });
+
+      for (const option of options) {
+        option.addEventListener("click", function () {
+          inputElement.value = option.textContent;
+          const actualValue = option.getAttribute("data-value");
+          inputElement.setAttribute("data-actual-value", actualValue);
+          dropdownElement.style.display = "none";
+        });
+      }
+
+      inputElement.addEventListener("input", function () {
+        const value = inputElement.value.toUpperCase();
+        for (const option of options) {
+          if (option.textContent.toUpperCase().includes(value)) {
+            option.style.display = "block";
+          } else {
+            option.style.display = "none";
+          }
+        }
+        dropdownElement.style.display = "block";
+      });
+
+      document.addEventListener("click", function (event) {
+        const target = event.target;
+        if (!dropdownElement.contains(target) && target !== inputElement) {
+          dropdownElement.style.display = "none";
+        }
+      });
+    }
+
+    function addOption3(dropdownId, displayText, actualValue) {
+      const dropdownElement = document.getElementById(dropdownId);
+      const hiddenInput = document.getElementById("hiddenemmployeevalue");
+
+      const newOption = document.createElement("div");
+      newOption.className = "dropdown-option";
+      newOption.textContent = displayText;
+      newOption.setAttribute("data-value", actualValue);
+
+      newOption.addEventListener("click", function () {
+        const inputElement = document.getElementById("employee");
+        inputElement.value = displayText;
+        hiddenInput.value = actualValue;
+        dropdownElement.style.display = "none";
+      });
+
+      dropdownElement.appendChild(newOption);
+    }
+
+    function addOption2(dropdownId, displayText, actualValue) {
+      const dropdownElement = document.getElementById(dropdownId);
+      const hiddenInput = document.getElementById("hiddenSerialValue");
+
+      const newOption = document.createElement("div");
+      newOption.className = "dropdown-option";
+      newOption.textContent = displayText;
+      newOption.setAttribute("data-value", actualValue);
+
+      newOption.addEventListener("click", function () {
+        const inputElement = document.getElementById("serialname");
+        inputElement.value = displayText;
+        hiddenInput.value = actualValue;
+        dropdownElement.style.display = "none";
+      });
+
+      dropdownElement.appendChild(newOption);
+    }
+
+    function addOption1(dropdownId, displayText, actualValue) {
+      const dropdownElement = document.getElementById(dropdownId);
+      const hiddenInput = document.getElementById("hiddenValue");
+
+      const newOption = document.createElement("div");
+      newOption.className = "dropdown-option";
+      newOption.textContent = displayText;
+      newOption.setAttribute("data-value", actualValue);
+
+      newOption.addEventListener("click", function () {
+        const inputElement = document.getElementById("location");
+        inputElement.value = displayText;
+        hiddenInput.value = actualValue;
+        dropdownElement.style.display = "none";
+      });
+
+      dropdownElement.appendChild(newOption);
+    }
+
+    setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
+    setupCustomDropdown("location", "locationDropdown", "dropdown-option");
+    setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
+    LoadList();
+    //#endregion
+
+    function filterTableRows() {
+      const searchQuery = $("#search").val().trim().toLowerCase();
+      let foundMatches = false;
+
+      $("#no-match-row").remove();
+
+      $("#datatable tbody tr").each(function () {
+        const rowData = $(this).text().toLowerCase();
+        if (rowData.includes(searchQuery)) {
+          $(this).show();
+          foundMatches = true;
+        } else {
+          $(this).hide();
+        }
+      });
+
+      if (!foundMatches) {
+        const noMatchRow = $("<tr>").append(
+          $("<td>", {
+            colspan: 9,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        $("#datatable tbody").append(noMatchRow);
+        noMatchRow.attr("id", "no-match-row");
+      }
+    }
+
+    $("#search").on("input", filterTableRows);
+
+    //#region Upload
+    $(document).on("click", "#uploadButton", function () {
+      //   console.log("clicked!");
+      let uploaddata = $("#fileinput").val();
+      if (uploaddata != "") {
+        Loading('Uploading, Please wait for a moment...');
+        UploadProcess();
+      } else {
+        warning("Warning!", "No File Chosen!");
+      }
+    });
+
+    function UploadProcess() {
+      //Reference the FileUpload element.
+      var fileUpload = document.getElementById("fileinput");
+
+      //Validate whether File is valid Excel file.
+      var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx|.csv|.ods)$/;
+      if (regex.test(fileUpload.value.toLowerCase())) {
+        if (typeof FileReader != "undefined") {
+          var reader = new FileReader();
+
+          //For Browsers other than IE.
+          if (reader.readAsBinaryString) {
+            reader.onload = function (e) {
+              GetTableFromExcel(e.target.result);
+            };
+            reader.readAsBinaryString(fileUpload.files[0]);
+          } else {
+            //For IE Browser.
+            reader.onload = function (e) {
+              var data = "";
+              var bytes = new Uint8Array(e.target.result);
+              for (var i = 0; i < bytes.byteLength; i++) {
+                data += String.fromCharCode(bytes[i]);
+              }
+              GetTableFromExcel(data);
+            };
+            reader.readAsArrayBuffer(fileUpload.files[0]);
+          }
+        } else {
+          warning("Upload", "This browser does not support HTML5.");
+        }
+      } else {
+        warning("Upload", "Please upload a valid Excel file.");
+      }
+    }
+
+    function GetTableFromExcel(data) {
+      //Read the Excel File data in binary
+      var workbook = XLSX.read(data, {
+        type: "binary",
+      });
+
+      //get the name of First Sheet.
+      var Sheet = workbook.SheetNames[0];
+
+      //Read all rows from First Sheet into an JSON array.
+      var excelRows = XLSX.utils.sheet_to_row_object_array(
+        workbook.Sheets[Sheet]
+      );
+      var columns = Object.keys(excelRows[0]);
+
+      //Create a HTML Table element.
+      var myTable = document.createElement("table");
+      myTable.border = "1";
+
+      //Add the header row.
+      var row = myTable.insertRow(-1);
+
+      var dataExcelArr = [];
+      //Add the data rows from Excel file.
+      for (var i = 0; i < excelRows.length; i++) {
+        //Add the data row.
+        var data = [];
+        var row = myTable.insertRow(-1);
+        for (var j = 0; j < columns.length; j++) {
+          var cell = row.insertCell(-1);
+          cell.innerHTML = excelRows[i][columns[j]];
+          data.push({
+            item: excelRows[i][columns[j]],
+          });
+        }
+        dataExcelArr.push({
+          serial: data[0].item,
+          date: data[1].item,
+          company: data[2].item,
+          branch: data[3].item,
+          soldby: data[4].item,
+          referenceno: data[5].item,
+          sellingprice: data[6].item,
+          paymenttype: data[7].item,
+          deliveryfee: data[8].item,
+          transactionref: data[9].item,
+          transactionstatus: data[10].item,
+          remarks: data[11].item,
+        });
+      }
+      excelDataSave(dataExcelArr);
+    }
+
+    function excelDataSave(data) {
+      var dataraw = JSON.stringify(data, null, 2);
+      console.log(dataraw);
+      $.ajax({
+        type: "POST",
+        url: "/sold/upload",
+        data: {
+          data: dataraw,
+        },
+        success: function (result) {
+          
+          hideLoading();
+          console.log("Message: ", result.msg);
+          console.log("Info: ", result.info);
+          let info = result.info;
+          if (result.msg != "success") {
+            warningInfo(
+              "Info",
+              `Completed: ${info.completed} Failed: ${info.failed}<br>Some data are invalid or already exist in the database. <br> <div class="row justify-content-center mt-1">
+                  <button class="btn btn-sm btn-success" id="txtBtn">Download</button>
+              </div>`
             );
-            var columns = Object.keys(excelRows[0]);
-
-            //Create a HTML Table element.
-            var myTable = document.createElement("table");
-            myTable.border = "1";
-
-            //Add the header row.
-            var row = myTable.insertRow(-1);
-
-            var dataExcelArr = [];
-            //Add the data rows from Excel file.
-            for (var i = 0; i < excelRows.length; i++) {
-                //Add the data row.
-                var data = [];
-                var row = myTable.insertRow(-1);
-                for (var j = 0; j < columns.length; j++) {
-                    var cell = row.insertCell(-1);
-                    cell.innerHTML = excelRows[i][columns[j]];
-                    data.push({
-                        item: excelRows[i][columns[j]],
-                    });
-                }
-                dataExcelArr.push({
-                    category: data[0].item,
-                    itemname: data[1].item,
-                    serial: data[2].item,
-                    podate: data[3].item,
-                    ponumber: data[4].item,
-                    warrantydate: data[5].item,
-                });
-            }
-            excelDataSave(dataExcelArr);
-        }
-
-        function excelDataSave(data) {
-            var dataraw = JSON.stringify(data, null, 2);
-            $.ajax({
-                type: "POST",
-                url: "/sold/upload",
-                data: {
-                    data: dataraw,
-                },
-                success: function (result) {
-                    hidespinner();
-                    if (result.msg != "success") {
-                        warning(
-                            "Duplicate",
-                            `Some data already exist on the database. ID[${result.data}]`
-                        );
-
-                        // swal({
-                        //   title: "Exist",
-                        //   text: "Some data already exist on the database. ID[${result.data}]",
-                        //   icon: "warning",
-                        //   button: "OK!",
-                        // });
-                    } else {
-                        success("Saved!", "Data saved!");
-                        LoadTable();
-                        // swal({
-                        //   title: "Success",
-                        //   text: "Data saved!",
-                        //   icon: "success",
-                        //   button: "OK!",
-                        // });
-                    }
-
-                    // $('#item-tbl').DataTable().ajax.reload();
-                },
-                error: function (result) {
-                    console.error(result);
-                },
+            
+            $(document).on("click", "#txtBtn", function () {
+              downloadTxtFile(result.data, 'existing_invalid_data.txt');
             });
 
-        }
-        //#endregion
-    })
+            resettable();
+          } else{
+            success("Saved!", "Data saved!");
+            resettable();
+          }
+        },
+        error: function (result) {
+          console.error(result);
+        },
+      });
+    }
+
+    function downloadTxtFile(data, filename) {
+      data = data.toString().replace(/,/g, '\n');
+
+      const blob = new Blob([data], { type: 'text/plain' });
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    }
+    //#endregion
+  });
 </script>

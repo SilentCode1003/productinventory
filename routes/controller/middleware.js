@@ -50,6 +50,18 @@ var roleacess = [
       {
         layout: "search",
       },
+      {
+        layout: "itemprice",
+      },
+      {
+        layout: "replace",
+      },
+      {
+        layout: "defective",
+      },
+      {
+        layout: "report",
+      },
     ],
   },
   {
@@ -84,6 +96,21 @@ var roleacess = [
       },
       {
         layout: "search",
+      },
+      {
+        layout: "itemprice",
+      },
+      {
+        layout: "employee",
+      },
+      {
+        layout: "replace",
+      },
+      {
+        layout: "defective",
+      },
+      {
+        layout: "report",
       },
     ],
   },

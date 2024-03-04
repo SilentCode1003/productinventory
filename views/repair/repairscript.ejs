@@ -1,7 +1,25 @@
 <script>
     $(document).ready(function () {
         //Functionality
+        let isFetchingData = false;
+        let hasMoreData = true;
+        let currentPage = 1;
         let assetcontrol = "";
+
+        const loader = `  
+        <tr class="loading-row">
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+        </tr>`;
+
+        const tbody = $('#datatable tbody');
+        for (let i = 0; i < 7; i++) {
+            tbody.append(loader);
+        }
 
         LoadTable();
 
@@ -14,12 +32,25 @@
             assetcontrol = dataRow[0];
         })
 
+        $(document).on("input", "#location", function () {
+            $("#hiddenValue").val("");
+        });
+
+        $(document).on("input", "#employee", function () {
+            $("#hiddenemmployeevalue").val("");
+        });
+
+        $(document).on("input", "#serialname", function () {
+            $("#hiddenSerialValue").val("");
+        });
 
         $(document).on('click', '#addBtn', function () {
             // const actualValue = $('#hiddenSerialValue').val();
 
             let data = $('#serialname').val();
-            let repairby = $('#repairbyid').val();
+            let serialasset = $("#hiddenSerialValue").val();
+            let employee = $("#employee").val();
+            let repairby = $('#hiddenemmployeevalue').val();
             let referenceno = $('#referenceno').val();
             let date = $('#date').val();
             let splitData = data.split(' ');
@@ -28,16 +59,16 @@
             let assetControl = splitData[1].replace('(', '').replace(')', '');
 
             var message = "";
-            if (data == '') { message += 'Serial and Asset Control, ' }
-            if (repairby == '') { message += 'Deploy By, ' }
+            if (serialasset == '') { message += "Serial and Asset Control does not Exist " + `${data}, ` }
+            if (repairby == '') { message += "Employee does not Exist " + `${employee}, `}
             if (referenceno == '') { message += 'referenceno, ' }
             if (date == '') { message += 'Date, ' }
 
             if (message != '') {
-                warning('Required', `Please fill up ${message}`);
+                warning('Required', `${message}`);
             }
             else {
-                console.log(assetControl, serial, date, repairby, referenceno,)
+                // console.log(assetControl, serial, date, repairby, referenceno,)
                 $.ajax({
                     type: 'POST',
                     url: '/repair/save',
@@ -50,13 +81,14 @@
                     },
                     success: function (result) {
                         if (result.msg == 'success') {
-                            LoadTable()
+                            resettable()
                             success('Saved', 'Successfully')
-                            $('#serial').val('');
-                            $('#deployto').val('');
                             $('#referenceno').val('');
                             $("#serialname").val('');
                             $("#hiddenSerialValue").val('');
+                            $("#hiddenemmployeevalue").val("");
+                            $("#employee").val("");
+                            $("#date").val("");
                         }
 
                         if (result.msg == 'exist') {
@@ -74,7 +106,6 @@
         function populatetable(data) {
             console.log(data);
             const tableBody = $('#datatable tbody');
-            tableBody.empty();
 
             if (data.length === 0) {
                 const tr = $('<tr>').append($('<td>', {
@@ -99,38 +130,88 @@
         }
 
         function LoadTable() {
+            if (!hasMoreData) {
+                return;
+            }
             $(".progress").hide();
             $(".progress").slideDown();
             $.ajax({
-                url: '/repair/load',
-                method: 'GET',
-                dataType: 'json',
+                url: "/repair/load",
+                method: "GET",
+                dataType: "json",
+                data: { page: currentPage },
                 xhrFields: {
                     onprogress: function (e) {
                         if (e.lengthComputable) {
                             var percentComplete = (e.loaded / e.total) * 100;
                             $(".progress-bar").css("width", percentComplete + "%");
                         }
-                    }
+                    },
                 },
                 success: function (data) {
                     setTimeout(function () {
                         $(".progress").slideUp(function () {
-                            if (data.msg === 'success') {
-                                populatetable(data.data);
+                            hasMoreData = data.data.length > 0;
+                            if (!hasMoreData) {
+                                const tableBody = $("#datatable tbody");
+                                tableBody.empty();
+                                const tr = $("<tr>").append(
+                                    $("<td>", {
+                                        colspan: 9,
+                                        class: "text-center",
+                                        text: "No More Data",
+                                    })
+                                );
+                                tableBody.append(tr);
                             } else {
-                                console.error(data.msg);
+                                if (data.msg === "success") {
+                                    var loadingstate = document.querySelectorAll('.loading-row');
+                                    loadingstate.forEach(function (row) {
+                                        row.remove();
+                                    });
+                                    populatetable(data.data);
+                                    currentPage++;
+                                } else {
+                                    console.error(data.msg);
+                                }
                             }
+                            isFetchingData = false;
                         });
                     }, 1000);
                 },
                 error: function (error) {
                     console.error(error);
-                }
+                    isFetchingData = false;
+                    hasMoreData = false
+                },
             });
+        }
+
+        $(".scrollable-table-container").scroll(function () {
+            const container = $(this);
+            if (isFetchingData) {
+                return;
+            }
+            if (
+                container.scrollTop() + container.innerHeight() >=
+                container[0].scrollHeight - 10
+            ) {
+                //console.log("Append Triggered!");
+                isFetchingData = true;
+                LoadTable();
+            }
+        });
+
+        function resettable() {
+            const tableBody = $("#datatable tbody");
+            tableBody.empty();
+            currentPage = 1;
+            hasMoreData = true;
+            LoadTable();
         }
         //#region CUSTOM DROPDOWN INPUT
         let activeSerial = [];
+        let activeEmployee = [];
 
         function LoadList() {
             // console.log("triggered");
@@ -141,8 +222,10 @@
                     let container = result.data;
                     // console.log(container);
                     $.each(container, (key, item) => {
-                        let newname = item.serial + " (" + item.assetcontrol + ")";
-                        activeSerial.push({ display: newname, value: item.serial });
+                        if (item.status != "DEPLOYED" && item.status != "SOLD") {
+                            let newname = item.serial + " (" + item.assetcontrol + ")";
+                            activeSerial.push({ display: newname, value: item.serial });
+                        }
                     });
                     populateCustomDropdown1();
                 },
@@ -156,25 +239,17 @@
                 url: "/employee/load",
                 success: function (result) {
                     let container = result.data;
+                    // console.log(container)
                     $.each(container, (key, item) => {
                         let displayname = item.fullname;
                         let dataid = item.id;
-                        // console.log(displayname);
-
-                        var listItem = $("<li></li>")
-                            .text(displayname)
-                            .data("dataid", dataid);
-
-                        $(".repairbylist").append(listItem);
+                        activeEmployee.push({
+                            display: displayname,
+                            value: dataid,
+                        });
                     });
+                    populateCustomDropdown2()
 
-                    $(".repairbylist").on("click", "li", function () {
-                        var selectedOption = $(this).text();
-                        var selectedrepairbyId = $(this).data("dataid");
-
-                        $("#selectedrepairby").text(selectedOption);
-                        $("#repairbyid").val(selectedrepairbyId).change();
-                    });
                 },
                 error: function (err) {
                     errormsg(err);
@@ -186,6 +261,12 @@
         function populateCustomDropdown1() {
             for (const serial of activeSerial) {
                 addOption2("serialDropdown", serial.display, serial.value);
+            }
+        }
+
+        function populateCustomDropdown2() {
+            for (const employee of activeEmployee) {
+                addOption3("employeeDropdown", employee.display, employee.value);
             }
         }
 
@@ -227,6 +308,25 @@
             });
         }
 
+        function addOption3(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenemmployeevalue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("employee");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
         function addOption2(dropdownId, displayText, actualValue) {
             const dropdownElement = document.getElementById(dropdownId);
             const hiddenInput = document.getElementById("hiddenSerialValue");
@@ -234,12 +334,12 @@
             const newOption = document.createElement("div");
             newOption.className = "dropdown-option";
             newOption.textContent = displayText;
-            newOption.setAttribute("data-value", actualValue); // Store the actual value in a data attribute
+            newOption.setAttribute("data-value", actualValue); 
 
             newOption.addEventListener("click", function () {
                 const inputElement = document.getElementById("serialname");
-                inputElement.value = displayText; // Display the text in the input field
-                hiddenInput.value = actualValue; // Update the hidden input field with the actual value
+                inputElement.value = displayText; 
+                hiddenInput.value = actualValue; 
                 dropdownElement.style.display = "none";
             });
 
@@ -247,6 +347,7 @@
         }
 
         setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
+        setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
         LoadList()
         //#endregion
 
@@ -286,7 +387,7 @@
             //   console.log("clicked!");
             let uploaddata = $("#fileinput").val();
             if (uploaddata != '') {
-                showspinner();
+                Loading('Uploading, Please wait for a moment...');
                 UploadProcess();
             } else {
                 warning('Warning!', "No File Chosen!")
@@ -366,12 +467,10 @@
                     });
                 }
                 dataExcelArr.push({
-                    category: data[0].item,
-                    itemname: data[1].item,
-                    serial: data[2].item,
-                    podate: data[3].item,
-                    ponumber: data[4].item,
-                    warrantydate: data[5].item,
+                    serial: data[0].item,
+                    date: data[1].item,
+                    repairby: data[2].item,
+                    referenceno: data[3].item,
                 });
             }
             excelDataSave(dataExcelArr);
@@ -379,14 +478,15 @@
 
         function excelDataSave(data) {
             var dataraw = JSON.stringify(data, null, 2);
+            console.log(dataraw);
             $.ajax({
                 type: "POST",
-                url: "/product/upload",
+                url: "/repair/upload",
                 data: {
                     data: dataraw,
                 },
                 success: function (result) {
-                    hidespinner();
+                    hideLoading();
                     if (result.msg != "success") {
                         warning(
                             "Duplicate",
@@ -401,7 +501,7 @@
                         // });
                     } else {
                         success("Saved!", "Data saved!");
-                        LoadTable();
+                        resettable();
                         // swal({
                         //   title: "Success",
                         //   text: "Data saved!",

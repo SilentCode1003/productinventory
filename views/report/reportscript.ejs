@@ -1,0 +1,902 @@
+<script>
+    $(document).ready(function () {
+        let id = "";
+        let name = "";
+        let status = "";
+
+        $('#dateRange').daterangepicker({
+            opens: 'right',
+            startDate: moment().startOf('month'),
+            endDate: moment(),
+            maxDate: moment(),
+            ranges: {
+                'This Week': [moment().startOf('week'), moment().endOf('week')],
+                'Last Week': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Last 2 Month': [moment().subtract(2, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Last 3 Month': [moment().subtract(3, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            },
+            alwaysShowCalendars: true,
+            showCustomRangeLabel: false,
+            buttonClasses: ['btn btn-outline-inventory'],
+            locale: {
+                format: 'MMM D, YYYY'
+            }
+        });
+
+        $('#adjustDateBackward').on('click', function () {
+            var startDate = $('#dateRange').data('daterangepicker').startDate;
+            var endDate = $('#dateRange').data('daterangepicker').endDate.clone().subtract(7, 'days');
+            $('#dateRange').data('daterangepicker').setEndDate(endDate);
+            $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().subtract(7, 'days'));
+        });
+
+        $('#adjustDateForward').on('click', function () {
+            var startDate = $('#dateRange').data('daterangepicker').startDate;
+            var endDate = $('#dateRange').data('daterangepicker').endDate.clone().add(7, 'days');
+            $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().add(7, 'days'));
+            $('#dateRange').data('daterangepicker').setEndDate(endDate);
+        });
+
+        let initialdate = $('#dateRange').val();
+
+        LoadTable();
+
+        const historyloader = `  
+          <tr>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+            <td><div class="custom-loader"></div></td>
+          </tr>`;
+
+        $(document).on("click", "#editBtn", function () {
+            $(".id-edit").text(id);
+        });
+
+        const saleshistory = $('#salesreporthistory-table tbody');
+        for (let i = 0; i < 5; i++) {
+            saleshistory.append(historyloader);
+        }
+
+        $("#salesreporthistory-table tbody").on("click", "tr", function () {
+            var dataRow = [];
+            $(this)
+                .closest("tr")
+                .find("td")
+                .each(function () {
+                    dataRow.push($(this).text());
+                });
+            console.log(dataRow);
+            id = dataRow[0];
+            referenceno = dataRow[1];
+            status = dataRow[2];
+        });
+
+        function filterTableRows() {
+            const searchQuery = $("#search").val().trim().toLowerCase();
+            let foundMatches = false;
+
+            $("#no-match-row").remove();
+
+            $("#datatable tbody tr").each(function () {
+                const rowData = $(this).text().toLowerCase();
+                if (rowData.includes(searchQuery)) {
+                    $(this).show();
+                    foundMatches = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (!foundMatches) {
+                const noMatchRow = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 6,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                $("#datatable tbody").append(noMatchRow);
+                noMatchRow.attr("id", "no-match-row");
+            }
+        }
+
+        $("#search").on("input", filterTableRows);
+
+
+        $(document).on('click', '.cbi-link', function () {
+            // console.log(referenceno);
+            let downloadLinksDiv = document.getElementById('downloadLinks');
+            downloadLinksDiv.innerHTML = '';
+            $.ajax({
+                type: 'POST',
+                url: '/report/salesreport',
+                data: {
+                    referenceno: referenceno,
+                },
+                success: function (result) {
+                    var data = result.data;
+                    console.log("display data:", data)
+                    let processeddata = displayReport(data)
+
+                    const tableBody = $("#salesreport-table tbody");
+                    tableBody.empty();
+                    Object.keys(processeddata).forEach((key, index) => {
+                        const itemsForDate = processeddata[key];
+                        // console.log(itemsForDate);
+                        itemsForDate.forEach(item => {
+
+                            const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
+                            const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
+
+                            const tr = $("<tr>").append(
+                                $("<td>", { text: key, "data-label": "Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.soldrefno, "data-label": "department", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.category, "data-label": "Created By", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.item, "data-label": "Created Date", class: "custom-mobile-align no-wrap", }),
+                                $("<td>", { text: item.sellingprice, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.deliveryfee, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.quantity, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.paymenttype, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $("<td>", { text: item.transacrefno, "data-label": "Created Date", class: "custom-mobile-align", }),
+                                $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+                                    $('<div>', { class: containerBackground }).append(
+                                        $('<span>', { text: item.status, class: statusBackground })
+                                    )
+                                )
+                            );
+
+                            tableBody.append(tr);
+
+                        });
+                    });
+
+                    $(".id").text(id);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/report/historydetails',
+                        data: {
+                            id: id,
+                        },
+                        success: function (result) {
+                            var myDiv = document.getElementById('historydata');
+                            myDiv.innerHTML = '';
+
+                            let data = result.data;
+                            let base64docu = data[0].documents;
+                            if (base64docu != "N/A") {
+                                let downloadLinksDiv = document.getElementById('downloadLinks');
+                                downloadLinksDiv.innerHTML = '';
+                                let parsedData = JSON.parse(base64docu);
+                                console.log(parsedData);
+                                displayLinks(parsedData);
+                            }
+                            if (data.length == 0) {
+                                let historydiv = $(`
+                                    <div class="row justify-content-center">
+                                        <h5 class="">NO CURRENT HISTORY</h5>
+                                    </div>`);
+                                $('#historydata').append(historydiv);
+                            } else {
+                                let historydata = JSON.parse(data[0].date);
+                                // console.log("all data: ", historydata)
+                                let jsonData = {};
+
+                                for( var key in historydata){
+                                    if(historydata.hasOwnProperty){
+                                        console.log(historydata[key]);
+                                        for(index in historydata[key]){
+                                            console.log(historydata[key][index]);
+
+                                            let historydiv = $(`
+                                        <div class="row">
+                                            <div class="col-3 text-center">
+                                                <div>
+                                                    <span class="">${historydata[key][index].date}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-3 text-center">
+                                                <span class="">${index}</span>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="row ml-1">
+                                                    <span class="">${historydata[key][index].details}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr class="sidebar-divider">`);
+
+                                    $('#historydata').append(historydiv);
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        error: function (err) {
+                            errormsg(err);
+                        }
+                    });
+                },
+                error: function (err) {
+                    errormsg(err);
+                }
+            });
+        });
+
+        function populatesalesreporthistory(data) {
+            // console.log(data);
+            const tableBody = $("#salesreporthistory-table tbody");
+            tableBody.empty();
+
+            if (data.length === 0) {
+                const tr = $("<tr>").append(
+                    $("<td>", {
+                        colspan: 6,
+                        class: "text-center",
+                        text: "No Data Matched",
+                    })
+                );
+                tableBody.append(tr);
+            } else {
+                data.forEach((item) => {
+                    let action = "";
+                    if (item.status == 'PAID') {
+                        action = `<span class="editbutton" id="editDocs" name="editDocs" data-toggle="modal" data-target="#SupportingDocuments"><i class="fas fa-plus" style="color: rgb(99, 115, 129);"></i></span> `;
+                    } else{
+                        action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span> `;
+                    }
+
+                    const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
+                    const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
+
+                    const tr = $("<tr>").append(
+                        $("<td>", {
+                            text: item.id,
+                            "data-label": "ID",
+                            class: "custom-mobile-align",
+                        }),
+                        $("<td>", {
+                            text: item.referenceno,
+                            "data-label": "department",
+                            class: "custom-mobile-align cbi-link",
+                            "data-toggle": "modal",
+                            "data-target": "#salesreportmodal",
+                        }),
+                        $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+                            $('<div>', { class: containerBackground }).append(
+                                $('<span>', { text: item.status, class: statusBackground })
+                            )
+                        ),
+                        $("<td>", {
+                            html: action,
+                            "data-label": "Action",
+                            class: "actionWidth",
+                        })
+                    );
+
+                    tableBody.append(tr);
+                });
+            }
+        }
+
+        function LoadTable() {
+            $.ajax({
+                url: "/report/salesreporthistory",
+                method: "GET",
+                dataType: "json",
+                success: function (data) {
+                    // console.log("Data: ", data.data)
+                    if (data.msg === "success") {
+                        populatesalesreporthistory(data.data);
+                    } else {
+                        console.error(data.msg);
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                },
+            });
+
+        }
+
+        $(document).on("input", "#employee", function () {
+            $("#hiddenemmployeevalue").val("");
+        });
+
+        $('#convertopdf').on('click', function () {
+            let daterange = $('#dateRange').val();
+            let soldby;
+            let employee;
+
+            if ("<%= access%>" == "Admin") {
+                soldby = $("#hiddenemmployeevalue").val();
+                employee = $("#employee").val();
+            } else {
+                soldby = "<%= fullname%>";
+            }
+
+            let startDate = moment(daterange.split(' - ')[0], 'MMM D, YYYY');
+            let endDate = moment(daterange.split(' - ')[1], 'MMM D, YYYY');
+            let formattedStartDate = startDate.format('MM/DD/YYYY');
+            let formattedEndDate = endDate.format('MM/DD/YYYY');
+            let formattedDate = formattedStartDate + ' - ' + formattedEndDate;
+
+            if (soldby !== '') {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/report/getsalesreport",
+                    data: {
+                        daterange: formattedDate,
+                        soldby: soldby,
+                    },
+                    success: function (result) {
+                        if (result.msg == "success") {
+                            let container = result.data;
+                            // console.log("Container: ", container)
+                            let data = salesreportdata(container);
+                            let template = 'SALES REPORT';
+                            // console.log("Current Stock: ", groupedData);
+                            if (data.length != 0) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/index/processpdfdata",
+                                    data: {
+                                        processeddata: data,
+                                        template: template,
+                                        employee: soldby,
+                                        date: formattedDate,
+                                    },
+                                    success: function (result) {
+                                        // console.log("MSG: ", result.msg)
+                                        if (result.msg == "success") {
+                                            window.open(`/index/generatepdf`, "_blank");
+                                            success("Success", "PDF generate successfully!");
+                                            $("#employee").val("");
+                                            $("#hiddenemmployeevalue").val("");
+                                        } else {
+                                            warningInfo("Notice", "No Data within in the date range.");
+                                        }
+                                    },
+                                    error: function (err) {
+                                        errormsg(err);
+                                    },
+                                });
+                            }
+                        } else {
+                            warning("Notice", "No Data within in the date range.")
+                        }
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    },
+                });
+            } else {
+                warning("Warning", "Empty Employee Field!");
+            }
+        });
+
+        function salesreportdata(data) {
+            return data.reduce((result, current) => {
+                console.log(current.status);
+                if (current.status === 'PAID' || current.status === 'PARTIALLY PAID' || current.status === 'NOT PAID') {
+
+                    const date = current.date;
+
+                    if (!result[date]) {
+                        result[date] = [];
+                    }
+
+                    const matchingEntry = result[date].find(entry =>
+                        entry.soldrefno === current.soldrefno &&
+                        entry.transacrefno === current.transacrefno &&
+                        entry.itemname === current.itemname &&
+                        entry.category === current.category &&
+                        entry.price === current.price &&
+                        entry.deliveryfee === current.deliveryfee
+                    );
+
+                    if (matchingEntry) {
+                        matchingEntry.quantity += current.quantity;
+                    } else {
+                        result[date].push({ ...current });
+                    }
+
+                    return result;
+                } else {
+                    return result;
+                }
+            }, {});
+
+        }
+
+        function displayReport(data) {
+            return data.reduce((result, current) => {
+                console.log(current.status);
+
+
+                const date = current.date;
+
+                if (!result[date]) {
+                    result[date] = [];
+                }
+
+                const matchingEntry = result[date].find(entry =>
+                    entry.soldrefno === current.soldrefno &&
+                    entry.transacrefno === current.transacrefno &&
+                    entry.item === current.item &&
+                    entry.category === current.category &&
+                    entry.price === current.price &&
+                    entry.deliveryfee === current.deliveryfee &&
+                    entry.status === current.status
+                );
+
+                if (matchingEntry) {
+                    matchingEntry.quantity += current.quantity;
+                } else {
+                    result[date].push({ ...current });
+                }
+
+                return result;
+            }, {});
+
+        }
+
+        let activeEmployee = [];
+        let activeCategory = [];
+        let activeStatus = [];
+
+        function LoadList() {
+
+            $.ajax({
+                type: "GET",
+                url: "/employee/load",
+                success: function (result) {
+                    let container = result.data;
+                    // console.log(container)
+                    $.each(container, (key, item) => {
+                        let displayname = item.fullname;
+                        let dataid = item.id;
+                        activeEmployee.push({
+                            display: displayname,
+                            value: displayname,
+                        });
+                    });
+                    populateCustomDropdown();
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "/category/load",
+                success: function (result) {
+                    let container = result.data;
+                    console.log('category:',container)
+                    $.each(container, (key, item) => {
+                        let displayname = item.name;
+                        let dataid = item.id;
+                        activeCategory.push({
+                            display: displayname,
+                            value: dataid,
+                        });
+                    });
+                    populateCategoryDropdown();
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "/product/getproductstatus",
+                success: function (result) {
+                    let container = result.data;
+                    console.log('product:',container)
+                    $.each(container, (key, item) => {
+                        let displayname = item.status;
+                        // let dataid = item.id;
+                        activeStatus.push({
+                            display: displayname,
+                            value: displayname,
+                        });
+                    });
+                    populateStatusDropdown()
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        }
+
+        function populateCustomDropdown() {
+            for (const employee of activeEmployee) {
+                addOption("employeeDropdown", employee.display, employee.value);
+            }
+        }
+
+        function populateCategoryDropdown() {
+            for (const category of activeCategory) {
+                addCategoryOption("categoryDropdown", category.display, category.value);
+            }
+        }
+
+        function populateStatusDropdown() {
+            for (const status of activeStatus) {
+                addStatusOption("statusDropdown", status.display, status.value);
+            }
+            console.log(activeStatus)
+        }
+
+        function addOption(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenemmployeevalue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("employee");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        function addCategoryOption(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddencategoryvalue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("category");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        function addStatusOption(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenstatusvalue");
+
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+                const inputElement = document.getElementById("status");
+                inputElement.value = displayText;
+                hiddenInput.value = actualValue;
+                dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+        }
+
+        function setupCustomDropdown(inputId, dropdownId, optionClass) {
+            const inputElement = document.getElementById(inputId);
+            const dropdownElement = document.getElementById(dropdownId);
+            const options = dropdownElement.getElementsByClassName(optionClass);
+
+            inputElement.addEventListener("click", function () {
+                dropdownElement.style.display = "block";
+            });
+
+            for (const option of options) {
+                option.addEventListener("click", function () {
+                    inputElement.value = option.textContent;
+                    const actualValue = option.getAttribute("data-value");
+                    inputElement.setAttribute("data-actual-value", actualValue);
+                    dropdownElement.style.display = "none";
+                });
+            }
+
+            inputElement.addEventListener("input", function () {
+                const value = inputElement.value.toUpperCase();
+                for (const option of options) {
+                    if (option.textContent.toUpperCase().includes(value)) {
+                        option.style.display = "block";
+                    } else {
+                        option.style.display = "none";
+                    }
+                }
+                dropdownElement.style.display = "block";
+            });
+
+            document.addEventListener("click", function (event) {
+                const target = event.target;
+                if (!dropdownElement.contains(target) && target !== inputElement) {
+                    dropdownElement.style.display = "none";
+                }
+            });
+        }
+
+        setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
+        setupCustomDropdown("category", "categoryDropdown", "dropdown-option");
+        setupCustomDropdown("status", "statusDropdown", "dropdown-option");
+        LoadList();
+
+        function getBase64(inputfield, display) {
+            const inputElement = document.getElementById(inputfield);
+            const fileList = inputElement.files;
+            let documents = [];
+
+            function handleFileProcessed() {
+                if (documents.length === fileList.length) {
+                    // console.log(documents);
+                    displaySelectedFiles();
+                }
+            }
+
+            function displaySelectedFiles() {
+                const selectedFilesList = document.getElementById(display);
+                selectedFilesList.innerHTML = '<p><strong>Selected Files:</strong></p>';
+
+                for (const doc of documents) {
+                    const fileItem = document.createElement('div');
+                    fileItem.textContent = `${doc.filename}: ${doc.data.substring(0, 20)}...`;
+                    selectedFilesList.appendChild(fileItem);
+                }
+            }
+
+            for (const file of fileList) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const base64String = e.target.result;
+                    documents.push({
+                        filename: file.name,
+                        data: base64String
+                    });
+
+                    handleFileProcessed();
+                };
+
+                reader.readAsDataURL(file);
+            }
+            return documents;
+        }
+
+        $(document).on("input", "#category", function () {
+            $("#hiddencategoryvalue").val("");
+        });
+
+        $(document).on("input", "#status", function () {
+            $("#hiddenstatusvalue").val("");
+        });
+
+        $(document).on("click", "#prdExcel", function () {
+            let category = $("#hiddencategoryvalue").val();
+            let status = $("#hiddenstatusvalue").val();
+            console.log("category:", category, "status:", status)
+
+            let message = '';
+            if(category == ''){
+                message += "Product Category, ";
+            }
+
+            if(status == ''){
+                message += "Product Status ";
+            }
+
+            if (message !== '') { 
+                warning('Warning!', `${message} is Empty`)
+            }else{
+                let data = {
+                    category: category,
+                    status: status,
+                }
+                console.log(data)
+                $.ajax({
+                    url: '/product/getProductbyCategory',
+                    type: 'POST',
+                    data: data,
+                    success: function (result) {
+                        if (result.msg === "success" && result.data.length > 0) {
+                            let wb = XLSX.utils.book_new();
+                            let ws = XLSX.utils.json_to_sheet(result.data);
+                            XLSX.utils.book_append_sheet(wb, ws, "Products");
+
+                            let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+                            function s2ab(s) {
+                                let buf = new ArrayBuffer(s.length);
+                                let view = new Uint8Array(buf);
+                                for (let i = 0; i < s.length; i++) {
+                                    view[i] = s.charCodeAt(i) & 0xFF;
+                                }
+                                return buf;
+                            }
+
+                            saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `PRODUCTS_${status}.xlsx`);
+                        } else {
+                            console.error("Export failed:", result.msg);
+                        }
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    },
+                });
+            }
+        });
+
+        $(document).on("click", "#updateBtn", function () {
+            $(".id").text(id);
+            let dateupdate = $("#date").val();
+            let remarks = $("#remarks").val();
+            let transactionstatus = $("#transactionstatus").val();
+            let documents = getBase64('fileinput', 'selectedFilesList');
+            let historydata = [];
+            var message = "";
+
+            if (dateupdate === "") {
+                message += "Empty Date, ";
+            }
+            if (remarks === "") {
+                message += "Empty Remarks, ";
+            }
+            if (transactionstatus === "") {
+                message += "Empty Status ";
+            }
+
+            if (message != "") {
+                warning("Required", `Please fill up ${message}`);
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/report/historydetails',
+                    data: {
+                        id: id,
+                    },
+                    success: function (result) {
+                        let data = result.data;
+                        historydata = JSON.parse(data[0].date);
+                        let newdata = {
+                            [transactionstatus]: { date: dateupdate, details: remarks }
+                        };
+                        historydata.push(newdata);
+                        // console.log("appended date", historydata)
+                        // console.log(historydata, documents, id, transactionstatus);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/report/updatehistory",
+                            data: {
+                                details: historydata,
+                                documents: documents,
+                                id: id,
+                                status: transactionstatus,
+                                referenceno: referenceno,
+                            },
+                            success: function (result) {
+                                if (result.msg == "success") {
+                                    $("#date").val("");
+                                    $("#remarks").val("");
+                                    $("#transactionstatus").val("");
+                                    $("#editModal").modal("hide");
+                                    success("Saved", "Successfully");
+                                    LoadTable();
+                                }
+                            },
+                            error: function (err) {
+                                errormsg(err);
+                            },
+                        });
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    }
+                });
+
+
+            }
+        });
+        
+        let updateDocuments;
+        $(document).on("change", "#documentfile", function () {
+            updateDocuments = getBase64('documentfile', 'selectedDocuments');
+        });
+
+        $(document).on("click", "#updateDocs", function () {
+            $(".id-documents").text(id);
+            console.log(updateDocuments)
+            let message = "";
+
+            if (updateDocuments === undefined) {
+                message += "Empty Documents, ";
+            }
+
+            if (message != "") {
+                warning("Required", `Please fill up ${message}`);
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '/report/adddocuments',
+                    data: {
+                        id: id,
+                        documents: updateDocuments
+                    },
+                    success: function (result) {
+                        $("#SupportingDocuments").modal("hide");
+                        updateDocuments = "";
+                        success("Saved", "Successfully");
+                    },
+                    error: function (err) {
+                        errormsg(err);
+                    }
+                });
+            }
+        });
+
+        function displayLinks(dataArray) {
+            let downloadLinksDiv = document.getElementById('downloadLinks');
+            downloadLinksDiv.innerHTML = '';
+            dataArray.forEach((item, index) => {
+                // Ensure data URI prefix is removed before decoding
+                let base64Data = item.data.split(',')[1];
+                let blob = b64toBlob(base64Data);
+
+                if (item.filename.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                    let img = document.createElement('img');
+                    img.src = URL.createObjectURL(blob);
+                    img.alt = `Image ${index + 1}`;
+                    img.classList.add('custom-image-class');
+
+                    downloadLinksDiv.appendChild(img);
+
+                    downloadLinksDiv.appendChild(document.createElement('br'));
+
+                    let link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = item.filename;
+                    link.classList.add('custom-download-link-class');
+                    link.textContent = `${item.filename}`;
+
+                    downloadLinksDiv.appendChild(link);
+                } else {
+                    let link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = item.filename;
+                    link.classList.add('custom-download-link-class');
+                    link.textContent = `${item.filename}`;
+
+                    downloadLinksDiv.appendChild(link);
+                }
+
+                downloadLinksDiv.appendChild(document.createElement('br'));
+            });
+
+            function b64toBlob(b64Data) {
+                let byteCharacters = atob(b64Data);
+                let byteNumbers = new Array(byteCharacters.length);
+
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+
+                let byteArray = new Uint8Array(byteNumbers);
+
+                return new Blob([byteArray], { type: 'application/octet-stream' });
+            }
+        }
+
+    });
+</script>

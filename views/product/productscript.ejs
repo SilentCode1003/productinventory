@@ -4,10 +4,30 @@
     let isFetchingData = false;
     let hasMoreData = true;
     let currentPage = 1;
+    let categoryContainer = "";
+    let itemContainer = "";
 
     var activePositions = [];
     let assetcontrol = "";
     let status = "";
+
+    const loader = `  
+        <tr class="loading-row">
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+          <td><div class="custom-loader"></div></td>
+        </tr>`;
+
+    const tbody = $('#datatable tbody');
+    for(let i = 0; i < 7; i++){
+      tbody.append(loader);
+    }
 
     LoadTable();
 
@@ -24,51 +44,95 @@
       status = dataRow[7];
     });
 
-    $(document).on("change", "#categoryid", function () {
-      let id = $(this).val();
-      //console.log(id);
+    let activeItems = [];
+    function test(selector, newValue){
+      const inputElement = $(selector);
+      const currentValue = inputElement.val();
+      inputElement.val(newValue);
 
-      $(".productlist").empty();
-      $("#selectedproduct").text("Select Product");
-      $("#productid").val("");
+      // Log the change if the value is different
+      if (currentValue !== newValue) {
+        console.log(`Value changed: ${currentValue} => ${newValue}`);
+      }
+    }
+
+    $(document).on("input", "#category", function () {
+      $("#hiddenvalue").val("");
+      categoryContainer = "";
+    });
+
+    $(document).on("input", "#item", function () {
+      $("#hiddenvalue2").val("");
+      itemContainer = "";
+    });
+
+    $(document).on('click', '#itemDropdown .dropdown-option', function () {
+      itemContainer = $('#hiddenValue2').val();
+      // console.log("product: ", itemContainer)
+    });
+
+    $(document).on('click', '#categoryDropdown .dropdown-option', function () {
+      categoryContainer = $('#hiddenValue').val();
+      // console.log("category: ", categoryContainer)
+
+      activeItems.length = 0;
+      $('#itemDropdown .dropdown-option').remove();
+      $("#item").val('');
+      itemContainer = "";
+
       $.ajax({
         type: "POST",
         url: "/items/getitemsbycategory",
         data: {
-          id: id,
+          id: categoryContainer,
         },
         success: function (result) {
           let container = result.data;
           //console.log(container);
           $.each(container, (key, item) => {
-            let productname = item.name;
-            let productid = item.id;
-
-            let listItem = $("<li></li>")
-              .text(productname)
-              .data("productid", productid);
-
-            $(".productlist").append(listItem);
+            let displayname = item.name;
+            let id = item.id;
+            activeItems.push({ display: displayname, value: item.id });
           });
+          populateCustomDropdown2()
 
-          $(".productlist").on("click", "li", function () {
-            let selectedOption = $(this).text();
-            let selectedproductId = $(this).data("productid");
+          function populateCustomDropdown2() {
+            for (const item of activeItems) {
+              addOption2("itemDropdown", item.display, item.value);
+            }
+          }
+          
+          function addOption2(dropdownId, displayText, actualValue) {
+            const dropdownElement = document.getElementById(dropdownId);
+            const hiddenInput = document.getElementById("hiddenValue2");
 
-            $("#selectedproduct").text(selectedOption);
-            $("#productid").val(selectedproductId).change();
-          });
+            const newOption = document.createElement("div");
+            newOption.className = "dropdown-option";
+            newOption.textContent = displayText;
+            newOption.setAttribute("data-value", actualValue);
+
+            newOption.addEventListener("click", function () {
+              const inputElement = document.getElementById("item");
+              inputElement.value = displayText;
+              hiddenInput.value = actualValue;
+              dropdownElement.style.display = "none";
+            });
+
+            dropdownElement.appendChild(newOption);
+          }
+
+          setupCustomDropdown("item", "itemDropdown", "dropdown-option");
         },
         error: function (err) {
           errormsg(err);
         },
       });
     });
-
+    
     $(document).on("click", "#addBtn", function () {
       let serial = $("#serial").val();
-      let itemname = $("#productid").val();
-      let category = $("#categoryid").val();
+      let categoryname = $("#category").val();
+      let itemname = $("#item").val();
       let podate = $("#podate").val();
       let ponumber = $("#ponumber").val();
       let warrantydate = $("#warrantydate").val();
@@ -77,11 +141,11 @@
       if (serial == "") {
         message += "Serial, ";
       }
-      if (itemname == "") {
-        message += "Item Name, ";
+      if (itemContainer == "") {
+        message += "Item does not Exist " + `${itemname}, `;
       }
-      if (category == "") {
-        message += "Category, ";
+      if (categoryContainer == "") {
+        message += "Category does not Exist " + `${categoryname}, `;
       }
       if (podate == "") {
         message += "PO Date, ";
@@ -96,14 +160,14 @@
       if (message != "") {
         warning("Required", `Please fill up ${message}`);
       } else {
-        //console.log(serial, itemname, category, podate, ponumber, warrantydate);
+        // console.log(serial, itemContainer, categoryContainer, podate, ponumber, warrantydate);
         $.ajax({
           type: "POST",
           url: "/product/save",
           data: {
             serial: serial,
-            itemname: itemname,
-            category: category,
+            itemname: itemContainer,
+            category: categoryContainer,
             podate: podate,
             ponumber: ponumber,
             warrantydate: warrantydate,
@@ -117,11 +181,11 @@
               $("#podate").val("");
               $("#ponumber").val("");
               $("#warrantydate").val("");
-              $("#productid").val("");
-              $("#selectedproduct").text("Select Product");
-              $("#categoryid").val("");
-              $("#selectedcategory").text("Select Category");
-              $(".productlist").empty();
+              $("#item").val("");
+              $("#category").val("");
+              $('#itemDropdown .dropdown-option').remove();
+              itemContainer = "";
+              categoryContainer = "";
             }
 
             if (result.msg == "exist") {
@@ -219,7 +283,7 @@
       $(".progress").hide();
       $(".progress").slideDown();
       $.ajax({
-        url: "/product/load",
+        url: "/product/loadproduct",
         method: "GET",
         dataType: "json",
         data: { page: currentPage },
@@ -247,6 +311,10 @@
                 tableBody.append(tr);
               } else {
                 if (data.msg === "success") {
+                  var loadingstate = document.querySelectorAll('.loading-row');
+                  loadingstate.forEach(function (row) {
+                    row.remove();
+                  });
                   populatetable(data.data);
                   currentPage++;
                 } else {
@@ -260,7 +328,7 @@
         error: function (error) {
           console.error(error);
           isFetchingData = false;
-          hasMoreData = fals
+          hasMoreData = false;
         },
       });
     }
@@ -289,38 +357,6 @@
     }
 
     //#endregion LOAD TABLE
-
-    function LoadList() {
-      $.ajax({
-        type: "GET",
-        url: "/category/load",
-        success: function (result) {
-          let container = result.data;
-          $.each(container, (key, item) => {
-            let categoryname = item.name;
-            let categoryid = item.id;
-            //console.log(categoryname);
-
-            var listItem = $("<li></li>")
-              .text(categoryname)
-              .data("categoryid", categoryid);
-
-            $(".categorylist").append(listItem);
-          });
-
-          $(".categorylist").on("click", "li", function () {
-            var selectedOption = $(this).text();
-            var selectedcategoryId = $(this).data("categoryid");
-
-            $("#selectedcategory").text(selectedOption);
-            $("#categoryid").val(selectedcategoryId).change();
-          });
-        },
-        error: function (err) {
-          errormsg(err);
-        },
-      });
-    }
 
     $(document).on("click", "#activeBtn", function () {
       //console.log(assetcontrol);
@@ -374,6 +410,97 @@
       });
     });
 
+    let activeCategory = [];
+
+    function LoadList() {
+      $.ajax({
+        type: "GET",
+        url: "/category/load",
+        success: function (result) {
+          let container = result.data;
+          $.each(container, (key, item) => {
+            let displayname = item.name;
+            let id = item.id;
+            // console.log(displayname);
+
+            activeCategory.push({
+              display: displayname,
+              value: id,
+            });
+          });
+          // console.log(activeCategory)
+          populateCustomDropdown1();
+        },
+        error: function (err) {
+          errormsg(err);
+        },
+      });
+    }
+
+    function populateCustomDropdown1() {
+      for (const category of activeCategory) {
+        addOption1("categoryDropdown", category.display, category.value);
+      }
+    }
+    
+    function addOption1(dropdownId, displayText, actualValue) {
+      const dropdownElement = document.getElementById(dropdownId);
+      const hiddenInput = document.getElementById("hiddenValue");
+
+      const newOption = document.createElement("div");
+      newOption.className = "dropdown-option";
+      newOption.textContent = displayText;
+      newOption.setAttribute("data-value", actualValue);
+
+      newOption.addEventListener("click", function () {
+        const inputElement = document.getElementById("category");
+        inputElement.value = displayText;
+        hiddenInput.value = actualValue;
+        dropdownElement.style.display = "none";
+      });
+
+      dropdownElement.appendChild(newOption);
+    }
+
+    function setupCustomDropdown(inputId, dropdownId, optionClass) {
+      const inputElement = document.getElementById(inputId);
+      const dropdownElement = document.getElementById(dropdownId);
+      const options = dropdownElement.getElementsByClassName(optionClass);
+
+      inputElement.addEventListener("click", function () {
+        dropdownElement.style.display = "block";
+      });
+
+      for (const option of options) {
+        option.addEventListener("click", function () {
+          inputElement.value = option.textContent;
+          const actualValue = option.getAttribute("data-value");
+          inputElement.setAttribute("data-actual-value", actualValue);
+          dropdownElement.style.display = "none";
+        });
+      }
+
+      inputElement.addEventListener("input", function () {
+        const value = inputElement.value.toUpperCase();
+        for (const option of options) {
+          if (option.textContent.toUpperCase().includes(value)) {
+            option.style.display = "block";
+          } else {
+            option.style.display = "none";
+          }
+        }
+        dropdownElement.style.display = "block";
+      });
+
+      document.addEventListener("click", function (event) {
+        const target = event.target;
+        if (!dropdownElement.contains(target) && target !== inputElement) {
+          dropdownElement.style.display = "none";
+        }
+      });
+    }
+
+    setupCustomDropdown("category", "categoryDropdown", "dropdown-option");
     LoadList();
 
     let searchTimeout;
@@ -398,6 +525,7 @@
               tableBody.empty();
 
               if (data.length === 0) {
+                tableBody.empty();
                 const tr = $("<tr>").append(
                   $("<td>", {
                     colspan: 8,
@@ -484,7 +612,7 @@
     $(document).on("click", "#uploadButton", function () {
       let uploaddata = $("#fileinput").val();
       if (uploaddata != '') {
-        showspinner();
+        Loading('Uploading, Please wait for a moment...')
         UploadProcess();
       } else {
         warning('Warning!', "No File Chosen!")
@@ -584,19 +712,16 @@
           data: dataraw,
         },
         success: function (result) {
-          hidespinner();
+          hideLoading();
           if (result.msg != "success") {
-            warning(
+            warningRegister(
               "Duplicate",
-              `Some data already exist on the database. ID[${result.data}]`
+              `Some data are invalid or already exist in the database <br><button class="btn btn-sm btn-primary" id="txtBtn">Download</button>`
             );
-
-            // swal({
-            //   title: "Exist",
-            //   text: "Some data already exist on the database. ID[${result.data}]",
-            //   icon: "warning",
-            //   button: "OK!",
-            // });
+            
+            $(document).on("click", "#txtBtn", function () {
+              downloadTxtFile(result.data, 'existing_invalid_data.txt');
+            });
           } else {
             success("Saved!", "Data saved!");
             resettable()
@@ -615,6 +740,25 @@
         },
       });
 
+    }
+
+    function downloadTxtFile(data, filename) {
+      data = data.toString().replace(/,/g, '\n');
+
+      const blob = new Blob([data], { type: 'text/plain' });
+
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      URL.revokeObjectURL(url);
+      document.body.removeChild(link);
     }
     //#endregion
   });

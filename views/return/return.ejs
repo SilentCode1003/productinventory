@@ -1,9 +1,5 @@
-<!-- PCreated by Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-3">
-    <h1 class="cyber-title">Return</h1>
-</div>
-<!-- Content Row -->
-<div class="row mb-2">
+
+<div class="row mb-2 mt-3">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
@@ -33,7 +29,7 @@
                         <div class="custom-dropdown custom-dropdown-margin-left" id="locationDropdown"></div>
                     </div>
 
-                    <div class="col-md-6 mb-2">
+                    <!-- <div class="col-md-6 mb-2">
                         <div class="customdropdown">
                             <div class="select selectemployee">
                               <span id="selectedemployee">Return By</span>
@@ -42,6 +38,17 @@
                             <input type="hidden" name="employeeid" id="employeeid">
                             <ul class="customdropdown-menu employeelist"></ul>
                         </div>
+                    </div> -->
+
+                    <div class="col-md-6 mb-2">
+                        <div class="input-group">
+                          <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee"/>
+                          <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Return By</span>
+                          </div>
+                        </div>
+                        <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
                     </div>
                 </div>
 
@@ -106,30 +113,28 @@
                 </div>                
             </div>
             <div class="col-md-2 mt-2">
-                <button class="btn btn-outline-cyberpower" id="uploadButton" type="button">
+                <button class="btn btn-outline-cyberpower w-75" id="uploadButton" type="button">
                     <i class="fas fa-upload"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="card-body">
-        <div class="table-responsive scrollable-table-container">
-            <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
-                <thead class="table-dark table-header">
-                    <tr>
-                        <th>ID</th>
-                        <th>Asset Control</th>
-                        <th>Serial</th>
-                        <th>Date</th>
-                        <th>Returned By</th>
-                        <th>Returned From</th>
-                        <th>Ref. No.</th>
-                    </tr>
-                </thead>
+    <div class="table-responsive scrollable-table-container">
+        <table class="table custom-mobile-table" id="datatable" width="100%" cellspacing="10">
+            <thead class="header-style table-header">
+                <tr>
+                    <th>ID</th>
+                    <th>Asset Control</th>
+                    <th>Serial</th>
+                    <th>Date</th>
+                    <th>Returned By</th>
+                    <th>Returned From</th>
+                    <th>Ref. No.</th>
+                </tr>
+            </thead>
 
-                <tbody class="no-border"></tbody>
-            </table>
-        </div>
+            <tbody class="no-border"></tbody>
+        </table>
     </div>
 </div>
