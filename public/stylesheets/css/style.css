@@ -751,3 +751,19 @@ CALENDAR
 .custom-download-link-class{
   color: var(--clr-text);
 }
+
+#convertopdf:hover span {
+  display: none
+}
+
+#convertopdf:hover:before {
+  content: "Download PDF "
+}
+
+#uploadButton:hover span {
+  display: none;
+}
+
+#uploadButton:hover:before {
+  content: "Upload Excel "
+}
