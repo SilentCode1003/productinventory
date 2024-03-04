@@ -836,6 +836,7 @@ exports.UploadReplaceItem = (data) => {
       date: key.date,
       replacedby: key.replacedby,
       referenceno: key.referenceno,
+      replacementmode: key.replacementmode,
     });
   });
 
@@ -848,6 +849,7 @@ exports.UploadReplaceItem = (data) => {
         key["date"],
         key["replacedby"],
         key["referenceno"],
+        key["replacementmode"],
       )
   );
 };
