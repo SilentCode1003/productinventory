@@ -322,7 +322,7 @@
         //     item2: { category: 'Category2', stocks: 20, totalPrice: 200 },
         // };
 
-    // displayDataInTable(mockData);
+        // displayDataInTable(mockData);
 
         function groupDataByItemName(data) {
 
@@ -337,7 +337,7 @@
                 groupedData[itemName].stocks += 1;
                 groupedData[itemName].totalPrice += item.price;
             });
-            console.log("sample",groupedData)
+            console.log("sample", groupedData)
 
             return groupedData;
         }
@@ -395,7 +395,7 @@
                     maintainAspectRatio: false,
                     plugins: {
                         labels: {
-                             font: {
+                            font: {
                                 family: 'Share Tech',
                                 size: 14,
                             },
@@ -405,7 +405,7 @@
             });
         }
 
-        function Loadtable () {
+        function Loadtable() {
             $.ajax({
                 url: '/index/deployed',
                 method: 'GET',
@@ -489,7 +489,7 @@
             }
         }
 
-        function getsoldcount(date){
+        function getsoldcount(date) {
             let startDate = moment(date.split(' - ')[0], 'MMM D, YYYY');
             let endDate = moment(date.split(' - ')[1], 'MMM D, YYYY');
             let formattedStartDate = startDate.format('MM/DD/YYYY');
@@ -500,7 +500,7 @@
                 url: '/index/getsoldcount',
                 method: 'POST',
                 dataType: 'json',
-                data:{
+                data: {
                     daterange: formattedDate
                 },
                 success: function (data) {
@@ -514,8 +514,8 @@
                             totalprice += item.price;
                         });
                         $("#totalsold").text(formatCurrency(totalprice));
-                        $("#date").text(" ("+ date + ")");
-                        
+                        $("#date").text(" (" + date + ")");
+
                     } else {
                         console.error(data.msg);
                     }
@@ -526,7 +526,7 @@
             });
         }
 
-        $('#convertopdf').on('click', function () {
+        $('#convertopdfdb').on('click', function () {
             $.ajax({
                 type: "GET",
                 url: "/product/getstocks",
@@ -536,10 +536,10 @@
                     // console.log("stocks: ", container);
 
                     let groupedData = groupDataByItemName(container);
-                    console.log("sample data",groupedData);
+                    console.log("sample data", groupedData);
                     let template = 'STOCKS REPORT';
                     // console.log("Current Stock: ", groupedData);
-                    if(groupedData.length != 0){
+                    if (groupedData.length != 0) {
                         $.ajax({
                             type: "POST",
                             url: "/index/processpdfdata",
@@ -564,18 +564,37 @@
             });
         });
 
-        // function generatePDF() {
-        //     const element = document.getElementById('datatable2');
-        //     const pdfOptions = {
-        //         margin: 10,
-        //         filename: 'table.pdf',
-        //         image: { type: 'jpeg', quality: 0.98 },
-        //         html2canvas: { scale: 2 },
-        //         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        //     };
+        $(document).on("click", "#convertoexceldb", function () {
+            $.ajax({
+                type: "GET",
+                url: "/product/getstocks",
+                success: function (result) {
+                    if (result.msg === "success" && result.data.length > 0) {
+                        let wb = XLSX.utils.book_new();
+                        let ws = XLSX.utils.json_to_sheet(result.data);
+                        XLSX.utils.book_append_sheet(wb, ws, "Stocks");
 
-        //     html2pdf(element, pdfOptions);
-        // }
+                        let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+                        function s2ab(s) {
+                            let buf = new ArrayBuffer(s.length);
+                            let view = new Uint8Array(buf);
+                            for (let i = 0; i < s.length; i++) {
+                                view[i] = s.charCodeAt(i) & 0xFF;
+                            }
+                            return buf;
+                        }
+
+                        saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `PRODUCTS_STOCKS.xlsx`);
+                    } else {
+                        console.error("Export failed:", result.msg);
+                    }
+                },
+                error: function (err) {
+                    errormsg(err);
+                },
+            });
+        });
 
     });
 </script>
