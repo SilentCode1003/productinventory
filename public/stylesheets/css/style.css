@@ -760,6 +760,15 @@ CALENDAR
   content: "Download PDF "
 }
 
+#convertoexcel:hover span {
+  display: none
+}
+
+#convertoexcel:hover:before {
+  content: "Download Excel "
+}
+
+
 #uploadButton:hover span {
   display: none;
 }
