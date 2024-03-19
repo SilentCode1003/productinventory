@@ -108,7 +108,7 @@
 
 
         $(document).on('click', '.cbi-link', function () {
-            // console.log(referenceno);
+            $(".id-history").text(id);
             let downloadLinksDiv = document.getElementById('downloadLinks');
             downloadLinksDiv.innerHTML = '';
             $.ajax({
