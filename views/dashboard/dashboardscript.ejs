@@ -565,35 +565,24 @@
         });
 
         $(document).on("click", "#convertoexceldb", function () {
-            $.ajax({
-                type: "GET",
-                url: "/product/getstocks",
-                success: function (result) {
-                    if (result.msg === "success" && result.data.length > 0) {
-                        let wb = XLSX.utils.book_new();
-                        let ws = XLSX.utils.json_to_sheet(result.data);
-                        XLSX.utils.book_append_sheet(wb, ws, "Stocks");
+            const table = document.getElementById("datatable2");
+            const ws = XLSX.utils.table_to_sheet(table);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+            var currentDate = new Date();
 
-                        let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+            var monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
 
-                        function s2ab(s) {
-                            let buf = new ArrayBuffer(s.length);
-                            let view = new Uint8Array(buf);
-                            for (let i = 0; i < s.length; i++) {
-                                view[i] = s.charCodeAt(i) & 0xFF;
-                            }
-                            return buf;
-                        }
+            var month = currentDate.getMonth(); 
+            var day = currentDate.getDate();
+            var year = currentDate.getFullYear();
 
-                        saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `PRODUCTS_STOCKS.xlsx`);
-                    } else {
-                        console.error("Export failed:", result.msg);
-                    }
-                },
-                error: function (err) {
-                    errormsg(err);
-                },
-            });
+            var formattedDate = monthNames[month] + ' ' + day + ', ' + year;
+
+            XLSX.writeFile(wb, `Product Stocks ${formattedDate}.xlsx`);
         });
 
     });
