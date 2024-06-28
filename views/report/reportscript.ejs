@@ -69,7 +69,7 @@
                 .each(function () {
                     dataRow.push($(this).text());
                 });
-            console.log(dataRow);
+            // console.log(dataRow);
             id = dataRow[0];
             referenceno = dataRow[1];
             status = dataRow[2];
@@ -119,7 +119,7 @@
                 },
                 success: function (result) {
                     var data = result.data;
-                    console.log("display data:", data)
+                    // console.log("display data:", data)
                     let processeddata = displayReport(data)
 
                     const tableBody = $("#salesreport-table tbody");
@@ -171,7 +171,7 @@
                                 let downloadLinksDiv = document.getElementById('downloadLinks');
                                 downloadLinksDiv.innerHTML = '';
                                 let parsedData = JSON.parse(base64docu);
-                                console.log(parsedData);
+                                // console.log(parsedData);
                                 displayLinks(parsedData);
                             }
                             if (data.length == 0) {
@@ -185,10 +185,10 @@
                                 // console.log("all data: ", historydata)
                                 let jsonData = {};
 
-                                for( var key in historydata){
-                                    if(historydata.hasOwnProperty){
+                                for (var key in historydata) {
+                                    if (historydata.hasOwnProperty) {
                                         console.log(historydata[key]);
-                                        for(index in historydata[key]){
+                                        for (index in historydata[key]) {
                                             console.log(historydata[key][index]);
 
                                             let historydiv = $(`
@@ -209,7 +209,7 @@
                                         </div>
                                         <hr class="sidebar-divider">`);
 
-                                    $('#historydata').append(historydiv);
+                                            $('#historydata').append(historydiv);
                                         }
                                     }
                                 }
@@ -245,7 +245,7 @@
                     let action = "";
                     if (item.status == 'PAID') {
                         action = `<span class="editbutton" id="editDocs" name="editDocs" data-toggle="modal" data-target="#SupportingDocuments"><i class="fas fa-plus" style="color: rgb(99, 115, 129);"></i></span> `;
-                    } else{
+                    } else {
                         action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span> `;
                     }
 
@@ -336,36 +336,36 @@
                     success: function (result) {
                         if (result.msg == "success") {
                             let container = result.data;
-                            // console.log("Container: ", container)
+                            console.log("Container: ", container)
                             let data = salesreportdata(container);
                             let template = 'SALES REPORT';
-                            // console.log("Current Stock: ", groupedData);
-                            if (data.length != 0) {
-                                $.ajax({
-                                    type: "POST",
-                                    url: "/index/processpdfdata",
-                                    data: {
-                                        processeddata: data,
-                                        template: template,
-                                        employee: soldby,
-                                        date: formattedDate,
-                                    },
-                                    success: function (result) {
-                                        // console.log("MSG: ", result.msg)
-                                        if (result.msg == "success") {
-                                            window.open(`/index/generatepdf`, "_blank");
-                                            success("Success", "PDF generate successfully!");
-                                            $("#employee").val("");
-                                            $("#hiddenemmployeevalue").val("");
-                                        } else {
-                                            warningInfo("Notice", "No Data within in the date range.");
-                                        }
-                                    },
-                                    error: function (err) {
-                                        errormsg(err);
-                                    },
-                                });
-                            }
+                            console.log("Current Stock: ", data);
+                            // if (data.length != 0) {
+                            //     $.ajax({
+                            //         type: "POST",
+                            //         url: "/index/processpdfdata",
+                            //         data: {
+                            //             processeddata: data,
+                            //             template: template,
+                            //             employee: soldby,
+                            //             date: formattedDate,
+                            //         },
+                            //         success: function (result) {
+                            //             // console.log("MSG: ", result.msg)
+                            //             if (result.msg == "success") {
+                            //                 window.open(`/index/generatepdf`, "_blank");
+                            //                 success("Success", "PDF generate successfully!");
+                            //                 $("#employee").val("");
+                            //                 $("#hiddenemmployeevalue").val("");
+                            //             } else {
+                            //                 warningInfo("Notice", "No Data within in the date range.");
+                            //             }
+                            //         },
+                            //         error: function (err) {
+                            //             errormsg(err);
+                            //         },
+                            //     });
+                            // }
                         } else {
                             warning("Notice", "No Data within in the date range.")
                         }
@@ -381,7 +381,7 @@
 
         function salesreportdata(data) {
             return data.reduce((result, current) => {
-                console.log(current.status);
+                // console.log(current.status);
                 if (current.status === 'PAID' || current.status === 'PARTIALLY PAID' || current.status === 'NOT PAID') {
 
                     const date = current.date;
@@ -415,8 +415,7 @@
 
         function displayReport(data) {
             return data.reduce((result, current) => {
-                console.log(current.status);
-
+                // console.log(current.status);
 
                 const date = current.date;
 
@@ -477,7 +476,7 @@
                 url: "/category/load",
                 success: function (result) {
                     let container = result.data;
-                    console.log('category:',container)
+                    // console.log('category:',container)
                     $.each(container, (key, item) => {
                         let displayname = item.name;
                         let dataid = item.id;
@@ -498,7 +497,7 @@
                 url: "/product/getproductstatus",
                 success: function (result) {
                     let container = result.data;
-                    console.log('product:',container)
+                    // console.log('product:',container)
                     $.each(container, (key, item) => {
                         let displayname = item.status;
                         // let dataid = item.id;
@@ -531,7 +530,7 @@
             for (const status of activeStatus) {
                 addStatusOption("statusDropdown", status.display, status.value);
             }
-            console.log(activeStatus)
+            // console.log(activeStatus)
         }
 
         function addOption(dropdownId, displayText, actualValue) {
@@ -686,25 +685,25 @@
         $(document).on("click", "#prdExcel", function () {
             let category = $("#hiddencategoryvalue").val();
             let status = $("#hiddenstatusvalue").val();
-            console.log("category:", category, "status:", status)
+            // console.log("category:", category, "status:", status)
 
             let message = '';
-            if(category == ''){
+            if (category == '') {
                 message += "Product Category, ";
             }
 
-            if(status == ''){
+            if (status == '') {
                 message += "Product Status ";
             }
 
-            if (message !== '') { 
+            if (message !== '') {
                 warning('Warning!', `${message} is Empty`)
-            }else{
+            } else {
                 let data = {
                     category: category,
                     status: status,
                 }
-                console.log(data)
+                // console.log(data)
                 $.ajax({
                     url: '/product/getProductbyCategory',
                     type: 'POST',
@@ -809,7 +808,7 @@
 
             }
         });
-        
+
         let updateDocuments;
         $(document).on("change", "#documentfile", function () {
             updateDocuments = getBase64('documentfile', 'selectedDocuments');
@@ -817,7 +816,7 @@
 
         $(document).on("click", "#updateDocs", function () {
             $(".id-documents").text(id);
-            console.log(updateDocuments)
+            // console.log(updateDocuments)
             let message = "";
 
             if (updateDocuments === undefined) {
@@ -897,6 +896,49 @@
                 return new Blob([byteArray], { type: 'application/octet-stream' });
             }
         }
+
+        $(document).on("click", "#summaryReport", function () {
+            const dateRange = formatDate($('#dateRange').val());
+            const startDate = moment(dateRange.split(' - ')[0], 'MMM D, YYYY');
+            const endDate = moment(dateRange.split(' - ')[1], 'MMM D, YYYY');
+            const data = {
+                dateRange: dateRange
+            }
+            Upsert("POST", "/report/summary", data, function (result) {
+                const container = result.data;
+                console.log("Stocks: ", container);
+
+                const rows = Object.entries(container).map(([key, value]) => ({
+                    ProductName: key,
+                    ...value
+                }));
+
+                const headerRow = [{ ProductName: "SUMMARY REPORT" }];
+                const dataRow = [{ ProductName: `Date: ${ConvertDate(startDate)} - ${ConvertDate(endDate)}` }]; 
+
+                const combinedRows = [...headerRow, ...dataRow, ...rows];
+
+                let wb = XLSX.utils.book_new();
+
+                let ws = XLSX.utils.json_to_sheet(combinedRows, { skipHeader: true });
+
+                XLSX.utils.book_append_sheet(wb, ws, "Products");
+
+                let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+                function s2ab(s) {
+                    let buf = new ArrayBuffer(s.length);
+                    let view = new Uint8Array(buf);
+                    for (let i = 0; i < s.length; i++) {
+                        view[i] = s.charCodeAt(i) & 0xFF;
+                    }
+                    return buf;
+                }
+
+                saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), "products_summary_report.xlsx");
+            });
+
+        });
 
     });
 </script>

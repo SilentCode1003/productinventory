@@ -9,8 +9,9 @@ const {
   Select,
   InsertTable,
   SelectParameter,
+  SelectResult,
 } = require("./repository/spidb");
-const { SelectStatement } = require("./repository/customhelper");
+const { SelectStatement, ConvertDate } = require("./repository/customhelper");
 
 router.get("/", function (req, res, next) {
   // res.render("report", { title: "Express" });
@@ -146,7 +147,7 @@ router.post("/historydetails", (req, res) => {
 
 router.post("/updatehistory", (req, res) => {
   try {
-    const { details, documents, id, status, referenceno} = req.body;
+    const { details, documents, id, status, referenceno } = req.body;
     // console.log(details, documents, id, status);
     let data = [];
     let sql_update = "update sales_report_history set";
@@ -157,7 +158,7 @@ router.post("/updatehistory", (req, res) => {
     }
     if (details) {
       sql_update += " srh_date=?,";
-      data.push(JSON.stringify(details) );
+      data.push(JSON.stringify(details));
     }
     if (status) {
       sql_update += " srh_status=?,";
@@ -183,17 +184,21 @@ router.post("/updatehistory", (req, res) => {
         salesreport.forEach((item) => {
           let id = item.id;
           let sales_report_update =
-
             "update sales_report set sr_status=? where sr_id=?";
           let report_update = [status, id];
-          console.log("ID: ", id, " Update Data: ", sales_report_update, report_update)
+          console.log(
+            "ID: ",
+            id,
+            " Update Data: ",
+            sales_report_update,
+            report_update
+          );
           Update(sales_report_update, report_update, (err, result) => {
             if (err) console.error("Error: ", err);
           });
-
         });
       });
-      
+
       res.json(JsonSuccess());
     });
   } catch (error) {
@@ -254,32 +259,108 @@ router.post("/getsalesreport", (req, res) => {
   }
 });
 
+router.post("/summary", (req, res) => {
+  const { dateRange } = req.body;
+  const [startDate, endDate] = dateRange.split(" - ");
+  const formattedStartDate = ConvertDate(startDate);
+  const formattedEndDate = ConvertDate(endDate);
+  try {
+    const sql = `
+      SELECT
+        p_assetcontrol as assetcontrol,
+        p_serial as serial,
+        mi_name as itemname,
+        mc_name as category,
+        p_podate as podate,
+        p_ponumber as ponumber,
+        p_warrantydate as warrantydate,
+        p_status as status,
+        mip_fobprice as price
+      FROM
+        product
+      INNER JOIN
+        master_item  ON p_itemname = mi_id
+      INNER JOIN
+        master_category mc ON p_category = mc_id
+      INNER JOIN
+        master_item_price ON  mip_itemid = p_itemname
+      WHERE p_status in ('WAREHOUSE', 'RETURNED');`;
+
+    const selectSold = `SELECT mi_name AS itemName, mc_name AS category FROM sold 
+      INNER JOIN product ON s_assetcontrol = p_assetcontrol
+      INNER JOIN master_category ON p_category = mc_id
+      INNER JOIN master_item ON p_itemname = mi_id
+      WHERE s_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`;
+
+    const selectDeffective = `SELECT mi_name AS itemName, mc_name AS category FROM deffectiveitem 
+      INNER JOIN product ON d_assetcontrol = p_assetcontrol
+      INNER JOIN master_category ON p_category = mc_id
+      INNER JOIN master_item ON p_itemname = mi_id
+      WHERE d_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`;
+
+    Select(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      if (result.length != 0) {
+        let groupedData = groupDataByItemName(result);
+
+        SelectResult(selectSold, (err, result) => {
+          if (err) console.error("Error: ", err);
+          if (result.length != 0) {
+            const soldData = result;
+
+            updateSold(groupedData, soldData);
+
+            SelectResult(selectDeffective, (err, result) => {
+              if (err) console.error("Error: ", err);
+              if (result.length != 0) {
+                const deffectiveData = result;
+
+                updateDeffective(groupedData, deffectiveData);
+
+                res.json({
+                  msg: "success",
+                  data: groupedData,
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
 router.post("/adddocuments", (req, res) => {
   try {
-    let {id, documents} = req.body;
+    let { id, documents } = req.body;
 
     Check_History(id)
       .then((result) => {
         let historydata = SalesReportHistory(result);
         let existingDocuments = [];
 
-        if(historydata[0].documents != "N/A"){
+        if (historydata[0].documents != "N/A") {
           existingDocuments = JSON.parse(historydata[0].documents);
           existingDocuments.push(...documents);
-          console.log(id, documents)
+          console.log(id, documents);
 
-          console.log(existingDocuments)
-          
+          console.log(existingDocuments);
+
           if (historydata.length != 1) {
             return res.json({
               msg: "notexist",
             });
           } else {
-            let history_update ="update sales_report_history set srh_documents=? where srh_id=?";
+            let history_update =
+              "update sales_report_history set srh_documents=? where srh_id=?";
             let history_data = [JSON.stringify(existingDocuments), id];
-  
+
             console.log(history_data);
-  
+
             Update(history_update, history_data, (err, result) => {
               if (err) console.error("Error: ", err);
               return res.json({
@@ -287,9 +368,9 @@ router.post("/adddocuments", (req, res) => {
               });
             });
           }
-        }else{
-
-          let history_update ="update sales_report_history set srh_documents=? where srh_id=?";
+        } else {
+          let history_update =
+            "update sales_report_history set srh_documents=? where srh_id=?";
           let history_data = [JSON.stringify(documents), id];
 
           Update(history_update, history_data, (err, result) => {
@@ -299,8 +380,6 @@ router.post("/adddocuments", (req, res) => {
             });
           });
         }
-
-
       })
       .catch((error) => {
         res.json({
@@ -316,8 +395,7 @@ router.post("/adddocuments", (req, res) => {
 
 function Check_History(id) {
   return new Promise((resolve, reject) => {
-    let sql =
-      "select * from sales_report_history where srh_id=?";
+    let sql = "select * from sales_report_history where srh_id=?";
     let command = SelectStatement(sql, [id]);
 
     Select(command, (err, result) => {
@@ -327,5 +405,43 @@ function Check_History(id) {
 
       resolve(result);
     });
+  });
+}
+
+function groupDataByItemName(data) {
+  const groupedData = {};
+  data.forEach((item) => {
+    const itemName = item.itemname;
+    groupedData[itemName] = groupedData[itemName] || {
+      category: item.category,
+      stocks: 0,
+      sold: 0,
+      deffective: 0,
+      // totalPrice: 0,
+    };
+    groupedData[itemName].stocks += 1;
+    // groupedData[itemName].totalPrice += item.price;
+  });
+
+  return groupedData;
+}
+
+function updateSold(inventory, soldData) {
+  soldData.forEach((item) => {
+    const { itemName, category } = item;
+    console.log(inventory[itemName]);
+    if (inventory[itemName]) {
+      inventory[itemName].sold += 1;
+    }
+  });
+}
+
+function updateDeffective(inventory, deffectiveData) {
+  deffectiveData.forEach((item) => {
+    const { itemName, category } = item;
+    console.log(inventory[itemName]);
+    if (inventory[itemName]) {
+      inventory[itemName].deffective += 1;
+    }
   });
 }

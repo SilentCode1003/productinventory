@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "prestart": "npm install",
-    "dev": "nodemon ./bin/www",
-    "start": "node ./bin/www"
+    "start": "nodemon ./bin/www"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -24,7 +23,7 @@
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "node-linq": "^0.0.5",
-    "nodemon": "^3.1.4",
+    "nodemon": "^3.1.0",
     "pdfmake": "^0.2.9",
     "uuid": "^9.0.1"
   }

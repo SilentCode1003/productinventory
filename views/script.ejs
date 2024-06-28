@@ -337,7 +337,7 @@
     return '$' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
   }
 
-  $(document).ready(function () {  
+  $(document).ready(function () {
     if ($('.collapse-item.active').length > 0) {
       $('.collapse-item.active').closest('.collapse').addClass('show');
     }
@@ -474,5 +474,59 @@
     } else {
       input.value = defaultValue;
     }
+  }
+
+  //@use for updating/saving/inserting data
+  Upsert = (type, url, data, callback) => {
+    $.ajax({
+      type: type,
+      url: url,
+      data: data,
+      success: function (result) {
+        callback(result);
+      },
+      error: function (err) {
+        warning('Error', 'An error occurred while communicating with the server.');
+      }
+    })
+  };
+
+  //@use for fetching GET data
+  Fetch = (url, callback) => {
+    $.ajax({
+      url: url,
+      method: 'GET',
+      dataType: 'json',
+      success: function (result) {
+        callback(result);
+      },
+      error: function (err) {
+        warning('Error', 'An error occurred while communicating with the server.');
+      }
+    })
+  }
+
+  function formatDate(date) {
+    let startDate = moment(date.split(' - ')[0], 'MMM D, YYYY').format('MM/DD/YYYY');
+    let endDate = moment(date.split(' - ')[1], 'MMM D, YYYY').format('MM/DD/YYYY');
+    let formattedDate = startDate + ' - ' + endDate;
+
+    return formattedDate;
+  }
+
+  ConvertDate = (dateTimeString) => {
+    const date = new Date(dateTimeString);
+
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    const formattedDate = date.toLocaleDateString('en-US', options);
+
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const formattedTime = `${hours}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+
+    return `${formattedDate} - ${formattedTime}`;
   }
 </script>
