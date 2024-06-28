@@ -283,8 +283,7 @@ router.post("/summary", (req, res) => {
       INNER JOIN
         master_category mc ON p_category = mc_id
       INNER JOIN
-        master_item_price ON  mip_itemid = p_itemname
-      WHERE p_status in ('WAREHOUSE', 'RETURNED');`;
+        master_item_price ON  mip_itemid = p_itemname`;
 
     const selectSold = `SELECT mi_name AS itemName, mc_name AS category FROM sold 
       INNER JOIN product ON s_assetcontrol = p_assetcontrol
@@ -302,28 +301,23 @@ router.post("/summary", (req, res) => {
       if (err) console.error("Error: ", err);
       if (result.length != 0) {
         let groupedData = groupDataByItemName(result);
-
         SelectResult(selectSold, (err, result) => {
           if (err) console.error("Error: ", err);
-          if (result.length != 0) {
-            const soldData = result;
+          const soldData = result;
 
-            updateSold(groupedData, soldData);
+          updateSold(groupedData, soldData);
 
-            SelectResult(selectDeffective, (err, result) => {
-              if (err) console.error("Error: ", err);
-              if (result.length != 0) {
-                const deffectiveData = result;
+          SelectResult(selectDeffective, (err, result) => {
+            if (err) console.error("Error: ", err);
+            const deffectiveData = result;
 
-                updateDeffective(groupedData, deffectiveData);
+            updateDeffective(groupedData, deffectiveData);
 
-                res.json({
-                  msg: "success",
-                  data: groupedData,
-                });
-              }
+            res.json({
+              msg: "success",
+              data: groupedData,
             });
-          }
+          });
         });
       }
     });
@@ -419,7 +413,9 @@ function groupDataByItemName(data) {
       deffective: 0,
       // totalPrice: 0,
     };
-    groupedData[itemName].stocks += 1;
+    if (item.status == "WAREHOUSE" || item.status == "RETURNED") {
+      groupedData[itemName].stocks += 1;
+    }
     // groupedData[itemName].totalPrice += item.price;
   });
 
