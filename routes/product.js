@@ -50,7 +50,7 @@ router.get("/load", (req, res) => {
       INNER JOIN 
         master_item mi ON p.p_itemname = mi.mi_id
       INNER JOIN 
-        master_category mc ON p.p_category = mc.mc_id;
+        master_category mc ON p.p_category = mc.mc_id
     `;
 
     Select(sql, (err, result) => {
@@ -107,13 +107,13 @@ router.get("/getproductstatus", (req, res) => {
 
 router.post("/getProductbyCategory", (req, res) => {
   try {
-    let {category, status} = req.body;
+    let { category, status } = req.body;
     let sql = `SELECT * FROM product WHERE p_category = '${category}' AND p_status = '${status}'`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
       let product = Product(result);
-      
+
       if (result.length != 0) {
         // console.log(data);
         res.json({
@@ -121,7 +121,7 @@ router.post("/getProductbyCategory", (req, res) => {
           data: product,
         });
       } else {
-        console.log(sql)
+        console.log(sql);
         res.json({
           msg: "NODATA",
           data: result,
@@ -162,7 +162,6 @@ router.get("/getstocks", (req, res) => {
       if (err) console.error("Error: ", err);
 
       if (result.length != 0) {
-
         res.json({
           msg: "success",
           data: result,
@@ -350,11 +349,11 @@ router.post("/upload", (req, res) => {
     let notexist = [];
     let notice = [];
 
-    // console.log(dataJSon);
+    console.log(dataJSon);
     Product_Count()
       .then((result) => {
         // console.log(result);
-        console.log("Data Length:", dataJSon.length)
+        console.log("Data Length:", dataJSon.length);
         sequence = parseInt(result[0].total);
         dataJSon.forEach((item) => {
           Product_Check(item.serial)
@@ -363,8 +362,8 @@ router.post("/upload", (req, res) => {
               if (result != undefined || result != null) {
                 if (result[0].total != 0) {
                   counter += 1;
-                  notice.push("SERIAL_"+item.serial + '_DUPLICATE_ENTRY')
-                  console.log("SERIAL_"+item.serial + '_DUPLICATE_ENTRY')
+                  notice.push("SERIAL_" + item.serial + "_DUPLICATE_ENTRY");
+                  console.log("SERIAL_" + item.serial + "_DUPLICATE_ENTRY");
                   console.log("counter:", counter);
                   uploadProduct();
                 } else {
@@ -402,6 +401,8 @@ router.post("/upload", (req, res) => {
                                 categoryid,
                                 convertExcelDate(item.podate),
                                 item.ponumber,
+                                convertExcelDate(item.deliverydate),
+                                item.trackingnumber,
                                 convertExcelDate(item.warrantydate),
                                 status,
                               ]);
@@ -409,8 +410,20 @@ router.post("/upload", (req, res) => {
                               // console.log(product);
                             } else {
                               counter += 1;
-                              notice.push("SERIAL_"+item.serial + '_INVALID_ITEM_NAME_('+item.itemname+")")
-                              console.log("SERIAL_"+item.serial + '_INVALID_ITEM_NAME_('+item.itemname+")")
+                              notice.push(
+                                "SERIAL_" +
+                                  item.serial +
+                                  "_INVALID_ITEM_NAME_(" +
+                                  item.itemname +
+                                  ")"
+                              );
+                              console.log(
+                                "SERIAL_" +
+                                  item.serial +
+                                  "_INVALID_ITEM_NAME_(" +
+                                  item.itemname +
+                                  ")"
+                              );
                               console.log("counter:", counter);
                               uploadProduct();
                             }
@@ -423,9 +436,21 @@ router.post("/upload", (req, res) => {
                           });
                       } else {
                         counter += 1;
-                        notice.push("SERIAL_"+item.serial + "_INVALID_CATEGORY_("+ item.category +")")
-                        console.log("SERIAL_"+item.serial + "_INVALID_CATEGORY_("+ item.category +")")
-                        console.log("counter:", counter)
+                        notice.push(
+                          "SERIAL_" +
+                            item.serial +
+                            "_INVALID_CATEGORY_(" +
+                            item.category +
+                            ")"
+                        );
+                        console.log(
+                          "SERIAL_" +
+                            item.serial +
+                            "_INVALID_CATEGORY_(" +
+                            item.category +
+                            ")"
+                        );
+                        console.log("counter:", counter);
                         uploadProduct();
                       }
                     })
@@ -438,7 +463,7 @@ router.post("/upload", (req, res) => {
                 }
               } else {
                 counter += 1;
-                notexist.push(item.serial)
+                notexist.push(item.serial);
                 uploadProduct();
               }
 
@@ -453,15 +478,15 @@ router.post("/upload", (req, res) => {
               //   }
               // }
 
-              function uploadProduct(){
+              function uploadProduct() {
                 if (counter == dataJSon.length) {
                   console.log(product);
-                  if(product.length != 0){
+                  if (product.length != 0) {
                     InsertTable("product", product, (err, result) => {
                       if (err) console.error("Error: ", err);
                       console.log(result);
                     });
-                  }else{
+                  } else {
                     console.log("NO DATA PUSHED");
                   }
                   if (notice != 0) {
@@ -542,7 +567,11 @@ router.post("/search", (req, res) => {
     where p_serial like ? 
     or p_assetcontrol like ? 
     or mi_name like ?`;
-    let command = SelectStatement(sql, [`${keyword}%`, `${keyword}%`, `${keyword}%`]);
+    let command = SelectStatement(sql, [
+      `${keyword}%`,
+      `${keyword}%`,
+      `${keyword}%`,
+    ]);
     console.log(command);
     Select(command, (err, result) => {
       if (err) console.error("Error: ", err);

@@ -24,8 +24,8 @@
           <td><div class="custom-loader"></div></td>
         </tr>`;
 
-    const tbody = $('#datatable tbody');
-    for(let i = 0; i < 7; i++){
+    const tbody = $("#datatable tbody");
+    for (let i = 0; i < 7; i++) {
       tbody.append(loader);
     }
 
@@ -45,7 +45,7 @@
     });
 
     let activeItems = [];
-    function test(selector, newValue){
+    function test(selector, newValue) {
       const inputElement = $(selector);
       const currentValue = inputElement.val();
       inputElement.val(newValue);
@@ -66,18 +66,18 @@
       itemContainer = "";
     });
 
-    $(document).on('click', '#itemDropdown .dropdown-option', function () {
-      itemContainer = $('#hiddenValue2').val();
+    $(document).on("click", "#itemDropdown .dropdown-option", function () {
+      itemContainer = $("#hiddenValue2").val();
       // console.log("product: ", itemContainer)
     });
 
-    $(document).on('click', '#categoryDropdown .dropdown-option', function () {
-      categoryContainer = $('#hiddenValue').val();
+    $(document).on("click", "#categoryDropdown .dropdown-option", function () {
+      categoryContainer = $("#hiddenValue").val();
       // console.log("category: ", categoryContainer)
 
       activeItems.length = 0;
-      $('#itemDropdown .dropdown-option').remove();
-      $("#item").val('');
+      $("#itemDropdown .dropdown-option").remove();
+      $("#item").val("");
       itemContainer = "";
 
       $.ajax({
@@ -94,14 +94,14 @@
             let id = item.id;
             activeItems.push({ display: displayname, value: item.id });
           });
-          populateCustomDropdown2()
+          populateCustomDropdown2();
 
           function populateCustomDropdown2() {
             for (const item of activeItems) {
               addOption2("itemDropdown", item.display, item.value);
             }
           }
-          
+
           function addOption2(dropdownId, displayText, actualValue) {
             const dropdownElement = document.getElementById(dropdownId);
             const hiddenInput = document.getElementById("hiddenValue2");
@@ -128,7 +128,7 @@
         },
       });
     });
-    
+
     $(document).on("click", "#addBtn", function () {
       let serial = $("#serial").val();
       let categoryname = $("#category").val();
@@ -175,7 +175,7 @@
           success: function (result) {
             //console.log(result);
             if (result.msg == "success") {
-              resettable()
+              resettable();
               success("Saved", "Successfully");
               $("#serial").val("");
               $("#podate").val("");
@@ -183,7 +183,7 @@
               $("#warrantydate").val("");
               $("#item").val("");
               $("#category").val("");
-              $('#itemDropdown .dropdown-option').remove();
+              $("#itemDropdown .dropdown-option").remove();
               itemContainer = "";
               categoryContainer = "";
             }
@@ -311,7 +311,7 @@
                 tableBody.append(tr);
               } else {
                 if (data.msg === "success") {
-                  var loadingstate = document.querySelectorAll('.loading-row');
+                  var loadingstate = document.querySelectorAll(".loading-row");
                   loadingstate.forEach(function (row) {
                     row.remove();
                   });
@@ -370,7 +370,7 @@
         },
         success: function (result) {
           if (result.msg == "success") {
-            resettable()
+            resettable();
             success("Saved", "Successfully");
           }
 
@@ -396,7 +396,7 @@
         },
         success: function (result) {
           if (result.msg == "success") {
-            resettable()
+            resettable();
             success("Saved", "Successfully");
           }
 
@@ -442,7 +442,7 @@
         addOption1("categoryDropdown", category.display, category.value);
       }
     }
-    
+
     function addOption1(dropdownId, displayText, actualValue) {
       const dropdownElement = document.getElementById(dropdownId);
       const hiddenInput = document.getElementById("hiddenValue");
@@ -511,7 +511,7 @@
       clearTimeout(searchTimeout);
 
       searchTimeout = setTimeout(function () {
-        if (keyword != '') {
+        if (keyword != "") {
           $.ajax({
             type: "POST",
             url: "/product/search",
@@ -607,17 +607,15 @@
 
     $("#search").on("input", filterTableRows);
 
-
     //#region Upload
     $(document).on("click", "#uploadButton", function () {
       let uploaddata = $("#fileinput").val();
-      if (uploaddata != '') {
-        Loading('Uploading, Please wait for a moment...')
+      if (uploaddata != "") {
+        Loading("Uploading, Please wait for a moment...");
         UploadProcess();
       } else {
-        warning('Warning!', "No File Chosen!")
+        warning("Warning!", "No File Chosen!");
       }
-
     });
 
     function UploadProcess() {
@@ -697,7 +695,9 @@
           serial: data[2].item,
           podate: data[3].item,
           ponumber: data[4].item,
-          warrantydate: data[5].item,
+          deliverydate: data[5].item,
+          trackingnumber: data[6].item,
+          warrantydate: data[7].item,
         });
       }
       excelDataSave(dataExcelArr);
@@ -718,13 +718,13 @@
               "Duplicate",
               `Some data are invalid or already exist in the database <br><button class="btn btn-sm btn-primary" id="txtBtn">Download</button>`
             );
-            
+
             $(document).on("click", "#txtBtn", function () {
-              downloadTxtFile(result.data, 'existing_invalid_data.txt');
+              downloadTxtFile(result.data, "existing_invalid_data.txt");
             });
           } else {
             success("Saved!", "Data saved!");
-            resettable()
+            resettable();
             // swal({
             //   title: "Success",
             //   text: "Data saved!",
@@ -739,17 +739,16 @@
           console.error(result);
         },
       });
-
     }
 
     function downloadTxtFile(data, filename) {
-      data = data.toString().replace(/,/g, '\n');
+      data = data.toString().replace(/,/g, "\n");
 
-      const blob = new Blob([data], { type: 'text/plain' });
+      const blob = new Blob([data], { type: "text/plain" });
 
       const url = URL.createObjectURL(blob);
 
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = filename;
 
