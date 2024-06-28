@@ -472,6 +472,8 @@ exports.SelectStatement = (str, data) => {
 //#region Excel Serial Date to Date
 exports.convertExcelDate = (serialDate) => {
   // Excel serial date starts from 1900-01-01
+
+  console.log(serialDate);
   const baseDate = new Date("1899-12-30");
   const offsetInMilliseconds = serialDate * 24 * 60 * 60 * 1000;
   const resultDate = new Date(baseDate.getTime() + offsetInMilliseconds);
