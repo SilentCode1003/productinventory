@@ -523,6 +523,8 @@ exports.UploadProduct = (data) => {
       serial: key.serial,
       podate: key.podate,
       ponumber: key.ponumber,
+      deliverydate: key.deliverydate,
+      trackingnumber: key.trackingnumber,
       warrantydate: key.warrantydate,
     });
   });
@@ -535,6 +537,8 @@ exports.UploadProduct = (data) => {
         key["serial"],
         key["podate"],
         key["ponumber"],
+        key["deliverydate"],
+        key["trackingnumber"],
         key["warrantydate"]
       )
   );
@@ -655,7 +659,7 @@ exports.SoldProduct = (data) => {
         key["deliveryfee"],
         key["transactionref"],
         key["transactionstatus"],
-        key["remarks"],
+        key["remarks"]
       )
   );
 };
@@ -747,7 +751,7 @@ exports.SalesReport = (data) => {
         key["soldrefno"],
         key["referenceno"],
         key["remarks"],
-        key["status"],
+        key["status"]
       )
   );
 };
@@ -820,7 +824,7 @@ exports.UploadDefectiveItem = (data) => {
         key["itemserial"],
         key["remarks"],
         key["date"],
-        key["referenceno"],
+        key["referenceno"]
       )
   );
 };
@@ -849,7 +853,7 @@ exports.UploadReplaceItem = (data) => {
         key["date"],
         key["replacedby"],
         key["referenceno"],
-        key["replacementmode"],
+        key["replacementmode"]
       )
   );
 };
@@ -876,7 +880,7 @@ exports.UploadSalesHistory = (data) => {
         key["remarks"],
         key["status"],
         key["referenceno"],
-        key["documents"],
+        key["documents"]
       )
   );
 };

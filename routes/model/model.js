@@ -244,12 +244,14 @@ class DeffectiveItemModel {
 
 //#region Excel Model
 class ProductUploadModel {
-  constructor(category, itemname, serial, podate, ponumber, warrantydate) {
+  constructor(category, itemname, serial, podate, ponumber, deliverydate,trackingnumber, warrantydate) {
     this.category = category;
     this.itemname = itemname;
     this.serial = serial;
     this.podate = podate;
     this.ponumber = ponumber;
+    this.deliverydate = deliverydate;
+    this.trackingnumber = trackingnumber;
     this.warrantydate = warrantydate;
   }
 }
