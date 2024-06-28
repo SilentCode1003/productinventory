@@ -899,8 +899,6 @@
 
         $(document).on("click", "#summaryReport", function () {
             const dateRange = formatDate($('#dateRange').val());
-            const startDate = moment(dateRange.split(' - ')[0], 'MMM D, YYYY');
-            const endDate = moment(dateRange.split(' - ')[1], 'MMM D, YYYY');
             const data = {
                 dateRange: dateRange
             }
@@ -914,15 +912,18 @@
                 }));
 
                 const headerRow = [{ ProductName: "SUMMARY REPORT" }];
-                const dataRow = [{ ProductName: `Date: ${ConvertDate(startDate)} - ${ConvertDate(endDate)}` }]; 
+                const dateRow = [{ ProductName: `Date: ${dateRange}` }];
 
-                const combinedRows = [...headerRow, ...dataRow, ...rows];
+                const combinedRows = [
+
+                    ...rows
+                ];
 
                 let wb = XLSX.utils.book_new();
 
-                let ws = XLSX.utils.json_to_sheet(combinedRows, { skipHeader: true });
+                let ws = XLSX.utils.json_to_sheet(combinedRows);
 
-                XLSX.utils.book_append_sheet(wb, ws, "Products");
+                XLSX.utils.book_append_sheet(wb, ws, `Products`);
 
                 let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 
@@ -935,7 +936,7 @@
                     return buf;
                 }
 
-                saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), "products_summary_report.xlsx");
+                saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `products_summary_report_${dateRange}.xlsx`);
             });
 
         });
