@@ -337,7 +337,7 @@
     return '$' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
   }
 
-  $(document).ready(function () {  
+  $(document).ready(function () {
     if ($('.collapse-item.active').length > 0) {
       $('.collapse-item.active').closest('.collapse').addClass('show');
     }
@@ -474,5 +474,43 @@
     } else {
       input.value = defaultValue;
     }
+  }
+
+  //@use for updating/saving/inserting data
+  Upsert = (type, url, data, callback) => {
+    $.ajax({
+      type: type,
+      url: url,
+      data: data,
+      success: function (result) {
+        callback(result);
+      },
+      error: function (err) {
+        warning('Error', 'An error occurred while communicating with the server.');
+      }
+    })
+  };
+
+  //@use for fetching GET data
+  Fetch = (url, callback) => {
+    $.ajax({
+      url: url,
+      method: 'GET',
+      dataType: 'json',
+      success: function (result) {
+        callback(result);
+      },
+      error: function (err) {
+        warning('Error', 'An error occurred while communicating with the server.');
+      }
+    })
+  }
+
+  function formatDate(date) {
+    let startDate = moment(date.split(' - ')[0], 'MMM D, YYYY').format('MM/DD/YYYY');
+    let endDate = moment(date.split(' - ')[1], 'MMM D, YYYY').format('MM/DD/YYYY');
+    let formattedDate = startDate + ' - ' + endDate;
+
+    return formattedDate;
   }
 </script>
