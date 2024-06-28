@@ -185,10 +185,10 @@
                                 // console.log("all data: ", historydata)
                                 let jsonData = {};
 
-                                for( var key in historydata){
-                                    if(historydata.hasOwnProperty){
+                                for (var key in historydata) {
+                                    if (historydata.hasOwnProperty) {
                                         console.log(historydata[key]);
-                                        for(index in historydata[key]){
+                                        for (index in historydata[key]) {
                                             console.log(historydata[key][index]);
 
                                             let historydiv = $(`
@@ -209,7 +209,7 @@
                                         </div>
                                         <hr class="sidebar-divider">`);
 
-                                    $('#historydata').append(historydiv);
+                                            $('#historydata').append(historydiv);
                                         }
                                     }
                                 }
@@ -245,7 +245,7 @@
                     let action = "";
                     if (item.status == 'PAID') {
                         action = `<span class="editbutton" id="editDocs" name="editDocs" data-toggle="modal" data-target="#SupportingDocuments"><i class="fas fa-plus" style="color: rgb(99, 115, 129);"></i></span> `;
-                    } else{
+                    } else {
                         action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span> `;
                     }
 
@@ -688,17 +688,17 @@
             // console.log("category:", category, "status:", status)
 
             let message = '';
-            if(category == ''){
+            if (category == '') {
                 message += "Product Category, ";
             }
 
-            if(status == ''){
+            if (status == '') {
                 message += "Product Status ";
             }
 
-            if (message !== '') { 
+            if (message !== '') {
                 warning('Warning!', `${message} is Empty`)
-            }else{
+            } else {
                 let data = {
                     category: category,
                     status: status,
@@ -808,7 +808,7 @@
 
             }
         });
-        
+
         let updateDocuments;
         $(document).on("change", "#documentfile", function () {
             updateDocuments = getBase64('documentfile', 'selectedDocuments');
@@ -899,21 +899,28 @@
 
         $(document).on("click", "#summaryReport", function () {
             const dateRange = formatDate($('#dateRange').val());
+            const startDate = moment(dateRange.split(' - ')[0], 'MMM D, YYYY');
+            const endDate = moment(dateRange.split(' - ')[1], 'MMM D, YYYY');
             const data = {
                 dateRange: dateRange
             }
             Upsert("POST", "/report/summary", data, function (result) {
                 const container = result.data;
-                console.log("Stocks: ", container)
+                console.log("Stocks: ", container);
 
                 const rows = Object.entries(container).map(([key, value]) => ({
                     ProductName: key,
                     ...value
                 }));
 
+                const headerRow = [{ ProductName: "SUMMARY REPORT" }];
+                const dataRow = [{ ProductName: `Date: ${ConvertDate(startDate)} - ${ConvertDate(endDate)}` }]; 
+
+                const combinedRows = [...headerRow, ...dataRow, ...rows];
+
                 let wb = XLSX.utils.book_new();
 
-                let ws = XLSX.utils.json_to_sheet(rows);
+                let ws = XLSX.utils.json_to_sheet(combinedRows, { skipHeader: true });
 
                 XLSX.utils.book_append_sheet(wb, ws, "Products");
 
@@ -929,7 +936,6 @@
                 }
 
                 saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), "products_summary_report.xlsx");
-
             });
 
         });
