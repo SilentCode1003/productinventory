@@ -340,32 +340,32 @@
                             let data = salesreportdata(container);
                             let template = 'SALES REPORT';
                             console.log("Current Stock: ", data);
-                            // if (data.length != 0) {
-                            //     $.ajax({
-                            //         type: "POST",
-                            //         url: "/index/processpdfdata",
-                            //         data: {
-                            //             processeddata: data,
-                            //             template: template,
-                            //             employee: soldby,
-                            //             date: formattedDate,
-                            //         },
-                            //         success: function (result) {
-                            //             // console.log("MSG: ", result.msg)
-                            //             if (result.msg == "success") {
-                            //                 window.open(`/index/generatepdf`, "_blank");
-                            //                 success("Success", "PDF generate successfully!");
-                            //                 $("#employee").val("");
-                            //                 $("#hiddenemmployeevalue").val("");
-                            //             } else {
-                            //                 warningInfo("Notice", "No Data within in the date range.");
-                            //             }
-                            //         },
-                            //         error: function (err) {
-                            //             errormsg(err);
-                            //         },
-                            //     });
-                            // }
+                            if (data.length != 0) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/index/processpdfdata",
+                                    data: {
+                                        processeddata: data,
+                                        template: template,
+                                        employee: soldby,
+                                        date: formattedDate,
+                                    },
+                                    success: function (result) {
+                                        // console.log("MSG: ", result.msg)
+                                        if (result.msg == "success") {
+                                            window.open(`/index/generatepdf`, "_blank");
+                                            success("Success", "PDF generate successfully!");
+                                            $("#employee").val("");
+                                            $("#hiddenemmployeevalue").val("");
+                                        } else {
+                                            warningInfo("Notice", "No Data within in the date range.");
+                                        }
+                                    },
+                                    error: function (err) {
+                                        errormsg(err);
+                                    },
+                                });
+                            }
                         } else {
                             warning("Notice", "No Data within in the date range.")
                         }
