@@ -216,6 +216,7 @@ router.post("/employee-sales", (req, res) => {
     const formattedStartDate = ConvertDate(startDate);
     const formattedEndDate = ConvertDate(endDate);
 
+    console.log(formattedStartDate, formattedEndDate);
     let sql = `
       SELECT sr_date AS date, sr_soldrefno AS soldRefNo, mc_name AS category, mi_name AS productName, 
             sr_sellingprice AS price, sr_quantity AS quantity, sr_paymenttype AS paymentType, p_serial AS serial,
@@ -245,6 +246,7 @@ router.post("/employee-sales", (req, res) => {
       params.push(productName);
     }
 
+    console.log(sql, params);
     SelectMultiple(sql, params, (err, result) => {
       if (err) console.error("Error: ", err);
       if (result.length != 0) {
