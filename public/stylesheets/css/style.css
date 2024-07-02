@@ -776,3 +776,36 @@ CALENDAR
 #uploadButton:hover:before {
   content: "Upload Excel "
 }
+
+.custom-form {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  position: static;
+  width: 100%;
+
+}
+
+.custom-form label.custom-label {
+  font-size: 1rem;
+  color: var(--clr-btn);
+  font-weight: 500;
+  position: relative;
+  top: 0.45rem;
+  margin: 0 0 0 .5rem;
+  padding: 0 3px;
+  background: #ffffff;
+  width: fit-content;
+}
+
+.custom-form input[type=text].input-cbi {
+  padding: 7px 10px;
+  font-size: 1rem;
+  border: 1px var(--clr-btn) solid;
+  border-radius: 5px;
+  background: #ffffff;
+}
+
+.custom-form input[type=text].input-cbi:focus {
+  outline: none;
+}
