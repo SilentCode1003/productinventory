@@ -67,22 +67,7 @@
 <script src="https://unpkg.com/scrollreveal"></script>
 
 <script>
-  // const sr = ScrollReveal();
-
-  // const revealConfig = {
-  //   duration: 500,
-  //   delay: 200, 
-  //   origin: 'bottom',
-  //   easing: 'linear',
-  //   reset: true
-  // };
-
-  // function applyScrollReveal() {
-  //   $('.custom-mobile-align').each(function (index) {
-  //     sr.reveal(this, { ...revealConfig, delay: index * 100 }); 
-  //   });
-  // }
-
+  //#region SideBar
   document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {
       // Specify the IDs of the collapsible sections
@@ -108,6 +93,103 @@
     }, 100);
   });
 
+  $(document).ready(function () {
+    if ($('.collapse-item.active').length > 0) {
+      $('.collapse-item.active').closest('.collapse').addClass('show');
+    }
+
+    $('.collapse-item').click(function () {
+      $('.collapse-item').removeClass('active');
+      $(this).addClass('active');
+    });
+
+    var path = window.location.pathname;
+
+    $('.collapse-item').each(function () {
+      var href = $(this).attr('href');
+      if (path === href) {
+        $(this).addClass('active');
+        $(this).closest('.collapse').addClass('show');
+      }
+    });
+
+    function adjustCollapse() {
+      if ($(window).width() <= 767) {
+        $('.collapse').removeClass('show');
+        $('.row.d-flex.justify-content-center.align-items-center').removeClass('login-height');
+      } else {
+        $('.collapse-item.active').closest('.collapse').addClass('show');
+      }
+    }
+    adjustCollapse();
+
+    $(window).resize(function () {
+      adjustCollapse();
+    });
+
+    $(document).on('click', function (event) {
+      if ($(window).width() <= 767) {
+        if (!$(event.target).closest('.collapse').length) {
+          $('.collapse').removeClass('show');
+        }
+      }
+
+    });
+  });
+
+  $(document).ready(function () {
+    let isSidebarOpen = localStorage.getItem('isSidebarOpen') === 'true';
+
+    function updateSidebarState() {
+      $("body").toggleClass("sidebar-toggled", isSidebarOpen);
+      $(".sidebar").toggleClass("toggled", isSidebarOpen);
+
+      if (isSidebarOpen) {
+        $('.sidebar .collapse').collapse('hide');
+        $('#content').toggleClass('content-toggled');
+        $('.navbar').toggleClass('navbar-toggled');
+        $('.sticky-footer').toggleClass('footer-toggled');
+      } else {
+        $('#content').removeClass('content-toggled');
+        $('.navbar').removeClass('navbar-toggled');
+        $('.sticky-footer').removeClass('footer-toggled');
+      }
+    }
+
+    updateSidebarState();
+
+    $("#sidebarToggle, #sidebarToggleTop").on('click', function (e) {
+      isSidebarOpen = !isSidebarOpen;
+
+      localStorage.setItem('isSidebarOpen', isSidebarOpen);
+
+      updateSidebarState();
+    });
+  });
+
+  const toggleButton = document.getElementById("toggleButton");
+  const toggleView = document.querySelector(".toggle-view");
+  let isOpen = false;
+  if (toggleButton != null && toggleView != null) {
+    toggleButton.addEventListener("click", function () {
+      if (!isOpen) {
+        toggleView.style.display = "block";
+        toggleView.style.height = toggleView.scrollHeight + "px";
+        toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i>';
+      } else {
+        toggleView.style.height = "0";
+        setTimeout(() => {
+          toggleView.style.display = "none";
+        }, 500);
+        toggleButton.innerHTML = '<i class="fas fa-plus"></i>';
+      }
+
+      isOpen = !isOpen;
+    });
+  }
+  //#endregion
+
+  //#region Search
   $("#searchproduct").on("click", function () {
     let searchdata = $("#searchdata").val();
     if (searchdata != '') {
@@ -117,22 +199,9 @@
       warning('Empty Input!', "Enter Asset Number/Serial Number!")
     }
   })
+  //#endregion
 
-  // hidespinner();
-
-  // function showspinner() {
-  //   console.log("show loader");
-  //   $(".loader-wrapper").show();
-  // }
-
-  // function hidespinner() {
-  //   console.log("hide loader");
-
-  //   setTimeout(() => {
-  //     $(".loader-wrapper").hide();
-  //   }, 1500);
-  // }
-
+  //#region Alerts
   function successlogin(title, text) {
     return swal({
       title: title,
@@ -270,7 +339,9 @@
     toastr.clear();
     console.log("Toastr Cleared!")
   }
+  //#endregion
 
+  //#region Logout
   $(document).on("click", "#logoutBtn", function () {
     $.ajax({
       type: "POST",
@@ -284,23 +355,120 @@
       },
     });
   });
+  //#endregion
 
-  const numberInputs = document.querySelectorAll(".number-validator");
+  //#region Dropdown
+  //@use for Input/Select Dropdown
+  function AddDropdownData(dropdownID, activeData, inputID, hiddenID) {
+    for (const data of activeData) {
+      AddOption(dropdownID, data.display, data.value, inputID, hiddenID);
+    }
+  }
 
-  numberInputs.forEach(function (input) {
-    input.addEventListener("input", function () {
-      const inputValue = this.value;
+  function AddOption(dropdownID, displayText, actualValue, inputID, hiddenID) {
+    const dropdownElement = document.getElementById(dropdownID);
+    const hiddenInput = document.getElementById(hiddenID);
 
-      if (inputValue.length === 1 && inputValue === "0") {
-        this.value = "";
-      } else if (!/^\d*$/.test(inputValue)) {
-        this.value = inputValue.replace(/\D/g, "");
+    const newOption = document.createElement("div");
+    newOption.className = "dropdown-option";
+    newOption.textContent = displayText;
+    newOption.setAttribute("data-value", actualValue);
+
+    newOption.addEventListener("click", function () {
+      const inputElement = document.getElementById(inputID);
+      inputElement.value = displayText;
+      hiddenInput.value = actualValue;
+      dropdownElement.style.display = "none";
+    });
+
+    dropdownElement.appendChild(newOption);
+
+    SetupDropdown(inputID, dropdownID, "dropdown-option");
+  }
+
+  function SetupDropdown(inputId, dropdownId, optionClass) {
+    const inputElement = document.getElementById(inputId);
+    const dropdownElement = document.getElementById(dropdownId);
+    const options = dropdownElement.getElementsByClassName(optionClass);
+
+    inputElement.addEventListener("click", function () {
+      dropdownElement.style.display = "block";
+    });
+
+    for (const option of options) {
+      option.addEventListener("click", function () {
+        inputElement.value = option.textContent;
+        const actualValue = option.getAttribute("data-value");
+        inputElement.setAttribute("data-actual-value", actualValue);
+        dropdownElement.style.display = "none";
+      });
+    }
+
+    inputElement.addEventListener("input", function () {
+      const value = inputElement.value.toUpperCase();
+      for (const option of options) {
+        if (option.textContent.toUpperCase().includes(value)) {
+          option.style.display = "block";
+        } else {
+          option.style.display = "none";
+        }
+      }
+      dropdownElement.style.display = "block";
+    });
+
+    document.addEventListener("click", function (event) {
+      const target = event.target;
+      if (!dropdownElement.contains(target) && target !== inputElement) {
+        dropdownElement.style.display = "none";
       }
     });
-  });
+  }
 
-  function ClearTable(name) {
-    $(`#${name}`).find("tr:gt(0)").remove();
+  //@use for Normal Dropdown
+  $('.customdropdown').click(function () {
+    $(this).attr('tabindex', 1).focus();
+    $(this).toggleClass('active');
+    $(this).find('.customdropdown-menu').slideToggle(300);
+  });
+  $('.customdropdown').focusout(function () {
+    $(this).removeClass('active');
+    $(this).find('.customdropdown-menu').slideUp(300);
+  });
+  $('.customdropdown .customdropdown-menu li').click(function () {
+    $(this).parents('.customdropdown').find('span').text($(this).text());
+    $(this).parents('.customdropdown').find('input').attr('value', $(this).attr('id'));
+  });
+  //#endregion
+
+  //#region Number Formatting
+  function formatPrice(event, input) {
+    event.preventDefault();
+
+    const cursorPosition = input.selectionStart;
+    const originalValue = input.value;
+    const defaultValue = '$0.00';
+    const currentValue = originalValue || defaultValue;
+
+    let value = currentValue.replace(/[^0-9.]/g, '');
+    let number = parseFloat(value);
+
+    if (!isNaN(number)) {
+      const formattedValue = number.toLocaleString('en-PH', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      input.value = formattedValue;
+
+      let newPosition = cursorPosition + (formattedValue.indexOf('.') > currentValue.indexOf('.') ? 1 : 0);
+
+      // Set the new cursor position
+      input.setSelectionRange(newPosition, newPosition);
+    } else {
+      input.value = defaultValue;
+    }
   }
 
   function ConvertToCurrency(val) {
@@ -336,146 +504,9 @@
     var formattedValue = parseFloat(value).toFixed(2);
     return '$' + formattedValue.replace(/\d(?=(\d{3})+\.)/g, '$&,');
   }
+  //#endregion
 
-  $(document).ready(function () {
-    if ($('.collapse-item.active').length > 0) {
-      $('.collapse-item.active').closest('.collapse').addClass('show');
-    }
-
-    $('.collapse-item').click(function () {
-      $('.collapse-item').removeClass('active');
-      $(this).addClass('active');
-    });
-
-    var path = window.location.pathname;
-
-    $('.collapse-item').each(function () {
-      var href = $(this).attr('href');
-      if (path === href) {
-        $(this).addClass('active');
-        $(this).closest('.collapse').addClass('show');
-      }
-    });
-
-    function adjustCollapse() {
-      if ($(window).width() <= 767) {
-        $('.collapse').removeClass('show');
-        $('.row.d-flex.justify-content-center.align-items-center').removeClass('login-height');
-      } else {
-        $('.collapse-item.active').closest('.collapse').addClass('show');
-      }
-    }
-    adjustCollapse();
-
-    $(window).resize(function () {
-      adjustCollapse();
-    });
-
-    $(document).on('click', function (event) {
-      if ($(window).width() <= 767) {
-        if (!$(event.target).closest('.collapse').length) {
-          $('.collapse').removeClass('show');
-        }
-      }
-
-    });
-  });
-
-  $('.customdropdown').click(function () {
-    $(this).attr('tabindex', 1).focus();
-    $(this).toggleClass('active');
-    $(this).find('.customdropdown-menu').slideToggle(300);
-  });
-  $('.customdropdown').focusout(function () {
-    $(this).removeClass('active');
-    $(this).find('.customdropdown-menu').slideUp(300);
-  });
-  $('.customdropdown .customdropdown-menu li').click(function () {
-    $(this).parents('.customdropdown').find('span').text($(this).text());
-    $(this).parents('.customdropdown').find('input').attr('value', $(this).attr('id'));
-  });
-
-  $(document).ready(function () {
-    let isSidebarOpen = localStorage.getItem('isSidebarOpen') === 'true';
-
-    function updateSidebarState() {
-      $("body").toggleClass("sidebar-toggled", isSidebarOpen);
-      $(".sidebar").toggleClass("toggled", isSidebarOpen);
-
-      if (isSidebarOpen) {
-        $('.sidebar .collapse').collapse('hide');
-        $('#content').toggleClass('content-toggled');
-        $('.navbar').toggleClass('navbar-toggled');
-        $('.sticky-footer').toggleClass('footer-toggled');
-      } else {
-        $('#content').removeClass('content-toggled');
-        $('.navbar').removeClass('navbar-toggled');
-        $('.sticky-footer').removeClass('footer-toggled');
-      }
-    }
-
-    updateSidebarState();
-
-    $("#sidebarToggle, #sidebarToggleTop").on('click', function (e) {
-      isSidebarOpen = !isSidebarOpen;
-
-      localStorage.setItem('isSidebarOpen', isSidebarOpen);
-
-      updateSidebarState();
-    });
-  });
-
-  const toggleButton = document.getElementById("toggleButton");
-  const toggleView = document.querySelector(".toggle-view");
-  let isOpen = false;
-  if (toggleButton != null && toggleView != null) {
-    toggleButton.addEventListener("click", function () {
-      if (!isOpen) {
-        toggleView.style.display = "block";
-        toggleView.style.height = toggleView.scrollHeight + "px";
-        toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i>';
-      } else {
-        toggleView.style.height = "0";
-        setTimeout(() => {
-          toggleView.style.display = "none";
-        }, 500);
-        toggleButton.innerHTML = '<i class="fas fa-plus"></i>';
-      }
-
-      isOpen = !isOpen;
-    });
-  }
-
-  function formatPrice(event, input) {
-    event.preventDefault();
-
-    const cursorPosition = input.selectionStart;
-    const originalValue = input.value;
-    const defaultValue = '$0.00';
-    const currentValue = originalValue || defaultValue;
-
-    let value = currentValue.replace(/[^0-9.]/g, '');
-    let number = parseFloat(value);
-
-    if (!isNaN(number)) {
-      const formattedValue = number.toLocaleString('en-PH', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-
-      input.value = formattedValue;
-
-      let newPosition = cursorPosition + (formattedValue.indexOf('.') > currentValue.indexOf('.') ? 1 : 0);
-
-      // Set the new cursor position
-      input.setSelectionRange(newPosition, newPosition);
-    } else {
-      input.value = defaultValue;
-    }
-  }
-
+  //#region Ajax Calls
   //@use for updating/saving/inserting data
   Upsert = (type, url, data, callback) => {
     $.ajax({
@@ -505,7 +536,32 @@
       }
     })
   }
+  //#endregion
 
+  //#region Table
+  //@use for Table Loading State
+  const TableLoader = (table, row, col) => {
+    const loaderCell = '<td><div class="custom-loader"></div></td>';
+    const tbody = $(`${table} tbody`);
+
+    if (tbody.length === 0) {
+      console.error("Table or tbody not found.");
+      return;
+    }
+
+    for (let i = 0; i < row; i++) {
+      let rowHtml = '<tr id="loading-state">';
+      for (let j = 0; j < col; j++) {
+        rowHtml += loaderCell;
+      }
+      rowHtml += '</tr>';
+      tbody.append(rowHtml);
+    }
+  };
+  
+  //#endregion
+
+  //#region Date Formatting
   function formatDate(date) {
     let startDate = moment(date.split(' - ')[0], 'MMM D, YYYY').format('MM/DD/YYYY');
     let endDate = moment(date.split(' - ')[1], 'MMM D, YYYY').format('MM/DD/YYYY');
@@ -529,4 +585,5 @@
 
     return `${formattedDate} - ${formattedTime}`;
   }
+  //#endregion
 </script>

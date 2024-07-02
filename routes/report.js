@@ -10,6 +10,7 @@ const {
   InsertTable,
   SelectParameter,
   SelectResult,
+  SelectMultiple,
 } = require("./repository/spidb");
 const { SelectStatement, ConvertDate } = require("./repository/customhelper");
 
@@ -208,39 +209,45 @@ router.post("/updatehistory", (req, res) => {
   }
 });
 
-router.post("/getsalesreport", (req, res) => {
+router.post("/employee-sales", (req, res) => {
   try {
-    let soldby = req.body.soldby;
-    let daterange = req.body.daterange;
-    let [startDate, endDate] = daterange.split(" - ");
+    const { employeeId, productName, category, dateRange } = req.body;
+    const [startDate, endDate] = dateRange.split(" - ");
+    const formattedStartDate = ConvertDate(startDate);
+    const formattedEndDate = ConvertDate(endDate);
 
-    let formattedStartDate = startDate.split("/").reverse().join("-");
-    let formattedEndDate = endDate.split("/").reverse().join("-");
+    let sql = `
+      SELECT sr_date AS date, sr_soldrefno AS soldRefNo, mc_name AS category, mi_name AS productName, 
+            sr_sellingprice AS price, sr_quantity AS quantity, sr_paymenttype AS paymentType, p_serial AS serial,
+            sr_referenceno AS transacRefNo, sr_status AS status, sr_deliveryfee AS deliveryFee, e_fullname AS fullName
+      FROM cyberpowerproduct.sales_report
+      INNER JOIN master_item ON sr_item = mi_id
+      INNER JOIN master_category ON sr_category = mc_id
+      INNER JOIN employee ON sr_soldby = e_id
+      INNER JOIN product ON sr_assetcontrol = p_assetcontrol
+      WHERE sr_date BETWEEN ? AND ?
+    `;
 
-    formattedStartDate = formattedStartDate.replace(
-      /(\d{4})-(\d{2})-(\d{2})/,
-      "$1-$3-$2"
-    );
-    formattedEndDate = formattedEndDate.replace(
-      /(\d{4})-(\d{2})-(\d{2})/,
-      "$1-$3-$2"
-    );
+    const params = [formattedStartDate, formattedEndDate];
 
-    // console.log("Date: ", formattedStartDate, formattedEndDate, "Sold By: ", soldby)
+    if (employeeId && employeeId !== "ALL") {
+      sql += " AND e_id = ?";
+      params.push(employeeId);
+    }
 
-    let sql = `SELECT sr_date as date, sr_soldrefno as soldrefno,  mc_name as category, mi_name as itemname, 
-                sr_sellingprice as price, sr_quantity as quantity, sr_paymenttype as paymenttype, 
-                sr_referenceno as transacrefno, sr_status as status, sr_deliveryfee as deliveryfee
-              FROM cyberpowerproduct.sales_report
-              INNER JOIN master_item ON sr_item = mi_id
-              INNER JOIN master_category ON sr_category = mc_id
-              INNER JOIN employee ON sr_soldby = e_id
-              WHERE e_fullname = '${soldby}' and sr_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}';`;
+    if (category && category !== "ALL") {
+      sql += " AND mc_id = ?";
+      params.push(category);
+    }
 
-    Select(sql, (err, result) => {
+    if (productName && productName !== "ALL") {
+      sql += " AND mi_id = ?";
+      params.push(productName);
+    }
+
+    SelectMultiple(sql, params, (err, result) => {
       if (err) console.error("Error: ", err);
       if (result.length != 0) {
-        // console.log(sql);
         res.json({
           msg: "success",
           data: result,
