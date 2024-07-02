@@ -4,6 +4,7 @@ const {
   Select,
   InsertTable,
   Update,
+  SelectResult,
 } = require("./repository/spidb");
 const {
   Employee,
@@ -49,6 +50,34 @@ router.get("/load", (req, res) => {
         res.json({
           msg: "success",
           data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.get("/sales-employee", (req, res) => {
+  try {
+    let sql = `SELECT DISTINCT e_id AS employeeId, e_fullname AS fullName, mp_name AS position, md_name AS department, ma_name AS access
+      FROM cyberpowerproduct.sales_report
+      INNER JOIN  employee ON sr_soldby = e_id
+      INNER JOIN master_access on ma_id = e_access
+      INNER JOIN master_department on md_id = e_department
+      INNER JOIN master_position on mp_id = e_position;`;
+    SelectResult(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+      if (result.length != 0) {
+        res.json({
+          msg: "success",
+          data: result,
+        });
+      } else {
+        res.json({
+          msg: "no data",
         });
       }
     });
@@ -269,14 +298,13 @@ router.post("/edit", (req, res) => {
     data.push(employeeid);
 
     // console.log(sql_update)
-    
+
     Update(sql_update, data, (err, result) => {
       if (err) console.error("Error: ", err);
 
       console.log(result);
       res.json(JsonSuccess());
     });
-
   } catch (error) {
     res.json(JsonErrorResponse(error));
   }

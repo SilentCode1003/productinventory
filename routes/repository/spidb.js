@@ -89,6 +89,17 @@ exports.SelectParameter = (sql, condition, callback) => {
   });
 };
 
+exports.SelectMultiple = (sql, condition, callback) => {
+  connection.query(sql, condition, (error, results, fields) => {
+    if (error) {
+      return callback(error, null);
+    }
+    // console.log(results);
+
+    callback(null, results);
+  });
+};
+
 exports.StoredProcedure = (sql, data, callback) => {
   try {
     connection.query(sql, data, (error, results, fields) => {

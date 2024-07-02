@@ -251,18 +251,6 @@
                                             <div class="col">
                                                 <h4 class="mt-1">Sales History</h4>
                                             </div>
-                                                <% if (access==="Admin" ) { %>
-                                                    <div class="col-md-4 mb-2">
-                                                        <input class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee" />
-                                                        <input type="hidden" id="hiddenemmployeevalue" name="hiddenemmployeevalue" />
-                                                        <div class="custom-dropdown custom-dropdown-margin-left" id="employeeDropdown"></div>
-                                                    </div>
-                                                <% } %>
-                                                <div class="col">
-                                                    <button class="btn btn-outline-cyberpower w-50" id="convertopdf" type="button">
-                                                        <i class="fas fa-file-export"></i>
-                                                    </button>
-                                                </div>
                                         </div>
                                     </div>
                                     <div class="table-responsive scrollable-table-size">
@@ -291,7 +279,7 @@
                         <div class="row" style="height: 580px;">
                             <div class="col-6">
                                 <div class="row">
-                                    <div class="col-12">
+                                    <div class="col-12 mb-2">
                                         <div class="card">
                                             <div class="card-header">
                                                 <div class="card-bg align-content-center h5 mt-1">
@@ -301,19 +289,57 @@
                                             <div class="card-body">
                                                 <div class="row">
                                                     <div class="col-5">
-                                                        <input class="form-control text-center custom-input" placeholder="Select Category"
-                                                                name="category" id="category" />
-                                                        <input type="hidden" id="hiddencategoryvalue" name="hiddencategoryvalue" />
-                                                        <div class="custom-dropdown custom-dropdown-margin-left" id="categoryDropdown"></div>
+                                                        <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Category" name="category" id="category"/>
+                                                        <input autocomplete="off" type="hidden" id="categoryId" name="categoryId"/>
+                                                        <div class="custom-dropdown cdw-tableoption" id="categoryDropdown"></div>
                                                     </div>
                                                     <div class="col-5">
-                                                        <input class="form-control text-center custom-input" placeholder="Select Product Status"
-                                                                name="status" id="status" />
-                                                        <input type="hidden" id="hiddenstatusvalue" name="hiddenstatusvalue" />
-                                                        <div class="custom-dropdown custom-dropdown-margin-left" id="statusDropdown"></div>
+                                                        <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Status" name="status" id="status"/>
+                                                        <input autocomplete="off" type="hidden" id="statusId" name="statusId"/>
+                                                        <div class="custom-dropdown cdw-tableoption" id="statusDropdown"></div>
                                                     </div>
                                                     <div class="col-2">
                                                         <div class="custom-btn" id="prdExcel"><i class="fas fa-file-export"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="card-bg align-content-center h5 mt-1">
+                                                    Employee Sales Report Export to PDF/Excel
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-4">
+                                                        <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Employee" name="employee" id="employee"/>
+                                                        <input autocomplete="off" type="hidden" id="employeeId" name="employeeId"/>
+                                                        <div class="custom-dropdown cdw-tableoption" id="employeeDropdown"></div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Product" name="product" id="product"/>
+                                                        <input autocomplete="off" type="hidden" id="productId" name="productId"/>
+                                                        <div class="custom-dropdown cdw-tableoption" id="productDropdown"></div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Category" name="salesCategory" id="salesCategory"/>
+                                                        <input autocomplete="off" type="hidden" id="salesCategoryId" name="salesCategoryId"/>
+                                                        <div class="custom-dropdown cdw-tableoption" id="salesCategoryDropdown"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="row justify-content-end">
+                                                    <div class="col-md-3 mb-2">
+                                                        <button class="btn btn-outline-cyberpower w-100" id="salesReportPdf" type="button">
+                                                            Download PDF<i class="pl-2 fas fa-file-export"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <button class="btn btn-outline-cyberpower w-100" id="salesReportExcel" type="button">
+                                                            Download Excel<i class="pl-2 fas fa-file-export"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
