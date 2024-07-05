@@ -6,6 +6,7 @@ const {
   Select,
   InsertTable,
   SelectParameter,
+  SelectResult,
 } = require("./repository/spidb");
 const dictionary = require("./repository/dictionary");
 const helper = require("./repository/customhelper");
@@ -181,6 +182,29 @@ router.post("/edit", (req, res) => {
           });
         });
       }
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/category", (req, res) => {
+  try {
+    const { categoryId } = req.body;
+    let sql = `SELECT mi_name AS productName, mi_id AS productId, mi_status as status FROM master_item`;
+
+    if (categoryId && categoryId !== "ALL") {
+      sql += ` WHERE mi_category = ${categoryId}`;
+    }
+    SelectResult(sql, (err, result) => {
+      if (err) console.error("Error: ", err);
+
+      res.json({
+        msg: "success",
+        data: result,
+      });
     });
   } catch (error) {
     res.json({

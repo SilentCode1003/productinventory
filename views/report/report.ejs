@@ -304,7 +304,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-12 mb-2">
                                         <div class="card">
                                             <div class="card-header">
                                                 <div class="card-bg align-content-center h5 mt-1">
@@ -318,15 +318,15 @@
                                                         <input autocomplete="off" type="hidden" id="employeeId" name="employeeId"/>
                                                         <div class="custom-dropdown cdw-tableoption" id="employeeDropdown"></div>
                                                     </div>
-                                                    <div class="col-xl-4 mb-2">
-                                                        <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Product" name="product" id="product"/>
-                                                        <input autocomplete="off" type="hidden" id="productId" name="productId"/>
-                                                        <div class="custom-dropdown cdw-tableoption" id="productDropdown"></div>
-                                                    </div>
                                                     <div class="col-xl-4">
                                                         <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Category" name="salesCategory" id="salesCategory"/>
                                                         <input autocomplete="off" type="hidden" id="salesCategoryId" name="salesCategoryId"/>
                                                         <div class="custom-dropdown cdw-tableoption" id="salesCategoryDropdown"></div>
+                                                    </div>
+                                                    <div class="col-xl-4 mb-2">
+                                                        <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Product" name="product" id="product"/>
+                                                        <input autocomplete="off" type="hidden" id="productId" name="productId"/>
+                                                        <div class="custom-dropdown cdw-tableoption" id="productDropdown"></div>
                                                     </div>
                                                 </div>
                                                 <div class="row justify-content-end">
@@ -345,13 +345,45 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-6">
                                 <div class="row">
-                                    <div class="col">
-                                        <button class="btn btn-outline-cyberpower w-50" id="summaryReport" type="button">
+                                    <div class="col-xl-6">
+                                        <button class="btn btn-outline-cyberpower w-100" id="summaryReport" type="button">
                                              Download Summary Report<i class="pl-2 fas fa-file-export"></i>
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="card-bg align-content-center h5 mt-1">
+                                                    Sold Products Export to PDF/Excel
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row mb-3">
+                                                    <div class="col-xl-6 mb-2">
+                                                        <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Category" name="soldCategory" id="soldCategory"/>
+                                                        <input autocomplete="off" type="hidden" id="soldCategoryId" name="soldCategoryId"/>
+                                                        <div class="custom-dropdown cdw-tableoption" id="soldCategoryDropdown"></div>
+                                                    </div>
+                                                    <div class="col-xl-6">
+                                                        <input autocomplete="off" class="form-control text-center custom-input" placeholder="Select Product" name="soldProduct" id="soldProduct" />
+                                                        <input autocomplete="off" type="hidden" id="soldProductId" name="soldProductId" />
+                                                        <div class="custom-dropdown cdw-tableoption" id="soldProductDropdown"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="row justify-content-end">
+                                                    <div class="col-xl-3">
+                                                        <button class="btn btn-outline-cyberpower w-100" id="soldProductExcel" type="button">
+                                                            Download Excel<i class="pl-2 fas fa-file-export"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>  
+                                        </div>
                                     </div>
                                 </div>
                             </div>

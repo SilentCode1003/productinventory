@@ -7,6 +7,7 @@ const {
   SelectParameter,
   StoredProcedure,
   SelectResult,
+  SelectMultiple,
 } = require("./repository/spidb");
 const {
   Product,
@@ -20,10 +21,12 @@ const {
   GenerateAssetTag,
   convertExcelDate,
   SelectStatement,
+  ConvertDate,
 } = require("./repository/customhelper");
 const { GetValue, WH } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
 const { sq, da } = require("date-fns/locale");
+const { format } = require("date-fns");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -606,6 +609,46 @@ router.post("/producthistory", (req, res) => {
       if (err) console.error("Error: ", err);
 
       console.log(result);
+      res.json({
+        msg: "success",
+        data: result,
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/byNameByCategory", (req, res) => {
+  try {
+    const { itemId, categoryId, dateRange } = req.body;
+    const [startDate, endDate] = dateRange.split(" - ");
+    const formattedStartDate = ConvertDate(startDate);
+    const formattedEndDate = ConvertDate(endDate);
+    let sql = `SELECT s_date AS date, s_referenceno AS refNo, mc_name AS category, mi_name AS productName, s_serial AS serial, s_soldto AS soldTo 
+      FROM sold 
+      INNER JOIN product ON p_assetcontrol = s_assetcontrol
+      INNER JOIN master_item ON mi_id = p_itemname
+      INNER JOIN master_category ON mc_id = p_category
+      WHERE s_date BETWEEN ? AND ?`;
+    const params = [formattedStartDate, formattedEndDate];
+
+    if (itemId && itemId !== "ALL") {
+      sql += ` AND p_itemname = ?`;
+      params.push(itemId);
+    }
+
+    if (categoryId && categoryId !== "ALL") {
+      sql += ` AND p_category = ?`;
+      params.push(categoryId);
+    }
+
+    SelectMultiple(sql, params, (err, result) => {
+      if (err) console.error("Error: ", err);
+      console.log(result);
+
       res.json({
         msg: "success",
         data: result,

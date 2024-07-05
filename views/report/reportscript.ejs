@@ -335,6 +335,62 @@
         }
 
         //#region Dropdowns
+        function AddSoldCategory(dropdownID, activeData, inputID, hiddenID) {
+            for (const data of activeData) {
+                AddSoldCategoryDropdown(dropdownID, data.display, data.value, inputID, hiddenID);
+            }
+        }
+
+        function AddSoldCategoryDropdown(dropdownID, displayText, actualValue, inputID, hiddenID) {
+            const dropdownElement = $("#" + dropdownID);
+            const hiddenInput = $("#" + hiddenID);
+
+            const newOption = $("<div>")
+                .addClass("dropdown-option")
+                .text(displayText)
+                .attr("data-value", actualValue);
+
+            newOption.on("click", function () {
+
+                // console.log("Selected Option:", displayText, actualValue)
+                const inputElement = $("#" + inputID);
+                const row = inputElement.closest("tr");
+                inputElement.val(displayText);
+                hiddenInput.val(actualValue);
+                dropdownElement.hide();
+
+                $("#soldProductDropdown").empty();
+                $("#soldProduct").val('');
+                $("#soldProductId").val('');
+
+                const categoryId = actualValue;
+                Upsert("POST", "/items/category", {categoryId: categoryId}, result => {
+                    console.log(result);
+                    const product = result.data;
+                    let activeProduct = [];
+                    product.forEach(item => {
+                        const {productName, productId, status} = item;
+                        activeProduct.push({
+                            display: "ALL PRODUCTS",
+                            value: "ALL",
+                        })
+
+                        if(status == "ACTIVE"){
+                            activeProduct.push({
+                                display: productName,
+                                value: productId,
+                            })
+                        }
+                    });
+                    AddDropdownData("soldProductDropdown", activeProduct, "soldProduct", "soldProductId");
+                });
+
+            });
+
+            dropdownElement.append(newOption);
+            SetupDropdown(inputID, dropdownID, "dropdown-option");
+        }
+
         function LoadList() {
             //Dropdown for Registered Product
             Fetch("/category/load", result => {
@@ -408,6 +464,7 @@
                     });
                 });
                 AddDropdownData("salesCategoryDropdown", categories, "salesCategory", "salesCategoryId");
+                AddSoldCategory("soldCategoryDropdown", categories, "soldCategory", "soldCategoryId");
             })
         }
         //#endregion
@@ -708,7 +765,100 @@
 
         });
 
+        //#region Sold Products
+        $(document).on("click", "#soldProductExcel", async function () {
+            const productId = $("#soldProductId").val();
+            const category = $("#soldCategoryId").val();
+            const dateRange = formatDate($('#dateRange').val());
+            const formatedDate = formatDate(dateRange);
+            let message = "";
 
+            if (productId == '') {
+                message += "Product, ";
+            }
+
+            if (category == '') {
+                message += "Category, ";
+            }
+
+            if (message != '') {
+                warning('Warning!', `${message} is Empty`)
+            } else {
+                try {
+                    Loading("Processing...");
+                    $("#soldProduct").val("");
+                    $("#soldProductId").val("");
+                    $("#soldCategory").val("");
+                    $("#soldCategoryId").val("");
+
+                    Upsert("POST", "/product/byNameByCategory", {itemId: productId, categoryId: category, dateRange: formatedDate}, result => {
+
+                        if(result.length == 0){
+                            warningInfo("Notice", "No Data within in the date range.");
+                            return;
+                        } else {
+                            const reportTitle = [["SOLD PRODUCTS REPORT", `Date: ${dateRange}`]];
+                            const headers = [
+                                ["Date", "Reference No.", "Category", "Product Name", "Serial", "Sold To", ]
+                            ];
+
+                            const rows = result.data.map(record => {
+                                return [
+                                    record.date,
+                                    record.refNo,
+                                    record.category,
+                                    record.productName,
+                                    record.serial,
+                                    record.soldTo,
+                                ];
+                            });
+
+                            const data = [...reportTitle, ...headers, ...rows];
+
+                            let wb = XLSX.utils.book_new();
+
+                            let ws = XLSX.utils.aoa_to_sheet(data);
+
+                            const colWidths = data.reduce((acc, row) => {
+                                row.forEach((cell, i) => {
+                                    const valueLength = cell ? cell.toString().length : 10;
+                                    if (!acc[i]) acc[i] = { wch: valueLength };
+                                    else if (acc[i].wch < valueLength) acc[i].wch = valueLength;
+                                });
+                                return acc;
+                            }, []);
+
+                            ws['!cols'] = colWidths;
+
+                            XLSX.utils.book_append_sheet(wb, ws, `Sold Products`);        
+
+                            let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+                            function s2ab(s) {
+                                let buf = new ArrayBuffer(s.length);
+                                let view = new Uint8Array(buf);
+                                for (let i = 0; i < s.length; i++) {
+                                    view[i] = s.charCodeAt(i) & 0xFF;
+                                }
+                                return buf;
+                            }   
+
+                            saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `Sold_Products_${dateRange}.xlsx`);
+                        }
+
+                    }); 
+                    
+                } catch (error) {
+                    console.error("Error fetching sold products:", error);
+                    warningInfo("Notice", "Failed to retrieve data.");
+                } finally {
+                    hideLoading()
+                }
+            }
+        });
+        //#endregion
+
+        //#region Employee Sales Report
         //@ Employee Sales Report Excel
         $(document).on("click", "#salesReportExcel", async function () {
             const employeeId = $("#employeeId").val();
@@ -933,6 +1083,7 @@
                 return result;
             }, {});
         }
+        //#endregion
 
     });
 </script>
