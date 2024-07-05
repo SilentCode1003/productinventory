@@ -770,7 +770,6 @@
             const productId = $("#soldProductId").val();
             const category = $("#soldCategoryId").val();
             const dateRange = formatDate($('#dateRange').val());
-            const formatedDate = formatDate(dateRange);
             let message = "";
 
             if (productId == '') {
@@ -791,7 +790,7 @@
                     $("#soldCategory").val("");
                     $("#soldCategoryId").val("");
 
-                    Upsert("POST", "/product/byNameByCategory", {itemId: productId, categoryId: category, dateRange: formatedDate}, result => {
+                    Upsert("POST", "/product/byNameByCategory", {itemId: productId, categoryId: category, dateRange: dateRange}, result => {
 
                         if(result.length == 0){
                             warningInfo("Notice", "No Data within in the date range.");
