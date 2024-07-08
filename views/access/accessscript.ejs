@@ -31,13 +31,10 @@
 
     $(document).on("click", "#addBtn", function () {
       let name = $("#name").val();
-
       var message = "";
-
       if (name == "") {
         message += "Add Access";
       }
-
       if (message != "") {
         warning("Required", `Please fill up ${message}`);
       } else {
@@ -104,55 +101,11 @@
 
     //Status Update
     $(document).on("click", "#activeBtn", function () {
-      console.log(id);
-      console.log(status);
-      $.ajax({
-        type: "POST",
-        url: "/access/status",
-        data: {
-          status: status,
-          id: id,
-        },
-        success: function (result) {
-          if (result.msg == "success") {
-            LoadTable();
-            success("Saved", "Successfully");
-          }
-
-          if (result.msg == "notexist") {
-            warning(`${id} does not exist!`);
-          }
-        },
-        error: function (err) {
-          errormsg(err);
-        },
-      });
+      updateStatus(id, status);
     });
 
     $(document).on("click", "#inactiveBtn", function () {
-      console.log(id);
-      console.log(status);
-      $.ajax({
-        type: "POST",
-        url: "/access/status",
-        data: {
-          status: status,
-          id: id,
-        },
-        success: function (result) {
-          if (result.msg == "success") {
-            LoadTable();
-            success("Saved", "Successfully");
-          }
-
-          if (result.msg == "notexist") {
-            warning(`${id} does not exist!`);
-          }
-        },
-        error: function (err) {
-          errormsg(err);
-        },
-      });
+      updateStatus(id, status);
     });
 
     $('#search').on('input', function () {
@@ -233,6 +186,19 @@
         },
         error: function (error) {
           console.error(error);
+        }
+      });
+    }
+
+    function updateStatus(id, status) {
+      Upsert("POST", "/access/status", { status: status, id: id }, function (data) {
+        if (data.msg == "success") {
+          LoadTable();
+          success("Saved", "Successfully");
+        }
+
+        if (data.msg == "notexist") {
+          warning(`${id} does not exist!`);
         }
       });
     }
