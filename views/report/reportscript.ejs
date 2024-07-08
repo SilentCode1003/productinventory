@@ -44,23 +44,7 @@
         LoadTable();
         LoadList();
 
-        const historyloader = `  
-          <tr>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-            <td><div class="custom-loader"></div></td>
-          </tr>`;
-
-        $(document).on("click", "#editBtn", function () {
-            $(".id-edit").text(id);
-        });
-
-        const saleshistory = $('#salesreporthistory-table tbody');
-        for (let i = 0; i < 5; i++) {
-            saleshistory.append(historyloader);
-        }
+        TableLoader("#salesreporthistory-table", 6, 4);
 
         $("#salesreporthistory-table tbody").on("click", "tr", function () {
             var dataRow = [];
@@ -75,38 +59,10 @@
             referenceno = dataRow[1];
             status = dataRow[2];
         });
-
-        function filterTableRows() {
-            const searchQuery = $("#search").val().trim().toLowerCase();
-            let foundMatches = false;
-
-            $("#no-match-row").remove();
-
-            $("#datatable tbody tr").each(function () {
-                const rowData = $(this).text().toLowerCase();
-                if (rowData.includes(searchQuery)) {
-                    $(this).show();
-                    foundMatches = true;
-                } else {
-                    $(this).hide();
-                }
-            });
-
-            if (!foundMatches) {
-                const noMatchRow = $("<tr>").append(
-                    $("<td>", {
-                        colspan: 6,
-                        class: "text-center",
-                        text: "No Data Matched",
-                    })
-                );
-                $("#datatable tbody").append(noMatchRow);
-                noMatchRow.attr("id", "no-match-row");
-            }
-        }
-
-        $("#search").on("input", filterTableRows);
-
+        
+        $('#search').on('input', function () {
+            TableSearch("datatable", 6, '#search');
+        });
 
         $(document).on('click', '.cbi-link', function () {
             $(".id-history").text(id);
@@ -368,13 +324,12 @@
                     console.log(result);
                     const product = result.data;
                     let activeProduct = [];
-                    product.forEach(item => {
-                        const {productName, productId, status} = item;
-                        activeProduct.push({
+                    activeProduct.push({
                             display: "ALL PRODUCTS",
                             value: "ALL",
                         })
-
+                    product.forEach(item => {
+                        const {productName, productId, status} = item;
                         if(status == "ACTIVE"){
                             activeProduct.push({
                                 display: productName,
