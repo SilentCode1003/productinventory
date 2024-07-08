@@ -645,7 +645,6 @@ router.post("/byNameByCategory", (req, res) => {
       params.push(categoryId);
     }
 
-    console.log(params);
     SelectMultiple(sql, params, (err, result) => {
       if (err) console.error("Error: ", err);
 
