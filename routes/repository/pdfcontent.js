@@ -549,7 +549,7 @@ exports.document = (data, template, employee, date) => {
 
     let itemdetails = [header, ...tableContent]
 
-    let content = {
+    const content = {
       pageSize: 'A4',
       pageOrientation: pageOrientation,
       pageMargins: margin,
