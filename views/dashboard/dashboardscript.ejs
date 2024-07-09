@@ -70,6 +70,10 @@
             }
         });
 
+        $('#search').on('input', function () {
+            TableSearch("#datatable2", 4, '#search');
+        });
+
         function LoadList() {
             $.ajax({
                 type: "GET",
@@ -113,8 +117,10 @@
         function getData(daterange, category) {
             let startDate = moment(daterange.split(' - ')[0], 'MMM D, YYYY');
             let endDate = moment(daterange.split(' - ')[1], 'MMM D, YYYY');
+
             let formattedStartDate = startDate.format('MM/DD/YYYY');
             let formattedEndDate = endDate.format('MM/DD/YYYY');
+
             let formattedDate = formattedStartDate + ' - ' + formattedEndDate;
             // console.log(formattedDate)
             // console.log("Paylaod: ", daterange, category)
@@ -128,7 +134,7 @@
                 },
                 success: function (data) {
                     if (data.msg === 'success') {
-                        // console.log("Data: ", data.data)
+                        console.log("Graph Sold Data: ", data.data)
                         if (data.data.length != 0) {
                             let filteredData = data.data.filter(function (item) {
                                 let itemDate = moment(item.date, 'YYYY-MM-DD');
@@ -178,6 +184,7 @@
 
                             let allProducts = getAllProducts(data.data);
                             let allDates = getAllDatesInRange(startDate, endDate);
+                            console.log("Included Products:", allProducts, "All Dates:", allDates);
 
                             allDates.forEach(function (date) {
                                 productByDate[date] = {};
@@ -185,7 +192,8 @@
                                     productByDate[date][product] = 0;
                                 });
                             });
-
+                            console.log("product by date 1:", productByDate)
+                            
                             data.data.forEach(function (item) {
                                 let date = item.date;
                                 let productName = item.productname;
@@ -337,7 +345,7 @@
                 groupedData[itemName].stocks += 1;
                 groupedData[itemName].totalPrice += item.price;
             });
-            console.log("sample", groupedData)
+            // console.log("sample", groupedData)
 
             return groupedData;
         }
@@ -440,7 +448,7 @@
         }
 
         function populatedeploytable(data) {
-            console.log(data);
+            // console.log(data);
             const tableBody = $('#deploytable tbody');
             tableBody.empty();
 
@@ -465,7 +473,7 @@
         }
 
         function populatesoldtable(data) {
-            console.log(data);
+            // console.log(data);
             const tableBody = $('#soldtable tbody');
             tableBody.empty();
 
@@ -506,11 +514,11 @@
                 success: function (data) {
                     if (data.msg === 'success') {
                         let container = data.data;
-                        console.log("Data: ", container)
+                        // console.log("Sold Data: ", container)
                         let totalprice = 0;
                         // console.log("sold total: ", container.length)
                         container.forEach(item => {
-                            console.log("Price: ", item.price)
+                            // console.log("Price: ", item.price)
                             totalprice += item.price;
                         });
                         $("#totalsold").text(formatCurrency(totalprice));
@@ -536,7 +544,7 @@
                     // console.log("stocks: ", container);
 
                     let groupedData = groupDataByItemName(container);
-                    console.log("sample data", groupedData);
+                    // console.log("sample data", groupedData);
                     let template = 'STOCKS REPORT';
                     // console.log("Current Stock: ", groupedData);
                     if (groupedData.length != 0) {

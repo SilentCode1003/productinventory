@@ -67,7 +67,7 @@ exports.Select = (sql, callback) => {
     });
     connection.query(sql, (error, results, fields) => {
       if (error) {
-        console.log(error)
+        console.log(error);
 
         return callback(error, null);
       }
@@ -80,6 +80,17 @@ exports.Select = (sql, callback) => {
 
 exports.SelectParameter = (sql, condition, callback) => {
   connection.query(sql, [condition], (error, results, fields) => {
+    if (error) {
+      return callback(error, null);
+    }
+    // console.log(results);
+
+    callback(null, results);
+  });
+};
+
+exports.SelectMultiple = (sql, condition, callback) => {
+  connection.query(sql, condition, (error, results, fields) => {
     if (error) {
       return callback(error, null);
     }
@@ -239,6 +250,8 @@ exports.InsertTable = (tablename, data, callback) => {
       p_category,
       p_podate,
       p_ponumber,
+      p_deliverydate,
+      p_trackingnumber,
       p_warrantydate,
       p_status) VALUES ?`;
 

@@ -7,6 +7,7 @@ const {
   SelectParameter,
   StoredProcedure,
   SelectResult,
+  SelectMultiple,
 } = require("./repository/spidb");
 const {
   Product,
@@ -20,10 +21,12 @@ const {
   GenerateAssetTag,
   convertExcelDate,
   SelectStatement,
+  ConvertDate,
 } = require("./repository/customhelper");
 const { GetValue, WH } = require("./repository/dictionary");
 const { Validator } = require("./controller/middleware");
 const { sq, da } = require("date-fns/locale");
+const { format } = require("date-fns");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -50,7 +53,7 @@ router.get("/load", (req, res) => {
       INNER JOIN 
         master_item mi ON p.p_itemname = mi.mi_id
       INNER JOIN 
-        master_category mc ON p.p_category = mc.mc_id;
+        master_category mc ON p.p_category = mc.mc_id
     `;
 
     Select(sql, (err, result) => {
@@ -107,13 +110,13 @@ router.get("/getproductstatus", (req, res) => {
 
 router.post("/getProductbyCategory", (req, res) => {
   try {
-    let {category, status} = req.body;
+    let { category, status } = req.body;
     let sql = `SELECT * FROM product WHERE p_category = '${category}' AND p_status = '${status}'`;
 
     Select(sql, (err, result) => {
       if (err) console.error("Error: ", err);
       let product = Product(result);
-      
+
       if (result.length != 0) {
         // console.log(data);
         res.json({
@@ -121,7 +124,7 @@ router.post("/getProductbyCategory", (req, res) => {
           data: product,
         });
       } else {
-        console.log(sql)
+        console.log(sql);
         res.json({
           msg: "NODATA",
           data: result,
@@ -162,7 +165,6 @@ router.get("/getstocks", (req, res) => {
       if (err) console.error("Error: ", err);
 
       if (result.length != 0) {
-
         res.json({
           msg: "success",
           data: result,
@@ -350,11 +352,11 @@ router.post("/upload", (req, res) => {
     let notexist = [];
     let notice = [];
 
-    // console.log(dataJSon);
+    console.log(dataJSon);
     Product_Count()
       .then((result) => {
         // console.log(result);
-        console.log("Data Length:", dataJSon.length)
+        console.log("Data Length:", dataJSon.length);
         sequence = parseInt(result[0].total);
         dataJSon.forEach((item) => {
           Product_Check(item.serial)
@@ -363,8 +365,8 @@ router.post("/upload", (req, res) => {
               if (result != undefined || result != null) {
                 if (result[0].total != 0) {
                   counter += 1;
-                  notice.push("SERIAL_"+item.serial + '_DUPLICATE_ENTRY')
-                  console.log("SERIAL_"+item.serial + '_DUPLICATE_ENTRY')
+                  notice.push("SERIAL_" + item.serial + "_DUPLICATE_ENTRY");
+                  console.log("SERIAL_" + item.serial + "_DUPLICATE_ENTRY");
                   console.log("counter:", counter);
                   uploadProduct();
                 } else {
@@ -402,6 +404,8 @@ router.post("/upload", (req, res) => {
                                 categoryid,
                                 convertExcelDate(item.podate),
                                 item.ponumber,
+                                convertExcelDate(item.deliverydate),
+                                item.trackingnumber,
                                 convertExcelDate(item.warrantydate),
                                 status,
                               ]);
@@ -409,8 +413,20 @@ router.post("/upload", (req, res) => {
                               // console.log(product);
                             } else {
                               counter += 1;
-                              notice.push("SERIAL_"+item.serial + '_INVALID_ITEM_NAME_('+item.itemname+")")
-                              console.log("SERIAL_"+item.serial + '_INVALID_ITEM_NAME_('+item.itemname+")")
+                              notice.push(
+                                "SERIAL_" +
+                                  item.serial +
+                                  "_INVALID_ITEM_NAME_(" +
+                                  item.itemname +
+                                  ")"
+                              );
+                              console.log(
+                                "SERIAL_" +
+                                  item.serial +
+                                  "_INVALID_ITEM_NAME_(" +
+                                  item.itemname +
+                                  ")"
+                              );
                               console.log("counter:", counter);
                               uploadProduct();
                             }
@@ -423,9 +439,21 @@ router.post("/upload", (req, res) => {
                           });
                       } else {
                         counter += 1;
-                        notice.push("SERIAL_"+item.serial + "_INVALID_CATEGORY_("+ item.category +")")
-                        console.log("SERIAL_"+item.serial + "_INVALID_CATEGORY_("+ item.category +")")
-                        console.log("counter:", counter)
+                        notice.push(
+                          "SERIAL_" +
+                            item.serial +
+                            "_INVALID_CATEGORY_(" +
+                            item.category +
+                            ")"
+                        );
+                        console.log(
+                          "SERIAL_" +
+                            item.serial +
+                            "_INVALID_CATEGORY_(" +
+                            item.category +
+                            ")"
+                        );
+                        console.log("counter:", counter);
                         uploadProduct();
                       }
                     })
@@ -438,7 +466,7 @@ router.post("/upload", (req, res) => {
                 }
               } else {
                 counter += 1;
-                notexist.push(item.serial)
+                notexist.push(item.serial);
                 uploadProduct();
               }
 
@@ -453,15 +481,15 @@ router.post("/upload", (req, res) => {
               //   }
               // }
 
-              function uploadProduct(){
+              function uploadProduct() {
                 if (counter == dataJSon.length) {
                   console.log(product);
-                  if(product.length != 0){
+                  if (product.length != 0) {
                     InsertTable("product", product, (err, result) => {
                       if (err) console.error("Error: ", err);
                       console.log(result);
                     });
-                  }else{
+                  } else {
                     console.log("NO DATA PUSHED");
                   }
                   if (notice != 0) {
@@ -542,7 +570,11 @@ router.post("/search", (req, res) => {
     where p_serial like ? 
     or p_assetcontrol like ? 
     or mi_name like ?`;
-    let command = SelectStatement(sql, [`${keyword}%`, `${keyword}%`, `${keyword}%`]);
+    let command = SelectStatement(sql, [
+      `${keyword}%`,
+      `${keyword}%`,
+      `${keyword}%`,
+    ]);
     console.log(command);
     Select(command, (err, result) => {
       if (err) console.error("Error: ", err);
@@ -577,6 +609,45 @@ router.post("/producthistory", (req, res) => {
       if (err) console.error("Error: ", err);
 
       console.log(result);
+      res.json({
+        msg: "success",
+        data: result,
+      });
+    });
+  } catch (error) {
+    res.json({
+      msg: error,
+    });
+  }
+});
+
+router.post("/byNameByCategory", (req, res) => {
+  try {
+    const { itemId, categoryId, dateRange } = req.body;
+    const [startDate, endDate] = dateRange.split(" - ");
+    const formattedStartDate = ConvertDate(startDate);
+    const formattedEndDate = ConvertDate(endDate);
+    let sql = `SELECT s_date AS date, s_referenceno AS refNo, mc_name AS category, mi_name AS productName, s_serial AS serial, s_soldto AS soldTo 
+      FROM sold 
+      INNER JOIN product ON p_assetcontrol = s_assetcontrol
+      INNER JOIN master_item ON mi_id = p_itemname
+      INNER JOIN master_category ON mc_id = p_category
+      WHERE s_date BETWEEN ? AND ?`;
+    const params = [formattedStartDate, formattedEndDate];
+
+    if (itemId && itemId !== "ALL") {
+      sql += ` AND p_itemname = ?`;
+      params.push(itemId);
+    }
+
+    if (categoryId && categoryId !== "ALL") {
+      sql += ` AND p_category = ?`;
+      params.push(categoryId);
+    }
+
+    SelectMultiple(sql, params, (err, result) => {
+      if (err) console.error("Error: ", err);
+
       res.json({
         msg: "success",
         data: result,
