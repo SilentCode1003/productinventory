@@ -70,6 +70,10 @@
             }
         });
 
+        $('#search').on('input', function () {
+            TableSearch("#datatable2", 4, '#search');
+        });
+
         function LoadList() {
             $.ajax({
                 type: "GET",
