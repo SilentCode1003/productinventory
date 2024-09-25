@@ -264,120 +264,118 @@ router.post("/upload", (req, res) => {
     let notice = [];
 
     dataJson.forEach((item) => {
+      let soldto = "";
       Check_MasterClient(item.company, item.branch, req)
         .then((result) => {
-          let soldto = result;
-
-          Check_Product(item.serial)
-            .then((result) => {
-              let product = Product(result);
-              console.log("product details:", product);
-              if (product.length != 0) {
-                let quantity = 1;
-                let category = product[0].category;
-                let itemname = product[0].itemname;
-                let assetcontrol = product[0].assetcontrol;
-
-                Check_Sold(assetcontrol, convertExcelDate(item.date), soldto)
-                  .then((result) => {
-                    let check_sold = Sold(result);
-                    counter += 1;
-                    if (check_sold.length != 0) {
-                      notice.push("SERIAL_" + item.serial + "_ALREADY_EXISTS");
-                      failed += 1;
-                    } else {
-                      success += 1;
-                      sold.push([
-                        assetcontrol,
-                        item.serial,
-                        convertExcelDate(item.date),
-                        item.soldby,
-                        soldto,
-                        item.referenceno,
-                      ]);
-
-                      salesreport.push([
-                        category,
-                        itemname,
-                        convertExcelDate(item.date),
-                        quantity,
-                        item.sellingprice,
-                        item.deliveryfee,
-                        item.soldby,
-                        soldto,
-                        item.paymenttype,
-                        item.referenceno,
-                        item.transactionref,
-                        item.remarks,
-                        item.transactionstatus,
-                        assetcontrol,
-                      ]);
-
-                      if (
-                        ReferenceNo_Checker(
-                          item.referenceno,
-                          salesreporthistory
-                        )
-                      ) {
-                        let activities = [
-                          {
-                            SOLD: {
-                              date: convertExcelDate(item.date),
-                              details: item.remarks,
-                            },
-                          },
-                        ];
-
-                        salesreporthistory.push([
-                          JSON.stringify(activities),
-                          item.remarks,
-                          item.transactionstatus,
-                          item.referenceno,
-                          "N/A",
-                        ]);
-                        console.log(
-                          `Reference number ${item.referenceno} Inserted.`
-                        );
-                      } else {
-                        console.log(
-                          `Reference number ${item.referenceno} already exists.`
-                        );
-                      }
-
-                      let status = GetValue(SLD());
-                      let product_update =
-                        "update product set p_status=? where p_assetcontrol=?";
-                      let product = [status, assetcontrol];
-                      Update(product_update, product, (err, result) => {
-                        if (err) console.error("Error: ", err);
-                        // console.log(result);
-                      });
-                    }
-
-                    if (counter == dataJson.length) {
-                      UploadSold();
-                    }
-                  })
-                  .catch((error) => {
-                    console.error(error, item.serial);
-                    res.json(JsonErrorResponse(error));
-                  });
-              } else {
-                failed += 1;
-                counter += 1;
-                notice.push("SERIAL_" + item.serial + "_DOES_NOT_EXISTS");
-                if (counter == dataJson.length) {
-                  UploadSold();
-                }
-              }
-            })
-            .catch((error) => {
-              console.error(error, item.serial);
-              res.json(JsonErrorResponse(error));
-            });
+          soldto = result;
         })
         .catch((error) => {
           console.error(error, item.company, item.branch);
+          res.json(JsonErrorResponse(error));
+        });
+
+      Check_Product(item.serial)
+        .then((result) => {
+          let product = Product(result);
+          console.log("product details:", product);
+          if (product.length != 0) {
+            let quantity = 1;
+            let category = product[0].category;
+            let itemname = product[0].itemname;
+            let assetcontrol = product[0].assetcontrol;
+
+            Check_Sold(assetcontrol, convertExcelDate(item.date), soldto)
+              .then((result) => {
+                let check_sold = Sold(result);
+                counter += 1;
+                if (check_sold.length != 0) {
+                  notice.push("SERIAL_" + item.serial + "_ALREADY_EXISTS");
+                  failed += 1;
+                } else {
+                  success += 1;
+                  sold.push([
+                    assetcontrol,
+                    item.serial,
+                    convertExcelDate(item.date),
+                    item.soldby,
+                    soldto,
+                    item.referenceno,
+                  ]);
+
+                  salesreport.push([
+                    category,
+                    itemname,
+                    convertExcelDate(item.date),
+                    quantity,
+                    item.sellingprice,
+                    item.deliveryfee,
+                    item.soldby,
+                    soldto,
+                    item.paymenttype,
+                    item.referenceno,
+                    item.transactionref,
+                    item.remarks,
+                    item.transactionstatus,
+                    assetcontrol,
+                  ]);
+
+                  if (
+                    ReferenceNo_Checker(item.referenceno, salesreporthistory)
+                  ) {
+                    let activities = [
+                      {
+                        SOLD: {
+                          date: convertExcelDate(item.date),
+                          details: item.remarks,
+                        },
+                      },
+                    ];
+
+                    salesreporthistory.push([
+                      JSON.stringify(activities),
+                      item.remarks,
+                      item.transactionstatus,
+                      item.referenceno,
+                      "N/A",
+                    ]);
+                    console.log(
+                      `Reference number ${item.referenceno} Inserted.`
+                    );
+                  } else {
+                    console.log(
+                      `Reference number ${item.referenceno} already exists.`
+                    );
+                  }
+
+                  let status = GetValue(SLD());
+                  let product_update =
+                    "update product set p_status=? where p_assetcontrol=?";
+                  let product = [status, assetcontrol];
+                  Update(product_update, product, (err, result) => {
+                    if (err) console.error("Error: ", err);
+                    // console.log(result);
+                  });
+                }
+
+                if (counter == dataJson.length) {
+                  UploadSold();
+                }
+              })
+              .catch((error) => {
+                console.error(error, item.serial);
+                res.json(JsonErrorResponse(error));
+              });
+          } else {
+            failed += 1;
+            counter += 1;
+            notice.push("SERIAL_" + item.serial + "_DOES_NOT_EXISTS");
+            if (counter == dataJson.length) {
+              UploadSold();
+            }
+          }
+        })
+        .catch((error) => {
+          console.error(error, item.serial);
           res.json(JsonErrorResponse(error));
         });
     });
