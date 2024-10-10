@@ -61,7 +61,7 @@ router.post('/salesreport', (req, res) => {
       if (result.length != 0) {
         // let data = SalesReport(result);
 
-        // console.log(data);
+        //  //console.log(error);
         res.json({
           msg: 'success',
           data: result,
@@ -92,7 +92,7 @@ router.get('/salesreporthistory', (req, res) => {
       if (result.length != 0) {
         let data = SalesReportHistory(result)
 
-        // console.log(data);
+        //  //console.log(error);
         res.json({
           msg: 'success',
           data: data,
@@ -124,7 +124,7 @@ router.post('/historydetails', (req, res) => {
       if (result.length != 0) {
         let data = SalesReportHistory(result)
 
-        // console.log(data);
+        //  //console.log(error);
         res.json({
           msg: 'success',
           data: data,
@@ -173,7 +173,7 @@ router.post('/updatehistory', (req, res) => {
     Update(sql_update, data, (err, result) => {
       if (err) console.error('Error: ', err)
 
-      console.log(result)
+      //console.log(result)
       select_sales_product = `SELECT * FROM sales_report WHERE sr_soldrefno = '${referenceno}'`
       Select(select_sales_product, (err, result) => {
         if (err) console.error('Error: ', err)
@@ -392,7 +392,7 @@ function Check_History(id) {
     Select(command, (err, result) => {
       if (err) reject(err)
 
-      console.log(result)
+      //console.log(result)
 
       resolve(result)
     })

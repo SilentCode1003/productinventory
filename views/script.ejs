@@ -345,7 +345,7 @@
   $(document).on("click", "#logoutBtn", function () {
     $.ajax({
       type: "POST",
-      url: "/login/logout",
+      url: "/logout",
       success: function (result) {
         success("Logout", "Successfully");
         location.replace("/");

@@ -1,20 +1,21 @@
-var express = require("express");
-const { Encrypter } = require("./repository/cryptography");
-const { SelectStatement } = require("./repository/customhelper");
-const { Select, SelectParameter } = require("./repository/spidb");
-const { Employee, MasterPosition, MasterAccess, MasterDepartment } = require("./model/spimodel");
-var router = express.Router();
+var express = require('express')
+const { Encrypter, EncrypterString } = require('./repository/cryptography')
+const { SelectStatement } = require('./repository/customhelper')
+const { Select, SelectParameter } = require('./repository/spidb')
+const { Employee, MasterPosition, MasterAccess, MasterDepartment } = require('./model/spimodel')
+var router = express.Router()
+const jwt = require("jsonwebtoken");
 
 /* GET home page. */
-router.get("/", function (req, res, next) {
-  res.render("login", { title: "Express" });
-});
+router.get('/', function (req, res, next) {
+  res.render('login', { title: 'Express' })
+})
 
-module.exports = router;
+module.exports = router
 
-router.post("/login", (req, res) => {
+router.post('/login', (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password } = req.body
     let sql = `select 
     e_id,
     e_fullname,
@@ -30,53 +31,64 @@ router.post("/login", (req, res) => {
     inner join master_position on e_position = mp_id
     inner join master_department on e_department = md_id
     inner join master_access on e_access = ma_id
-    where e_username = ? and e_password = ?`;
+    where e_username = ? and e_password = ?`
 
     Encrypter(password, (err, encrypted) => {
-      if (err) console.error("Error: ", err);
-      let data = [username, encrypted];
-      let command = SelectStatement(sql, data);
+      if (err) console.error('Error: ', err)
+      let data = [username, encrypted]
+      let command = SelectStatement(sql, data)
 
       Select(command, (err, result) => {
-        if (err) console.error("Error: ", err);
+        if (err) console.error('Error: ', err)
 
-        let info = Employee(result);
+        let info = Employee(result)
         console.log(info)
         if (info.length != 0) {
           info.forEach((user) => {
-            req.session.fullname = user.fullname;
-            req.session.position = user.position;
-            req.session.access = user.access;
-            req.session.department = user.department;
-          });
+            req.session.jwt = EncrypterString(
+              jwt.sign(
+                JSON.stringify({
+                  employeeid: user.employeeid,
+                  fullname: user.fullname,
+                }),
+                process.env._SECRET_KEY
+              ),
+              {}
+            );
+            req.session.fullname = user.fullname
+            req.session.position = user.position
+            req.session.access = user.access
+            req.session.department = user.department
+            req.session.clientip = req.body.client_ipaddress
+          })
           return res.json({
-            msg: "success",
+            msg: 'success',
             data: info,
-          });
+          })
         } else {
           return res.json({
-            msg: "incorrect",
-          });
+            msg: 'incorrect',
+          })
         }
-      });
-    });
+      })
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/logout", (req, res) => {
+router.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       res.json({
         msg: err,
-      });
+      })
     }
 
     res.json({
-      msg: "success",
-    });
-  });
-});
+      msg: 'success',
+    })
+  })
+})

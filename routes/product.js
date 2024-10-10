@@ -1,5 +1,5 @@
-var express = require("express");
-var router = express.Router();
+var express = require('express')
+var router = express.Router()
 
 const {
   Select,
@@ -8,7 +8,7 @@ const {
   StoredProcedure,
   SelectResult,
   SelectMultiple,
-} = require("./repository/spidb");
+} = require('./repository/spidb')
 const {
   Product,
   UploadProduct,
@@ -16,27 +16,27 @@ const {
   Return,
   MasterItem,
   Search,
-} = require("./model/spimodel");
+} = require('./model/spimodel')
 const {
   GenerateAssetTag,
   convertExcelDate,
   SelectStatement,
   ConvertDate,
-} = require("./repository/customhelper");
-const { GetValue, WH } = require("./repository/dictionary");
-const { Validator } = require("./controller/middleware");
-const { sq, da } = require("date-fns/locale");
-const { format } = require("date-fns");
+} = require('./repository/customhelper')
+const { GetValue, WH } = require('./repository/dictionary')
+const { Validator } = require('./controller/middleware')
+const { sq, da } = require('date-fns/locale')
+const { format } = require('date-fns')
 
 /* GET home page. */
-router.get("/", function (req, res, next) {
+router.get('/', function (req, res, next) {
   // res.render("product", { title: "Express" });
-  Validator(req, res, "product");
-});
+  Validator(req, res, 'product')
+})
 
-module.exports = router;
+module.exports = router
 
-router.get("/load", (req, res) => {
+router.get('/load', (req, res) => {
   try {
     let sql = `
       SELECT 
@@ -54,91 +54,91 @@ router.get("/load", (req, res) => {
         master_item mi ON p.p_itemname = mi.mi_id
       INNER JOIN 
         master_category mc ON p.p_category = mc.mc_id
-    `;
+    `
 
     Select(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
       if (result.length != 0) {
-        let data = Product(result);
+        let data = Product(result)
 
-        // console.log(data);
+        //  //console.log(error);
         res.json({
-          msg: "success",
+          msg: 'success',
           data: data,
-        });
+        })
       } else {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.get("/getproductstatus", (req, res) => {
+router.get('/getproductstatus', (req, res) => {
   try {
-    let sql = `SELECT DISTINCT p_status as status FROM product`;
+    let sql = `SELECT DISTINCT p_status as status FROM product`
 
     SelectResult(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
       if (result.length != 0) {
-        // console.log(data);
+        //  //console.log(error);
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       } else {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/getProductbyCategory", (req, res) => {
+router.post('/getProductbyCategory', (req, res) => {
   try {
-    let { category, status } = req.body;
-    let sql = `SELECT * FROM product WHERE p_category = '${category}' AND p_status = '${status}'`;
+    let { category, status } = req.body
+    let sql = `SELECT * FROM product WHERE p_category = '${category}' AND p_status = '${status}'`
 
     Select(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
-      let product = Product(result);
+      if (err) console.error('Error: ', err)
+      let product = Product(result)
 
       if (result.length != 0) {
-        // console.log(data);
+        //  //console.log(error);
         res.json({
-          msg: "success",
+          msg: 'success',
           data: product,
-        });
+        })
       } else {
-        console.log(sql);
+        console.log(sql)
         res.json({
-          msg: "NODATA",
+          msg: 'NODATA',
           data: result,
-        });
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.get("/getstocks", (req, res) => {
+router.get('/getstocks', (req, res) => {
   try {
     let sql = `
       SELECT
@@ -159,35 +159,35 @@ router.get("/getstocks", (req, res) => {
         master_category mc ON p_category = mc_id
       INNER JOIN
         master_item_price ON  mip_itemid = p_itemname
-      WHERE p_status in ('WAREHOUSE', 'RETURNED');`;
+      WHERE p_status in ('WAREHOUSE', 'RETURNED');`
 
     Select(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
       if (result.length != 0) {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       } else {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.get("/loadproduct", (req, res) => {
+router.get('/loadproduct', (req, res) => {
   try {
-    const page = req.query.page || 1;
-    const itemsPerPage = 500;
-    const offset = (page - 1) * itemsPerPage;
+    const page = req.query.page || 1
+    const itemsPerPage = 1000
+    const offset = (page - 1) * itemsPerPage
 
     let sql = `
       SELECT 
@@ -207,39 +207,38 @@ router.get("/loadproduct", (req, res) => {
         master_category mc ON p.p_category = mc.mc_id
       ORDER BY p.p_podate DESC
       LIMIT ${itemsPerPage} OFFSET ${offset};
-    `;
+    `
 
     Select(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
       if (result.length != 0) {
-        let data = Product(result);
+        let data = Product(result)
 
-        // console.log(data);
+        //  //console.log(error);
         res.json({
-          msg: "success",
+          msg: 'success',
           data: data,
-        });
+        })
       } else {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/save", (req, res) => {
+router.post('/save', (req, res) => {
   try {
-    const { serial, itemname, category, podate, ponumber, warrantydate } =
-      req.body;
-    let sequence = 1;
-    let status = GetValue(WH());
+    const { serial, itemname, category, podate, ponumber, warrantydate } = req.body
+    let sequence = 1
+    let status = GetValue(WH())
 
     // console.log(serial);
 
@@ -247,12 +246,12 @@ router.post("/save", (req, res) => {
       .then((result) => {
         if (result[0].total != 0) {
           res.json({
-            msg: "exist",
-          });
+            msg: 'exist',
+          })
         } else {
           Product_Count()
             .then((result) => {
-              sequence = parseInt((result[0].total += 1));
+              sequence = parseInt((result[0].total += 1))
 
               let product = [
                 [
@@ -265,137 +264,137 @@ router.post("/save", (req, res) => {
                   warrantydate,
                   status,
                 ],
-              ];
-              InsertTable("product", product, (err, result) => {
-                if (err) console.error("Error: ", err);
-                console.log(result);
+              ]
+              InsertTable('product', product, (err, result) => {
+                if (err) console.error('Error: ', err)
+                //console.log(result)
                 res.json({
-                  msg: "success",
-                });
-              });
+                  msg: 'success',
+                })
+              })
             })
             .catch((error) => {
               return res.json({
                 msg: error,
-              });
-            });
+              })
+            })
         }
       })
       .catch((error) => {
         return res.json({
           msg: error,
-        });
-      });
+        })
+      })
   } catch (error) {
     return res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/getserial", (req, res) => {
+router.post('/getserial', (req, res) => {
   try {
-    const { assetcontrol } = req.body;
-    let sql = "select * from product where p_assetcontrol=?";
+    const { assetcontrol } = req.body
+    let sql = 'select * from product where p_assetcontrol=?'
 
     SelectParameter(sql, [assetcontrol], (err, result) => {
-      if (err) console.error("Error: ", err);
-      let data = Product(result);
-      console.log(result);
+      if (err) console.error('Error: ', err)
+      let data = Product(result)
+      //console.log(result)
 
       res.json({
-        msg: "success",
+        msg: 'success',
         data: {
           serial: data[0].serial,
         },
-      });
-    });
+      })
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/getassetcontrol", (req, res) => {
+router.post('/getassetcontrol', (req, res) => {
   try {
-    const { serial } = req.body;
-    let sql = "select * from product where p_serial=?";
+    const { serial } = req.body
+    let sql = 'select * from product where p_serial=?'
 
     SelectParameter(sql, [serial], (err, result) => {
-      if (err) console.error("Error: ", err);
-      let data = Product(result);
-      console.log(result);
+      if (err) console.error('Error: ', err)
+      let data = Product(result)
+      //console.log(result)
 
       res.json({
-        msg: "success",
+        msg: 'success',
         data: {
           assetcontrol: data[0].assetcontrol,
         },
-      });
-    });
+      })
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/upload", (req, res) => {
+router.post('/upload', (req, res) => {
   try {
-    const { data } = req.body;
-    let dataJSon = UploadProduct(JSON.parse(data));
-    let status = GetValue(WH());
-    let counter = 0;
-    let sequence = 0;
-    let product = [];
-    let notexist = [];
-    let notice = [];
+    const { data } = req.body
+    let dataJSon = UploadProduct(JSON.parse(data))
+    let status = GetValue(WH())
+    let counter = 0
+    let sequence = 0
+    let product = []
+    let notexist = []
+    let notice = []
 
-    console.log(dataJSon);
+    console.log(dataJSon)
     Product_Count()
       .then((result) => {
-        // console.log(result);
-        console.log("Data Length:", dataJSon.length);
-        sequence = parseInt(result[0].total);
+        // //console.log(result);
+        console.log('Data Length:', dataJSon.length)
+        sequence = parseInt(result[0].total)
         dataJSon.forEach((item) => {
           Product_Check(item.serial)
             .then((result) => {
-              // console.log(result);
+              // //console.log(result);
               if (result != undefined || result != null) {
                 if (result[0].total != 0) {
-                  counter += 1;
-                  notice.push("SERIAL_" + item.serial + "_DUPLICATE_ENTRY");
-                  console.log("SERIAL_" + item.serial + "_DUPLICATE_ENTRY");
-                  console.log("counter:", counter);
-                  uploadProduct();
+                  counter += 1
+                  notice.push('SERIAL_' + item.serial + '_DUPLICATE_ENTRY')
+                  console.log('SERIAL_' + item.serial + '_DUPLICATE_ENTRY')
+                  console.log('counter:', counter)
+                  uploadProduct()
                 } else {
                   Get_Category(item.category)
                     .then((result) => {
                       if (result.length != 0) {
-                        // console.log(result);
-                        let category = MasterCategory(result);
-                        let categoryid = category[0].id;
+                        // //console.log(result);
+                        let category = MasterCategory(result)
+                        let categoryid = category[0].id
                         Get_Item(item.itemname, categoryid)
                           .then((result) => {
                             if (result.length != 0) {
-                              let dataitems = MasterItem(result);
-                              console.log("item names data: ", dataitems);
-                              let itemid = dataitems[0].id;
+                              let dataitems = MasterItem(result)
+                              console.log('item names data: ', dataitems)
+                              let itemid = dataitems[0].id
 
-                              counter += 1;
-                              sequence += 1;
+                              counter += 1
+                              sequence += 1
 
                               console.log(
-                                "sequence: ",
+                                'sequence: ',
                                 sequence,
-                                "counter: ",
+                                'counter: ',
                                 counter,
-                                "item serial: ",
+                                'item serial: ',
                                 item.serial,
-                                "Data Length: ",
+                                'Data Length: ',
                                 dataJSon.length
-                              );
+                              )
 
                               product.push([
                                 GenerateAssetTag(categoryid, sequence),
@@ -408,66 +407,58 @@ router.post("/upload", (req, res) => {
                                 item.trackingnumber,
                                 convertExcelDate(item.warrantydate),
                                 status,
-                              ]);
-                              uploadProduct();
+                              ])
+                              uploadProduct()
                               // console.log(product);
                             } else {
-                              counter += 1;
+                              counter += 1
                               notice.push(
-                                "SERIAL_" +
+                                'SERIAL_' +
                                   item.serial +
-                                  "_INVALID_ITEM_NAME_(" +
+                                  '_INVALID_ITEM_NAME_(' +
                                   item.itemname +
-                                  ")"
-                              );
+                                  ')'
+                              )
                               console.log(
-                                "SERIAL_" +
+                                'SERIAL_' +
                                   item.serial +
-                                  "_INVALID_ITEM_NAME_(" +
+                                  '_INVALID_ITEM_NAME_(' +
                                   item.itemname +
-                                  ")"
-                              );
-                              console.log("counter:", counter);
-                              uploadProduct();
+                                  ')'
+                              )
+                              console.log('counter:', counter)
+                              uploadProduct()
                             }
                           })
                           .catch((error) => {
-                            console.log("Get Items: ", error);
+                            console.log('Get Items: ', error)
                             res.json({
                               msg: error,
-                            });
-                          });
+                            })
+                          })
                       } else {
-                        counter += 1;
+                        counter += 1
                         notice.push(
-                          "SERIAL_" +
-                            item.serial +
-                            "_INVALID_CATEGORY_(" +
-                            item.category +
-                            ")"
-                        );
+                          'SERIAL_' + item.serial + '_INVALID_CATEGORY_(' + item.category + ')'
+                        )
                         console.log(
-                          "SERIAL_" +
-                            item.serial +
-                            "_INVALID_CATEGORY_(" +
-                            item.category +
-                            ")"
-                        );
-                        console.log("counter:", counter);
-                        uploadProduct();
+                          'SERIAL_' + item.serial + '_INVALID_CATEGORY_(' + item.category + ')'
+                        )
+                        console.log('counter:', counter)
+                        uploadProduct()
                       }
                     })
                     .catch((error) => {
-                      console.log("Get Category: ", error);
+                      console.log('Get Category: ', error)
                       return res.json({
                         msg: error,
-                      });
-                    });
+                      })
+                    })
                 }
               } else {
-                counter += 1;
-                notexist.push(item.serial);
-                uploadProduct();
+                counter += 1
+                notexist.push(item.serial)
+                uploadProduct()
               }
 
               // if (counter == dataJSon.length) {
@@ -483,53 +474,53 @@ router.post("/upload", (req, res) => {
 
               function uploadProduct() {
                 if (counter == dataJSon.length) {
-                  console.log(product);
+                  console.log(product)
                   if (product.length != 0) {
-                    InsertTable("product", product, (err, result) => {
-                      if (err) console.error("Error: ", err);
-                      console.log(result);
-                    });
+                    InsertTable('product', product, (err, result) => {
+                      if (err) console.error('Error: ', err)
+                      //console.log(result)
+                    })
                   } else {
-                    console.log("NO DATA PUSHED");
+                    console.log('NO DATA PUSHED')
                   }
                   if (notice != 0) {
                     return res.json({
-                      msg: "notice",
+                      msg: 'notice',
                       data: notice,
-                    });
+                    })
                   } else {
                     return res.json({
-                      msg: "success",
-                    });
+                      msg: 'success',
+                    })
                   }
                 }
               }
             })
             .catch((error) => {
-              console.log("Product Check: ", error);
+              console.log('Product Check: ', error)
               return res.json({
                 msg: error,
-              });
-            });
-        });
+              })
+            })
+        })
       })
       .catch((error) => {
-        console.log("Product Count: ", error);
+        console.log('Product Count: ', error)
         res.json({
           msg: error,
-        });
-      });
+        })
+      })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/search", (req, res) => {
+router.post('/search', (req, res) => {
   try {
-    const { keyword } = req.body;
-    console.log(keyword);
+    const { keyword } = req.body
+    console.log(keyword)
     let sql = `select
     p_assetcontrol as assetcontrol,
     mc_name as category,
@@ -569,147 +560,143 @@ router.post("/search", (req, res) => {
     left join sold on p_serial = s_serial
     where p_serial like ? 
     or p_assetcontrol like ? 
-    or mi_name like ?`;
-    let command = SelectStatement(sql, [
-      `${keyword}%`,
-      `${keyword}%`,
-      `${keyword}%`,
-    ]);
-    console.log(command);
+    or mi_name like ?`
+    let command = SelectStatement(sql, [`${keyword}%`, `${keyword}%`, `${keyword}%`])
+    console.log(command)
     Select(command, (err, result) => {
-      if (err) console.error("Error: ", err);
-      let data = Search(result);
+      if (err) console.error('Error: ', err)
+      let data = Search(result)
       if (data.length != 0) {
-        let data = Search(result);
+        let data = Search(result)
 
         res.json({
-          msg: "success",
+          msg: 'success',
           data: data,
-        });
+        })
       } else {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/producthistory", (req, res) => {
+router.post('/producthistory', (req, res) => {
   try {
-    const { assetcontrol } = req.body;
-    let sql = "call cyberpowerproduct.getproducthistory(?)";
+    const { assetcontrol } = req.body
+    let sql = 'call cyberpowerproduct.getproducthistory(?)'
 
     StoredProcedure(sql, assetcontrol, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
-      console.log(result);
+      //console.log(result)
       res.json({
-        msg: "success",
+        msg: 'success',
         data: result,
-      });
-    });
+      })
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/byNameByCategory", (req, res) => {
+router.post('/byNameByCategory', (req, res) => {
   try {
-    const { itemId, categoryId, dateRange } = req.body;
-    const [startDate, endDate] = dateRange.split(" - ");
-    const formattedStartDate = ConvertDate(startDate);
-    const formattedEndDate = ConvertDate(endDate);
+    const { itemId, categoryId, dateRange } = req.body
+    const [startDate, endDate] = dateRange.split(' - ')
+    const formattedStartDate = ConvertDate(startDate)
+    const formattedEndDate = ConvertDate(endDate)
     let sql = `SELECT s_date AS date, s_referenceno AS refNo, mc_name AS category, mi_name AS productName, s_serial AS serial, s_soldto AS soldTo 
       FROM sold 
       INNER JOIN product ON p_assetcontrol = s_assetcontrol
       INNER JOIN master_item ON mi_id = p_itemname
       INNER JOIN master_category ON mc_id = p_category
-      WHERE s_date BETWEEN ? AND ?`;
-    const params = [formattedStartDate, formattedEndDate];
+      WHERE s_date BETWEEN ? AND ?`
+    const params = [formattedStartDate, formattedEndDate]
 
-    if (itemId && itemId !== "ALL") {
-      sql += ` AND p_itemname = ?`;
-      params.push(itemId);
+    if (itemId && itemId !== 'ALL') {
+      sql += ` AND p_itemname = ?`
+      params.push(itemId)
     }
 
-    if (categoryId && categoryId !== "ALL") {
-      sql += ` AND p_category = ?`;
-      params.push(categoryId);
+    if (categoryId && categoryId !== 'ALL') {
+      sql += ` AND p_category = ?`
+      params.push(categoryId)
     }
 
     SelectMultiple(sql, params, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
       res.json({
-        msg: "success",
+        msg: 'success',
         data: result,
-      });
-    });
+      })
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
 //#region Functions
 function Product_Count() {
   return new Promise((resolve, reject) => {
-    let sql = "select count(*) as total from product";
+    let sql = 'select count(*) as total from product'
     Select(sql, (err, result) => {
-      if (err) reject(err);
+      if (err) reject(err)
 
-      // console.log(result);
+      // //console.log(result);
 
-      resolve(result);
-    });
-  });
+      resolve(result)
+    })
+  })
 }
 
 function Product_Check(serial) {
   return new Promise((resolve, reject) => {
-    let sql = "select count(*) as total from product where p_serial=?";
+    let sql = 'select count(*) as total from product where p_serial=?'
 
     SelectParameter(sql, [serial], (err, result) => {
-      if (err) reject(err);
+      if (err) reject(err)
 
-      // console.log(result);
-      resolve(result);
-    });
-  });
+      // //console.log(result);
+      resolve(result)
+    })
+  })
 }
 
 function Get_Category(name) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from master_category where mc_name=?";
+    let sql = 'select * from master_category where mc_name=?'
     SelectParameter(sql, [name], (err, result) => {
-      if (err) reject(err);
-      // console.log(result);
-      resolve(result);
-    });
-  });
+      if (err) reject(err)
+      // //console.log(result);
+      resolve(result)
+    })
+  })
 }
 
 function Get_Item(name, category) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from master_item where mi_name=? and mi_category=?";
-    let command = SelectStatement(sql, [name, category]);
+    let sql = 'select * from master_item where mi_name=? and mi_category=?'
+    let command = SelectStatement(sql, [name, category])
     Select(command, (err, result) => {
-      if (err) reject(err);
+      if (err) reject(err)
 
-      // console.log(result);
+      // //console.log(result);
 
-      resolve(result);
-    });
-  });
+      resolve(result)
+    })
+  })
 }
 
 //#endregion

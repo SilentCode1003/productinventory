@@ -84,7 +84,7 @@ router.post('/save', (req, res) => {
 
           InsertTable('replaceitem', replaceitem, (err, result) => {
             if (err) console.error('Error: ', err)
-            // console.log(result);
+            // //console.log(result);
             res.json(JsonSuccess())
           })
 
@@ -92,7 +92,7 @@ router.post('/save', (req, res) => {
           let data = [assetcontrol]
           Update(sql, data, (err, result) => {
             if (err) console.error('Error: ', err)
-            // console.log(result);
+            // //console.log(result);
           })
         }
       })
@@ -268,7 +268,7 @@ router.post('/upload', (req, res) => {
                         Update(update_product, update_product_data, (err, result) => {
                           if (err) console.error('Error: ', err)
                           console.log('Updated Sales Record: Success!', result)
-                          // console.log(result);
+                          // //console.log(result);
                         })
                       }
                     })
@@ -292,7 +292,7 @@ router.post('/upload', (req, res) => {
 
                         Update(update_product, update_product_data, (err, result) => {
                           if (err) console.error('Error: ', err)
-                          // console.log(result);
+                          // //console.log(result);
                         })
                       } else {
                         failed += 1
@@ -417,7 +417,7 @@ function Check_Product(serial) {
     // console.log(serial);
     SelectParameter(sql, [serial], (err, result) => {
       if (err) reject(err)
-      // console.log(result);
+      // //console.log(result);
 
       resolve(result)
     })
@@ -438,7 +438,7 @@ function Record_Replacement_Sold(repAssetControl, repDate, repSoldBy, repSoldto,
     // console.log(serial);
     SelectParameter(sql, [repAssetControl], (err, result) => {
       if (err) reject(err)
-      // console.log(result);
+      // //console.log(result);
       let replacement = Product(result)
       console.log('replacement: ' + replacement)
       let repSerial = replacement[0].serial
@@ -450,7 +450,7 @@ function Record_Replacement_Sold(repAssetControl, repDate, repSoldBy, repSoldto,
         }
 
         resolve(repSold)
-        // console.log(result);
+        // //console.log(result);
       })
     })
   })
@@ -472,7 +472,7 @@ function Record_Replaced_Defective(
       }
 
       resolve(redDefective)
-      // console.log(result);
+      // //console.log(result);
     })
   })
 }
@@ -483,7 +483,7 @@ function Check_SalesReport(assetcontrol) {
     // console.log(assetcontrol);
     SelectParameter(sql, [assetcontrol], (err, result) => {
       if (err) reject(err)
-      // console.log(result);
+      // //console.log(result);
 
       resolve(result)
     })
@@ -522,7 +522,7 @@ function Record_SalesHistory(soldrefno, date, assetcontrol, replacedAssetcontrol
 
       Update(update_history, update_history_data, (err, result) => {
         if (err) console.error('Error: ', err)
-        // console.log(result);
+        // //console.log(result);
       })
 
       resolve(details)
