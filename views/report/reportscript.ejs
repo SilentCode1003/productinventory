@@ -1,154 +1,197 @@
 <script>
-    $(document).ready(function () {
-        let id = "";
-        let name = "";
-        let status = "";
+  $(document).ready(function () {
+    let id = ''
+    let name = ''
+    let status = ''
 
-        $('#dateRange').daterangepicker({
-            opens: 'right',
-            startDate: moment().startOf('month'),
-            endDate: moment(),
-            maxDate: moment(),
-            ranges: {
-                'This Week': [moment().startOf('week'), moment().endOf('week')],
-                'Last Week': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                'Last 2 Month': [moment().subtract(2, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                'Last 3 Month': [moment().subtract(3, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+    $('#dateRange').daterangepicker({
+      opens: 'right',
+      startDate: moment().startOf('month'),
+      endDate: moment(),
+      maxDate: moment(),
+      ranges: {
+        'This Week': [moment().startOf('week'), moment().endOf('week')],
+        'Last Week': [
+          moment().subtract(1, 'week').startOf('week'),
+          moment().subtract(1, 'week').endOf('week'),
+        ],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [
+          moment().subtract(1, 'month').startOf('month'),
+          moment().subtract(1, 'month').endOf('month'),
+        ],
+        'Last 2 Month': [
+          moment().subtract(2, 'month').startOf('month'),
+          moment().subtract(1, 'month').endOf('month'),
+        ],
+        'Last 3 Month': [
+          moment().subtract(3, 'month').startOf('month'),
+          moment().subtract(1, 'month').endOf('month'),
+        ],
+      },
+      alwaysShowCalendars: true,
+      showCustomRangeLabel: false,
+      buttonClasses: ['btn btn-outline-inventory'],
+      locale: {
+        format: 'MMM D, YYYY',
+      },
+    })
+
+    $('#adjustDateBackward').on('click', function () {
+      var startDate = $('#dateRange').data('daterangepicker').startDate
+      var endDate = $('#dateRange').data('daterangepicker').endDate.clone().subtract(7, 'days')
+      $('#dateRange').data('daterangepicker').setEndDate(endDate)
+      $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().subtract(7, 'days'))
+    })
+
+    $('#adjustDateForward').on('click', function () {
+      var startDate = $('#dateRange').data('daterangepicker').startDate
+      var endDate = $('#dateRange').data('daterangepicker').endDate.clone().add(7, 'days')
+      $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().add(7, 'days'))
+      $('#dateRange').data('daterangepicker').setEndDate(endDate)
+    })
+
+    let initialdate = $('#dateRange').val()
+
+    LoadTable()
+    LoadList()
+
+    TableLoader('#salesreporthistory-table', 6, 4)
+
+    $('#salesreporthistory-table tbody').on('click', 'tr', function () {
+      var dataRow = []
+      $(this)
+        .closest('tr')
+        .find('td')
+        .each(function () {
+          dataRow.push($(this).text())
+        })
+      // console.log(dataRow);
+      id = dataRow[0]
+      referenceno = dataRow[1]
+      status = dataRow[2]
+    })
+
+    $('#search').on('input', function () {
+      TableSearch('datatable', 6, '#search')
+    })
+
+    $(document).on('click', '.cbi-link', function () {
+      $('.id-history').text(id)
+      let downloadLinksDiv = document.getElementById('downloadLinks')
+      downloadLinksDiv.innerHTML = ''
+      $.ajax({
+        type: 'POST',
+        url: '/report/salesreport',
+        data: {
+          referenceno: referenceno,
+        },
+        success: function (result) {
+          var data = result.data
+          // console.log("display data:", data)
+          let processeddata = displayReport(data)
+
+          const tableBody = $('#salesreport-table tbody')
+          tableBody.empty()
+          Object.keys(processeddata).forEach((key, index) => {
+            const itemsForDate = processeddata[key]
+            // console.log(itemsForDate);
+            itemsForDate.forEach((item) => {
+              const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning'
+              const containerBackground =
+                item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr'
+
+              const tr = $('<tr>').append(
+                $('<td>', { text: key, 'data-label': 'Date', class: 'custom-mobile-align' }),
+                $('<td>', {
+                  text: item.soldrefno,
+                  'data-label': 'department',
+                  class: 'custom-mobile-align',
+                }),
+                $('<td>', {
+                  text: item.category,
+                  'data-label': 'Created By',
+                  class: 'custom-mobile-align',
+                }),
+                $('<td>', {
+                  text: item.item,
+                  'data-label': 'Created Date',
+                  class: 'custom-mobile-align no-wrap',
+                }),
+                $('<td>', {
+                  text: item.sellingprice,
+                  'data-label': 'Created Date',
+                  class: 'custom-mobile-align',
+                }),
+                $('<td>', {
+                  text: item.deliveryfee,
+                  'data-label': 'Created Date',
+                  class: 'custom-mobile-align',
+                }),
+                $('<td>', {
+                  text: item.quantity,
+                  'data-label': 'Created Date',
+                  class: 'custom-mobile-align',
+                }),
+                $('<td>', {
+                  text: item.paymenttype,
+                  'data-label': 'Created Date',
+                  class: 'custom-mobile-align',
+                }),
+                $('<td>', {
+                  text: item.transacrefno,
+                  'data-label': 'Created Date',
+                  class: 'custom-mobile-align',
+                }),
+                $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+                  $('<div>', { class: containerBackground }).append(
+                    $('<span>', { text: item.status, class: statusBackground })
+                  )
+                )
+              )
+
+              tableBody.append(tr)
+            })
+          })
+
+          $('.id').text(id)
+          $.ajax({
+            type: 'POST',
+            url: '/report/historydetails',
+            data: {
+              id: id,
             },
-            alwaysShowCalendars: true,
-            showCustomRangeLabel: false,
-            buttonClasses: ['btn btn-outline-inventory'],
-            locale: {
-                format: 'MMM D, YYYY'
-            }
-        });
+            success: function (result) {
+              var myDiv = document.getElementById('historydata')
+              myDiv.innerHTML = ''
 
-        $('#adjustDateBackward').on('click', function () {
-            var startDate = $('#dateRange').data('daterangepicker').startDate;
-            var endDate = $('#dateRange').data('daterangepicker').endDate.clone().subtract(7, 'days');
-            $('#dateRange').data('daterangepicker').setEndDate(endDate);
-            $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().subtract(7, 'days'));
-        });
-
-        $('#adjustDateForward').on('click', function () {
-            var startDate = $('#dateRange').data('daterangepicker').startDate;
-            var endDate = $('#dateRange').data('daterangepicker').endDate.clone().add(7, 'days');
-            $('#dateRange').data('daterangepicker').setStartDate(startDate.clone().add(7, 'days'));
-            $('#dateRange').data('daterangepicker').setEndDate(endDate);
-        });
-
-        let initialdate = $('#dateRange').val();
-
-        LoadTable();
-        LoadList();
-
-        TableLoader("#salesreporthistory-table", 6, 4);
-
-        $("#salesreporthistory-table tbody").on("click", "tr", function () {
-            var dataRow = [];
-            $(this)
-                .closest("tr")
-                .find("td")
-                .each(function () {
-                    dataRow.push($(this).text());
-                });
-            // console.log(dataRow);
-            id = dataRow[0];
-            referenceno = dataRow[1];
-            status = dataRow[2];
-        });
-        
-        $('#search').on('input', function () {
-            TableSearch("datatable", 6, '#search');
-        });
-
-        $(document).on('click', '.cbi-link', function () {
-            $(".id-history").text(id);
-            let downloadLinksDiv = document.getElementById('downloadLinks');
-            downloadLinksDiv.innerHTML = '';
-            $.ajax({
-                type: 'POST',
-                url: '/report/salesreport',
-                data: {
-                    referenceno: referenceno,
-                },
-                success: function (result) {
-                    var data = result.data;
-                    // console.log("display data:", data)
-                    let processeddata = displayReport(data)
-
-                    const tableBody = $("#salesreport-table tbody");
-                    tableBody.empty();
-                    Object.keys(processeddata).forEach((key, index) => {
-                        const itemsForDate = processeddata[key];
-                        // console.log(itemsForDate);
-                        itemsForDate.forEach(item => {
-
-                            const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
-                            const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
-
-                            const tr = $("<tr>").append(
-                                $("<td>", { text: key, "data-label": "Date", class: "custom-mobile-align", }),
-                                $("<td>", { text: item.soldrefno, "data-label": "department", class: "custom-mobile-align", }),
-                                $("<td>", { text: item.category, "data-label": "Created By", class: "custom-mobile-align", }),
-                                $("<td>", { text: item.item, "data-label": "Created Date", class: "custom-mobile-align no-wrap", }),
-                                $("<td>", { text: item.sellingprice, "data-label": "Created Date", class: "custom-mobile-align", }),
-                                $("<td>", { text: item.deliveryfee, "data-label": "Created Date", class: "custom-mobile-align", }),
-                                $("<td>", { text: item.quantity, "data-label": "Created Date", class: "custom-mobile-align", }),
-                                $("<td>", { text: item.paymenttype, "data-label": "Created Date", class: "custom-mobile-align", }),
-                                $("<td>", { text: item.transacrefno, "data-label": "Created Date", class: "custom-mobile-align", }),
-                                $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
-                                    $('<div>', { class: containerBackground }).append(
-                                        $('<span>', { text: item.status, class: statusBackground })
-                                    )
-                                )
-                            );
-
-                            tableBody.append(tr);
-
-                        });
-                    });
-
-                    $(".id").text(id);
-                    $.ajax({
-                        type: 'POST',
-                        url: '/report/historydetails',
-                        data: {
-                            id: id,
-                        },
-                        success: function (result) {
-                            var myDiv = document.getElementById('historydata');
-                            myDiv.innerHTML = '';
-
-                            let data = result.data;
-                            let base64docu = data[0].documents;
-                            if (base64docu != "N/A") {
-                                let downloadLinksDiv = document.getElementById('downloadLinks');
-                                downloadLinksDiv.innerHTML = '';
-                                let parsedData = JSON.parse(base64docu);
-                                // console.log(parsedData);
-                                displayLinks(parsedData);
-                            }
-                            if (data.length == 0) {
-                                let historydiv = $(`
+              let data = result.data
+              let base64docu = data[0].documents
+              if (base64docu != 'N/A') {
+                let downloadLinksDiv = document.getElementById('downloadLinks')
+                downloadLinksDiv.innerHTML = ''
+                let parsedData = JSON.parse(base64docu)
+                // console.log(parsedData);
+                displayLinks(parsedData)
+              }
+              if (data.length == 0) {
+                let historydiv = $(`
                                     <div class="row justify-content-center">
                                         <h5 class="">NO CURRENT HISTORY</h5>
-                                    </div>`);
-                                $('#historydata').append(historydiv);
-                            } else {
-                                let historydata = JSON.parse(data[0].date);
-                                // console.log("all data: ", historydata)
-                                let jsonData = {};
+                                    </div>`)
+                $('#historydata').append(historydiv)
+              } else {
+                let historydata = JSON.parse(data[0].date)
+                // console.log("all data: ", historydata)
+                let jsonData = {}
 
-                                for (var key in historydata) {
-                                    if (historydata.hasOwnProperty) {
-                                        console.log(historydata[key]);
-                                        for (index in historydata[key]) {
-                                            console.log(historydata[key][index]);
+                for (var key in historydata) {
+                  if (historydata.hasOwnProperty) {
+                    console.log(historydata[key])
+                    for (index in historydata[key]) {
+                      console.log(historydata[key][index])
 
-                                            let historydiv = $(`
+                      let historydiv = $(`
                                         <div class="row">
                                             <div class="col-3 text-center">
                                                 <div>
@@ -164,937 +207,967 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <hr class="sidebar-divider">`);
+                                        <hr class="sidebar-divider">`)
 
-                                            $('#historydata').append(historydiv);
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        error: function (err) {
-                            errormsg(err);
-                        }
-                    });
-                },
-                error: function (err) {
-                    errormsg(err);
-                }
-            });
-        });
-
-        function populatesalesreporthistory(data) {
-            // console.log(data);
-            const tableBody = $("#salesreporthistory-table tbody");
-            tableBody.empty();
-
-            if (data.length === 0) {
-                const tr = $("<tr>").append(
-                    $("<td>", {
-                        colspan: 6,
-                        class: "text-center",
-                        text: "No Data Matched",
-                    })
-                );
-                tableBody.append(tr);
-            } else {
-                data.forEach((item) => {
-                    let action = "";
-                    if (item.status == 'PAID') {
-                        action = `<span class="editbutton" id="editDocs" name="editDocs" data-toggle="modal" data-target="#SupportingDocuments"><i class="fas fa-plus" style="color: rgb(99, 115, 129);"></i></span> `;
-                    } else {
-                        action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span> `;
+                      $('#historydata').append(historydiv)
                     }
+                  }
+                }
+              }
+            },
+            error: function (err) {
+              errormsg(err)
+            },
+          })
+        },
+        error: function (err) {
+          errormsg(err)
+        },
+      })
+    })
 
-                    const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning';
-                    const containerBackground = item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr';
+    function populatesalesreporthistory(data) {
+      //  //console.log(error);
+      const tableBody = $('#salesreporthistory-table tbody')
+      tableBody.empty()
 
-                    const tr = $("<tr>").append(
-                        $("<td>", {
-                            text: item.id,
-                            "data-label": "ID",
-                            class: "custom-mobile-align",
-                        }),
-                        $("<td>", {
-                            text: item.referenceno,
-                            "data-label": "department",
-                            class: "custom-mobile-align cbi-link",
-                            "data-toggle": "modal",
-                            "data-target": "#salesreportmodal",
-                        }),
-                        $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
-                            $('<div>', { class: containerBackground }).append(
-                                $('<span>', { text: item.status, class: statusBackground })
-                            )
-                        ),
-                        $("<td>", {
-                            html: action,
-                            "data-label": "Action",
-                            class: "actionWidth",
-                        })
-                    );
+      if (data.length === 0) {
+        const tr = $('<tr>').append(
+          $('<td>', {
+            colspan: 6,
+            class: 'text-center',
+            text: 'No Data Matched',
+          })
+        )
+        tableBody.append(tr)
+      } else {
+        data.forEach((item) => {
+          let action = ''
+          if (item.status == 'PAID') {
+            action = `<span class="editbutton" id="editDocs" name="editDocs" data-toggle="modal" data-target="#SupportingDocuments"><i class="fas fa-plus" style="color: rgb(99, 115, 129);"></i></span> `
+          } else {
+            action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span> `
+          }
 
-                    tableBody.append(tr);
-                });
-            }
+          const statusBackground = item.status === 'PAID' ? 'status-success' : 'status-warning'
+          const containerBackground =
+            item.status === 'PAID' ? 'status-container-sc' : 'status-container-wr'
+
+          const tr = $('<tr>').append(
+            $('<td>', {
+              text: item.id,
+              'data-label': 'ID',
+              class: 'custom-mobile-align',
+            }),
+            $('<td>', {
+              text: item.referenceno,
+              'data-label': 'department',
+              class: 'custom-mobile-align cbi-link',
+              'data-toggle': 'modal',
+              'data-target': '#salesreportmodal',
+            }),
+            $('<td>', { class: 'custom-mobile-align', 'data-label': 'Status' }).append(
+              $('<div>', { class: containerBackground }).append(
+                $('<span>', { text: item.status, class: statusBackground })
+              )
+            ),
+            $('<td>', {
+              html: action,
+              'data-label': 'Action',
+              class: 'actionWidth',
+            })
+          )
+
+          tableBody.append(tr)
+        })
+      }
+    }
+
+    function LoadTable() {
+      $.ajax({
+        url: '/report/salesreporthistory',
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          // console.log("Data: ", data.data)
+          if (data.msg === 'success') {
+            populatesalesreporthistory(data.data)
+          } else {
+            console.error(data.msg)
+          }
+        },
+        error: function (error) {
+          console.error(error)
+        },
+      })
+    }
+
+    function displayReport(data) {
+      return data.reduce((result, current) => {
+        // console.log(current.status);
+
+        const date = current.date
+
+        if (!result[date]) {
+          result[date] = []
         }
 
-        function LoadTable() {
+        const matchingEntry = result[date].find(
+          (entry) =>
+            entry.soldrefno === current.soldrefno &&
+            entry.transacrefno === current.transacrefno &&
+            entry.item === current.item &&
+            entry.category === current.category &&
+            entry.price === current.price &&
+            entry.deliveryfee === current.deliveryfee &&
+            entry.status === current.status
+        )
+
+        if (matchingEntry) {
+          matchingEntry.quantity += current.quantity
+        } else {
+          result[date].push({ ...current })
+        }
+
+        return result
+      }, {})
+    }
+
+    //#region Dropdowns
+    function AddSoldCategory(dropdownID, activeData, inputID, hiddenID) {
+      for (const data of activeData) {
+        AddSoldCategoryDropdown(dropdownID, data.display, data.value, inputID, hiddenID)
+      }
+    }
+
+    function AddSoldCategoryDropdown(dropdownID, displayText, actualValue, inputID, hiddenID) {
+      const dropdownElement = $('#' + dropdownID)
+      const hiddenInput = $('#' + hiddenID)
+
+      const newOption = $('<div>')
+        .addClass('dropdown-option')
+        .text(displayText)
+        .attr('data-value', actualValue)
+
+      newOption.on('click', function () {
+        // console.log("Selected Option:", displayText, actualValue)
+        const inputElement = $('#' + inputID)
+        const row = inputElement.closest('tr')
+        inputElement.val(displayText)
+        hiddenInput.val(actualValue)
+        dropdownElement.hide()
+
+        $('#soldProductDropdown').empty()
+        $('#soldProduct').val('')
+        $('#soldProductId').val('')
+
+        const categoryId = actualValue
+        Upsert('POST', '/items/category', { categoryId: categoryId }, (result) => {
+          //console.log(result)
+          const product = result.data
+          let activeProduct = []
+          activeProduct.push({
+            display: 'ALL PRODUCTS',
+            value: 'ALL',
+          })
+          product.forEach((item) => {
+            const { productName, productId, status } = item
+            if (status == 'ACTIVE') {
+              activeProduct.push({
+                display: productName,
+                value: productId,
+              })
+            }
+          })
+          AddDropdownData('soldProductDropdown', activeProduct, 'soldProduct', 'soldProductId')
+        })
+      })
+
+      dropdownElement.append(newOption)
+      SetupDropdown(inputID, dropdownID, 'dropdown-option')
+    }
+
+    function LoadList() {
+      //Dropdown for Registered Product
+      Fetch('/category/load', (result) => {
+        const categories = []
+        const container = result.data
+        $.each(container, (key, item) => {
+          categories.push({
+            display: item.name,
+            value: item.id,
+          })
+        })
+        AddDropdownData('categoryDropdown', categories, 'category', 'categoryId')
+      })
+
+      Fetch('/product/getproductstatus', (result) => {
+        const statuses = []
+        const container = result.data
+        $.each(container, (key, item) => {
+          statuses.push({
+            display: item.status,
+            value: item.status,
+          })
+        })
+        AddDropdownData('statusDropdown', statuses, 'status', 'statusId')
+      })
+
+      //Dropdown For Employee Sales Report
+      Fetch('/employee/sales-employee', (result) => {
+        const employees = []
+        const container = result.data
+        employees.push({
+          display: 'ALL SALES EMPLOYEE',
+          value: 'ALL',
+        })
+        $.each(container, (key, item) => {
+          employees.push({
+            display: item.fullName.toUpperCase(),
+            value: item.employeeId,
+          })
+        })
+        AddDropdownData('employeeDropdown', employees, 'employee', 'employeeId')
+      })
+
+      Fetch('/items/load', (result) => {
+        const products = []
+        const container = result.data
+        products.push({
+          display: 'ALL PRODUCTS',
+          value: 'ALL',
+        })
+        $.each(container, (key, item) => {
+          products.push({
+            display: item.name,
+            value: item.id,
+          })
+        })
+        AddDropdownData('productDropdown', products, 'product', 'productId')
+      })
+
+      Fetch('/category/load', (result) => {
+        const categories = []
+        const container = result.data
+        categories.push({
+          display: 'ALL CATEGORIES',
+          value: 'ALL',
+        })
+        $.each(container, (key, item) => {
+          categories.push({
+            display: item.name,
+            value: item.id,
+          })
+        })
+        AddDropdownData('salesCategoryDropdown', categories, 'salesCategory', 'salesCategoryId')
+        AddSoldCategory('soldCategoryDropdown', categories, 'soldCategory', 'soldCategoryId')
+      })
+    }
+    //#endregion
+
+    function getBase64(inputfield, display) {
+      const inputElement = document.getElementById(inputfield)
+      const fileList = inputElement.files
+      let documents = []
+
+      function handleFileProcessed() {
+        if (documents.length === fileList.length) {
+          displaySelectedFiles()
+        }
+      }
+
+      function displaySelectedFiles() {
+        const selectedFilesList = document.getElementById(display)
+        selectedFilesList.innerHTML = '<p><strong>Selected Files:</strong></p>'
+
+        for (const doc of documents) {
+          const fileItem = document.createElement('div')
+          fileItem.textContent = `${doc.filename}: ${doc.data.substring(0, 20)}...`
+          selectedFilesList.appendChild(fileItem)
+        }
+      }
+
+      for (const file of fileList) {
+        const reader = new FileReader()
+
+        reader.onload = function (e) {
+          const base64String = e.target.result
+          documents.push({
+            filename: file.name,
+            data: base64String,
+          })
+
+          handleFileProcessed()
+        }
+
+        reader.readAsDataURL(file)
+      }
+      return documents
+    }
+
+    $(document).on('input', '#category', function () {
+      $('#categoryId').val('')
+    })
+
+    $(document).on('input', '#status', function () {
+      $('#statusId').val('')
+    })
+
+    $(document).on('click', '#prdExcel', function () {
+      const category = $('#categoryId').val()
+      const status = $('#statusId').val()
+
+      let message = ''
+      if (category == '') {
+        message += 'Product Category, '
+      }
+
+      if (status == '') {
+        message += 'Product Status '
+      }
+
+      if (message !== '') {
+        warning('Warning!', `${message} is Empty`)
+      } else {
+        const data = {
+          category: category,
+          status: status,
+        }
+        // console.log(data)
+        Upsert('POST', '/product/getProductbyCategory', data, (result) => {
+          if (result.msg === 'success' && result.data.length > 0) {
+            let wb = XLSX.utils.book_new()
+            let ws = XLSX.utils.json_to_sheet(result.data)
+            XLSX.utils.book_append_sheet(wb, ws, 'Products')
+
+            let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' })
+
+            function s2ab(s) {
+              let buf = new ArrayBuffer(s.length)
+              let view = new Uint8Array(buf)
+              for (let i = 0; i < s.length; i++) {
+                view[i] = s.charCodeAt(i) & 0xff
+              }
+              return buf
+            }
+
+            saveAs(
+              new Blob([s2ab(wbout)], { type: 'application/octet-stream' }),
+              `PRODUCTS_${status}.xlsx`
+            )
+          } else {
+            console.error('Export failed:', result.msg)
+          }
+        })
+      }
+    })
+
+    $(document).on('click', '#updateBtn', function () {
+      $('.id').text(id)
+      const dateupdate = $('#date').val()
+      const remarks = $('#remarks').val()
+      const transactionstatus = $('#transactionstatus').val()
+      const documents = getBase64('fileinput', 'selectedFilesList')
+      let historydata = []
+      let message = ''
+
+      if (dateupdate === '') {
+        message += 'Empty Date, '
+      }
+      if (remarks === '') {
+        message += 'Empty Remarks, '
+      }
+      if (transactionstatus === '') {
+        message += 'Empty Status '
+      }
+
+      if (message != '') {
+        warning('Required', `Please fill up ${message}`)
+      } else {
+        $.ajax({
+          type: 'POST',
+          url: '/report/historydetails',
+          data: {
+            id: id,
+          },
+          success: function (result) {
+            let data = result.data
+            historydata = JSON.parse(data[0].date)
+            let newdata = {
+              [transactionstatus]: { date: dateupdate, details: remarks },
+            }
+            historydata.push(newdata)
+
             $.ajax({
-                url: "/report/salesreporthistory",
-                method: "GET",
-                dataType: "json",
-                success: function (data) {
-                    // console.log("Data: ", data.data)
-                    if (data.msg === "success") {
-                        populatesalesreporthistory(data.data);
-                    } else {
-                        console.error(data.msg);
-                    }
-                },
-                error: function (error) {
-                    console.error(error);
-                },
-            });
-
-        }
-
-        function displayReport(data) {
-            return data.reduce((result, current) => {
-                // console.log(current.status);
-
-                const date = current.date;
-
-                if (!result[date]) {
-                    result[date] = [];
+              type: 'POST',
+              url: '/report/updatehistory',
+              data: {
+                details: historydata,
+                documents: documents,
+                id: id,
+                status: transactionstatus,
+                referenceno: referenceno,
+              },
+              success: function (result) {
+                if (result.msg == 'success') {
+                  $('#date').val('')
+                  $('#remarks').val('')
+                  $('#transactionstatus').val('')
+                  $('#editModal').modal('hide')
+                  success('Saved', 'Successfully')
+                  LoadTable()
                 }
-
-                const matchingEntry = result[date].find(entry =>
-                    entry.soldrefno === current.soldrefno &&
-                    entry.transacrefno === current.transacrefno &&
-                    entry.item === current.item &&
-                    entry.category === current.category &&
-                    entry.price === current.price &&
-                    entry.deliveryfee === current.deliveryfee &&
-                    entry.status === current.status
-                );
-
-                if (matchingEntry) {
-                    matchingEntry.quantity += current.quantity;
-                } else {
-                    result[date].push({ ...current });
-                }
-
-                return result;
-            }, {});
-
-        }
-
-        //#region Dropdowns
-        function AddSoldCategory(dropdownID, activeData, inputID, hiddenID) {
-            for (const data of activeData) {
-                AddSoldCategoryDropdown(dropdownID, data.display, data.value, inputID, hiddenID);
-            }
-        }
-
-        function AddSoldCategoryDropdown(dropdownID, displayText, actualValue, inputID, hiddenID) {
-            const dropdownElement = $("#" + dropdownID);
-            const hiddenInput = $("#" + hiddenID);
-
-            const newOption = $("<div>")
-                .addClass("dropdown-option")
-                .text(displayText)
-                .attr("data-value", actualValue);
-
-            newOption.on("click", function () {
-
-                // console.log("Selected Option:", displayText, actualValue)
-                const inputElement = $("#" + inputID);
-                const row = inputElement.closest("tr");
-                inputElement.val(displayText);
-                hiddenInput.val(actualValue);
-                dropdownElement.hide();
-
-                $("#soldProductDropdown").empty();
-                $("#soldProduct").val('');
-                $("#soldProductId").val('');
-
-                const categoryId = actualValue;
-                Upsert("POST", "/items/category", {categoryId: categoryId}, result => {
-                    console.log(result);
-                    const product = result.data;
-                    let activeProduct = [];
-                    activeProduct.push({
-                            display: "ALL PRODUCTS",
-                            value: "ALL",
-                        })
-                    product.forEach(item => {
-                        const {productName, productId, status} = item;
-                        if(status == "ACTIVE"){
-                            activeProduct.push({
-                                display: productName,
-                                value: productId,
-                            })
-                        }
-                    });
-                    AddDropdownData("soldProductDropdown", activeProduct, "soldProduct", "soldProductId");
-                });
-
-            });
-
-            dropdownElement.append(newOption);
-            SetupDropdown(inputID, dropdownID, "dropdown-option");
-        }
-
-        function LoadList() {
-            //Dropdown for Registered Product
-            Fetch("/category/load", result => {
-                const categories = [];
-                const container = result.data;
-                $.each(container, (key, item) => {
-                    categories.push({
-                        display: item.name,
-                        value: item.id,
-                    });
-                });
-                AddDropdownData("categoryDropdown", categories, "category", "categoryId");
+              },
+              error: function (err) {
+                errormsg(err)
+              },
             })
+          },
+          error: function (err) {
+            errormsg(err)
+          },
+        })
+      }
+    })
 
-            Fetch("/product/getproductstatus", result => {
-                const statuses = [];
-                const container = result.data;
-                $.each(container, (key, item) => {
-                    statuses.push({
-                        display: item.status,
-                        value: item.status,
-                    });
-                });
-                AddDropdownData("statusDropdown", statuses, "status", "statusId");
-            });
+    let updateDocuments
+    $(document).on('change', '#documentfile', function () {
+      updateDocuments = getBase64('documentfile', 'selectedDocuments')
+    })
 
-            //Dropdown For Employee Sales Report
-            Fetch("/employee/sales-employee", result => {
-                const employees = [];
-                const container = result.data;
-                employees.push({
-                    display: "ALL SALES EMPLOYEE",
-                    value: "ALL",
-                });
-                $.each(container, (key, item) => {
-                    employees.push({
-                        display: item.fullName.toUpperCase(),
-                        value: item.employeeId,
-                    });
-                });
-                AddDropdownData("employeeDropdown", employees, "employee", "employeeId");
-            });
+    $(document).on('click', '#updateDocs', function () {
+      $('.id-documents').text(id)
+      // console.log(updateDocuments)
+      let message = ''
 
-            Fetch("/items/load", result => {
-                const products = [];
-                const container = result.data;
-                products.push({
-                    display: "ALL PRODUCTS",
-                    value: "ALL",
-                });
-                $.each(container, (key, item) => {
-                    products.push({
-                        display: item.name,
-                        value: item.id,
-                    });
-                });
-                AddDropdownData("productDropdown", products, "product", "productId");
-            });
+      if (updateDocuments === undefined) {
+        message += 'Empty Documents, '
+      }
 
-            Fetch("/category/load", result => {
-                const categories = [];
-                const container = result.data;
-                categories.push({
-                    display: "ALL CATEGORIES",
-                    value: "ALL",
-                });
-                $.each(container, (key, item) => {
-                    categories.push({
-                        display: item.name,
-                        value: item.id,
-                    });
-                });
-                AddDropdownData("salesCategoryDropdown", categories, "salesCategory", "salesCategoryId");
-                AddSoldCategory("soldCategoryDropdown", categories, "soldCategory", "soldCategoryId");
-            })
-        }
-        //#endregion
+      if (message != '') {
+        warning('Required', `Please fill up ${message}`)
+      } else {
+        $.ajax({
+          type: 'POST',
+          url: '/report/adddocuments',
+          data: {
+            id: id,
+            documents: updateDocuments,
+          },
+          success: function (result) {
+            $('#SupportingDocuments').modal('hide')
+            updateDocuments = ''
+            success('Saved', 'Successfully')
+          },
+          error: function (err) {
+            errormsg(err)
+          },
+        })
+      }
+    })
 
-        function getBase64(inputfield, display) {
-            const inputElement = document.getElementById(inputfield);
-            const fileList = inputElement.files;
-            let documents = [];
+    function displayLinks(dataArray) {
+      let downloadLinksDiv = document.getElementById('downloadLinks')
+      downloadLinksDiv.innerHTML = ''
+      dataArray.forEach((item, index) => {
+        // Ensure data URI prefix is removed before decoding
+        let base64Data = item.data.split(',')[1]
+        let blob = b64toBlob(base64Data)
 
-            function handleFileProcessed() {
-                if (documents.length === fileList.length) {
-                    displaySelectedFiles();
-                }
-            }
+        if (item.filename.match(/\.(jpeg|jpg|gif|png)$/i)) {
+          let img = document.createElement('img')
+          img.src = URL.createObjectURL(blob)
+          img.alt = `Image ${index + 1}`
+          img.classList.add('custom-image-class')
 
-            function displaySelectedFiles() {
-                const selectedFilesList = document.getElementById(display);
-                selectedFilesList.innerHTML = '<p><strong>Selected Files:</strong></p>';
+          downloadLinksDiv.appendChild(img)
 
-                for (const doc of documents) {
-                    const fileItem = document.createElement('div');
-                    fileItem.textContent = `${doc.filename}: ${doc.data.substring(0, 20)}...`;
-                    selectedFilesList.appendChild(fileItem);
-                }
-            }
+          downloadLinksDiv.appendChild(document.createElement('br'))
 
-            for (const file of fileList) {
-                const reader = new FileReader();
+          let link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = item.filename
+          link.classList.add('custom-download-link-class')
+          link.textContent = `${item.filename}`
 
-                reader.onload = function (e) {
-                    const base64String = e.target.result;
-                    documents.push({
-                        filename: file.name,
-                        data: base64String
-                    });
+          downloadLinksDiv.appendChild(link)
+        } else {
+          let link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = item.filename
+          link.classList.add('custom-download-link-class')
+          link.textContent = `${item.filename}`
 
-                    handleFileProcessed();
-                };
-
-                reader.readAsDataURL(file);
-            }
-            return documents;
+          downloadLinksDiv.appendChild(link)
         }
 
-        $(document).on("input", "#category", function () {
-            $("#categoryId").val("");
-        });
+        downloadLinksDiv.appendChild(document.createElement('br'))
+      })
 
-        $(document).on("input", "#status", function () {
-            $("#statusId").val("");
-        });
+      function b64toBlob(b64Data) {
+        let byteCharacters = atob(b64Data)
+        let byteNumbers = new Array(byteCharacters.length)
 
-        $(document).on("click", "#prdExcel", function () {
-            const category = $("#categoryId").val();
-            const status = $("#statusId").val();
-
-            let message = '';
-            if (category == '') {
-                message += "Product Category, ";
-            }
-
-            if (status == '') {
-                message += "Product Status ";
-            }
-
-            if (message !== '') {
-                warning('Warning!', `${message} is Empty`)
-            } else {
-                const data = {
-                    category: category,
-                    status: status,
-                }
-                // console.log(data)
-                Upsert("POST", "/product/getProductbyCategory", data, result => {
-                    if (result.msg === "success" && result.data.length > 0) {
-                        let wb = XLSX.utils.book_new();
-                        let ws = XLSX.utils.json_to_sheet(result.data);
-                        XLSX.utils.book_append_sheet(wb, ws, "Products");
-
-                        let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-
-                        function s2ab(s) {
-                            let buf = new ArrayBuffer(s.length);
-                            let view = new Uint8Array(buf);
-                            for (let i = 0; i < s.length; i++) {
-                                view[i] = s.charCodeAt(i) & 0xFF;
-                            }
-                            return buf;
-                        }
-
-                        saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `PRODUCTS_${status}.xlsx`);
-                    } else {
-                        console.error("Export failed:", result.msg);
-                    }
-                });
-            }
-        });
-
-        $(document).on("click", "#updateBtn", function () {
-            $(".id").text(id);
-            const dateupdate = $("#date").val();
-            const remarks = $("#remarks").val();
-            const transactionstatus = $("#transactionstatus").val();
-            const documents = getBase64('fileinput', 'selectedFilesList');
-            let historydata = [];
-            let message = "";
-
-            if (dateupdate === "") {
-                message += "Empty Date, ";
-            }
-            if (remarks === "") {
-                message += "Empty Remarks, ";
-            }
-            if (transactionstatus === "") {
-                message += "Empty Status ";
-            }
-
-            if (message != "") {
-                warning("Required", `Please fill up ${message}`);
-            } else {
-                $.ajax({
-                    type: 'POST',
-                    url: '/report/historydetails',
-                    data: {
-                        id: id,
-                    },
-                    success: function (result) {
-                        let data = result.data;
-                        historydata = JSON.parse(data[0].date);
-                        let newdata = {
-                            [transactionstatus]: { date: dateupdate, details: remarks }
-                        };
-                        historydata.push(newdata);
-
-                        $.ajax({
-                            type: "POST",
-                            url: "/report/updatehistory",
-                            data: {
-                                details: historydata,
-                                documents: documents,
-                                id: id,
-                                status: transactionstatus,
-                                referenceno: referenceno,
-                            },
-                            success: function (result) {
-                                if (result.msg == "success") {
-                                    $("#date").val("");
-                                    $("#remarks").val("");
-                                    $("#transactionstatus").val("");
-                                    $("#editModal").modal("hide");
-                                    success("Saved", "Successfully");
-                                    LoadTable();
-                                }
-                            },
-                            error: function (err) {
-                                errormsg(err);
-                            },
-                        });
-                    },
-                    error: function (err) {
-                        errormsg(err);
-                    }
-                });
-
-
-            }
-        });
-
-        let updateDocuments;
-        $(document).on("change", "#documentfile", function () {
-            updateDocuments = getBase64('documentfile', 'selectedDocuments');
-        });
-
-        $(document).on("click", "#updateDocs", function () {
-            $(".id-documents").text(id);
-            // console.log(updateDocuments)
-            let message = "";
-
-            if (updateDocuments === undefined) {
-                message += "Empty Documents, ";
-            }
-
-            if (message != "") {
-                warning("Required", `Please fill up ${message}`);
-            } else {
-                $.ajax({
-                    type: 'POST',
-                    url: '/report/adddocuments',
-                    data: {
-                        id: id,
-                        documents: updateDocuments
-                    },
-                    success: function (result) {
-                        $("#SupportingDocuments").modal("hide");
-                        updateDocuments = "";
-                        success("Saved", "Successfully");
-                    },
-                    error: function (err) {
-                        errormsg(err);
-                    }
-                });
-            }
-        });
-
-        function displayLinks(dataArray) {
-            let downloadLinksDiv = document.getElementById('downloadLinks');
-            downloadLinksDiv.innerHTML = '';
-            dataArray.forEach((item, index) => {
-                // Ensure data URI prefix is removed before decoding
-                let base64Data = item.data.split(',')[1];
-                let blob = b64toBlob(base64Data);
-
-                if (item.filename.match(/\.(jpeg|jpg|gif|png)$/i)) {
-                    let img = document.createElement('img');
-                    img.src = URL.createObjectURL(blob);
-                    img.alt = `Image ${index + 1}`;
-                    img.classList.add('custom-image-class');
-
-                    downloadLinksDiv.appendChild(img);
-
-                    downloadLinksDiv.appendChild(document.createElement('br'));
-
-                    let link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = item.filename;
-                    link.classList.add('custom-download-link-class');
-                    link.textContent = `${item.filename}`;
-
-                    downloadLinksDiv.appendChild(link);
-                } else {
-                    let link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = item.filename;
-                    link.classList.add('custom-download-link-class');
-                    link.textContent = `${item.filename}`;
-
-                    downloadLinksDiv.appendChild(link);
-                }
-
-                downloadLinksDiv.appendChild(document.createElement('br'));
-            });
-
-            function b64toBlob(b64Data) {
-                let byteCharacters = atob(b64Data);
-                let byteNumbers = new Array(byteCharacters.length);
-
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-
-                let byteArray = new Uint8Array(byteNumbers);
-
-                return new Blob([byteArray], { type: 'application/octet-stream' });
-            }
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i)
         }
 
-        $(document).on("click", "#summaryReport", function () {
-            const dateRange = formatDate($('#dateRange').val());
-            const data = {
-                dateRange: dateRange
-            }
-            Upsert("POST", "/report/summary", data, function (result) {
-                const container = result.data;
-                console.log("Stocks: ", container);
+        let byteArray = new Uint8Array(byteNumbers)
 
-                const rows = Object.entries(container).map(([key, value]) => ({
-                    ProductName: key,
-                    ...value
-                }));
+        return new Blob([byteArray], { type: 'application/octet-stream' })
+      }
+    }
 
-                const headerRow = [{ ProductName: "SUMMARY REPORT" }];
-                const dateRow = [{ ProductName: `Date: ${dateRange}` }];
+    $(document).on('click', '#summaryReport', function () {
+      const dateRange = formatDate($('#dateRange').val())
+      const data = {
+        dateRange: dateRange,
+      }
+      Upsert('POST', '/report/summary', data, function (result) {
+        const container = result.data
+        console.log('Stocks: ', container)
 
-                const combinedRows = [
+        const rows = Object.entries(container).map(([key, value]) => ({
+          ProductName: key,
+          ...value,
+        }))
 
-                    ...rows
-                ];
+        const headerRow = [{ ProductName: 'SUMMARY REPORT' }]
+        const dateRow = [{ ProductName: `Date: ${dateRange}` }]
 
-                let wb = XLSX.utils.book_new();
+        const combinedRows = [...rows]
 
-                let ws = XLSX.utils.json_to_sheet(combinedRows);
+        let wb = XLSX.utils.book_new()
 
-                XLSX.utils.book_append_sheet(wb, ws, `Products`);
+        let ws = XLSX.utils.json_to_sheet(combinedRows)
 
-                let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+        XLSX.utils.book_append_sheet(wb, ws, `Products`)
+
+        let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' })
+
+        function s2ab(s) {
+          let buf = new ArrayBuffer(s.length)
+          let view = new Uint8Array(buf)
+          for (let i = 0; i < s.length; i++) {
+            view[i] = s.charCodeAt(i) & 0xff
+          }
+          return buf
+        }
+
+        saveAs(
+          new Blob([s2ab(wbout)], { type: 'application/octet-stream' }),
+          `products_summary_report_${dateRange}.xlsx`
+        )
+      })
+    })
+
+    //#region Sold Products Export
+    $(document).on('click', '#soldProductExcel', async function () {
+      const productId = $('#soldProductId').val()
+      const category = $('#soldCategoryId').val()
+      const dateRange = formatDate($('#dateRange').val())
+      let message = ''
+
+      if (productId == '') {
+        message += 'Product, '
+      }
+
+      if (category == '') {
+        message += 'Category, '
+      }
+
+      if (message != '') {
+        warning('Warning!', `${message} is Empty`)
+      } else {
+        try {
+          Loading('Processing...')
+          $('#soldProduct').val('')
+          $('#soldProductId').val('')
+          $('#soldCategory').val('')
+          $('#soldCategoryId').val('')
+
+          Upsert(
+            'POST',
+            '/product/byNameByCategory',
+            { itemId: productId, categoryId: category, dateRange: dateRange },
+            (result) => {
+              //console.log(result)
+              if (result.length == 0) {
+                warningInfo('Notice', 'No Data within in the date range.')
+                return
+              } else {
+                const reportTitle = [['SOLD PRODUCTS REPORT', `Date: ${dateRange}`]]
+                const headers = [
+                  ['Date', 'Reference No.', 'Category', 'Product Name', 'Serial', 'Sold To'],
+                ]
+
+                const rows = result.data.map((record) => {
+                  return [
+                    record.date,
+                    record.refNo,
+                    record.category,
+                    record.productName,
+                    record.serial,
+                    record.soldTo,
+                  ]
+                })
+
+                const data = [...reportTitle, ...headers, ...rows]
+
+                let wb = XLSX.utils.book_new()
+
+                let ws = XLSX.utils.aoa_to_sheet(data)
+
+                const colWidths = data.reduce((acc, row) => {
+                  row.forEach((cell, i) => {
+                    const valueLength = cell ? cell.toString().length : 10
+                    if (!acc[i]) acc[i] = { wch: valueLength }
+                    else if (acc[i].wch < valueLength) acc[i].wch = valueLength
+                  })
+                  return acc
+                }, [])
+
+                ws['!cols'] = colWidths
+
+                XLSX.utils.book_append_sheet(wb, ws, `Sold Products`)
+
+                let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' })
 
                 function s2ab(s) {
-                    let buf = new ArrayBuffer(s.length);
-                    let view = new Uint8Array(buf);
-                    for (let i = 0; i < s.length; i++) {
-                        view[i] = s.charCodeAt(i) & 0xFF;
-                    }
-                    return buf;
+                  let buf = new ArrayBuffer(s.length)
+                  let view = new Uint8Array(buf)
+                  for (let i = 0; i < s.length; i++) {
+                    view[i] = s.charCodeAt(i) & 0xff
+                  }
+                  return buf
                 }
 
-                saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `products_summary_report_${dateRange}.xlsx`);
-            });
-
-        });
-
-        //#region Sold Products Export
-        $(document).on("click", "#soldProductExcel", async function () {
-            const productId = $("#soldProductId").val();
-            const category = $("#soldCategoryId").val();
-            const dateRange = formatDate($('#dateRange').val());
-            let message = "";
-
-            if (productId == '') {
-                message += "Product, ";
+                saveAs(
+                  new Blob([s2ab(wbout)], { type: 'application/octet-stream' }),
+                  `Sold_Products_${dateRange}.xlsx`
+                )
+              }
             }
-
-            if (category == '') {
-                message += "Category, ";
-            }
-
-            if (message != '') {
-                warning('Warning!', `${message} is Empty`)
-            } else {
-                try {
-                    Loading("Processing...");
-                    $("#soldProduct").val("");
-                    $("#soldProductId").val("");
-                    $("#soldCategory").val("");
-                    $("#soldCategoryId").val("");
-
-                    Upsert("POST", "/product/byNameByCategory", {itemId: productId, categoryId: category, dateRange: dateRange}, result => {
-                        console.log(result);
-                        if(result.length == 0){
-                            warningInfo("Notice", "No Data within in the date range.");
-                            return;
-                        } else {
-                            const reportTitle = [["SOLD PRODUCTS REPORT", `Date: ${dateRange}`]];
-                            const headers = [
-                                ["Date", "Reference No.", "Category", "Product Name", "Serial", "Sold To", ]
-                            ];
-
-                            const rows = result.data.map(record => {
-                                return [
-                                    record.date,
-                                    record.refNo,
-                                    record.category,
-                                    record.productName,
-                                    record.serial,
-                                    record.soldTo,
-                                ];
-                            });
-
-                            const data = [...reportTitle, ...headers, ...rows];
-
-                            let wb = XLSX.utils.book_new();
-
-                            let ws = XLSX.utils.aoa_to_sheet(data);
-
-                            const colWidths = data.reduce((acc, row) => {
-                                row.forEach((cell, i) => {
-                                    const valueLength = cell ? cell.toString().length : 10;
-                                    if (!acc[i]) acc[i] = { wch: valueLength };
-                                    else if (acc[i].wch < valueLength) acc[i].wch = valueLength;
-                                });
-                                return acc;
-                            }, []);
-
-                            ws['!cols'] = colWidths;
-
-                            XLSX.utils.book_append_sheet(wb, ws, `Sold Products`);        
-
-                            let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-
-                            function s2ab(s) {
-                                let buf = new ArrayBuffer(s.length);
-                                let view = new Uint8Array(buf);
-                                for (let i = 0; i < s.length; i++) {
-                                    view[i] = s.charCodeAt(i) & 0xFF;
-                                }
-                                return buf;
-                            }   
-
-                            saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `Sold_Products_${dateRange}.xlsx`);
-                        }
-
-                    }); 
-                    
-                } catch (error) {
-                    console.error("Error fetching sold products:", error);
-                    warningInfo("Notice", "Failed to retrieve data.");
-                } finally {
-                    hideLoading()
-                }
-            }
-        });
-
-        $(document).on("click", "#soldProductPDF", async function () {
-            const productId = $("#soldProductId").val();
-            const category = $("#soldCategoryId").val();
-            const dateRange = formatDate($('#dateRange').val());
-            let message = "";
-
-            if (productId == '') {
-                message += "Product, ";
-            }
-
-            if (category == '') {
-                message += "Category, ";
-            }
-
-            if (message != '') {
-                warning('Warning!', `${message} is Empty`)
-            } else {
-                try {
-                    Loading("Processing...");
-                    $("#soldProduct").val("");
-                    $("#soldProductId").val("");
-                    $("#soldCategory").val("");
-                    $("#soldCategoryId").val("");
-
-                    Upsert("POST", "/product/byNameByCategory", {itemId: productId, categoryId: category, dateRange: dateRange}, result => {
-                        console.log(result);
-                        if(result.length == 0){
-                            warningInfo("Notice", "No Data within in the date range.");
-                            return;
-                        } else {
-                            const data = {
-                                processeddata: result.data,
-                                template: 'SOLD PRODUCTS REPORT',
-                                employee: 'santos',
-                                date: dateRange,
-                            }
-                            Upsert("POST", "/index/processpdfdata", data, result => {
-                                console.log("MSG: ", result.msg)
-                                if (result.msg == "success") {
-                                    window.open(`/index/generatepdf`, "_blank");
-                                    success("Success", "PDF generate successfully!");
-                                } else {
-                                    warningInfo("Notice", "No Data within in the date range.");
-                                }
-                            })
-                        }
-                    }); 
-                    
-                } catch (error) {
-                    console.error("Error fetching sold products:", error);
-                    warningInfo("Notice", "Failed to retrieve data.");
-                } finally {
-                    hideLoading()
-                }
-            }
-        });
-        //#endregion
-
-        //#region Employee Sales Report
-        //@ Employee Sales Report Excel
-        $(document).on("click", "#salesReportExcel", async function () {
-            const employeeId = $("#employeeId").val();
-            const productName = $("#productId").val();
-            const category = $("#salesCategoryId").val();
-            const dateRange = formatDate($('#dateRange').val());
-            let fullName = "";
-            let message = "";
-
-            if(employeeId == 'ALL'){
-                fullName = "";
-            }else{
-                fullName = $("#employee").val();
-            }
-
-            if (employeeId == '') {
-                message += "Employee, ";
-            }
-
-            if (productName == '') {
-                message += "Product, ";
-            }
-
-            if (category == '') {
-                message += "Category, ";
-            }
-
-            if (message != '') {
-                warning('Warning!', `${message} is Empty`)
-            } else {
-                try {
-                    Loading("Processing...");
-                    $("#employee").val("");
-                    $("#employeeId").val("");
-                    $("#product").val("");
-                    $("#productId").val("");
-                    $("#salesCategory").val("");
-                    $("#salesCategoryId").val("");
-
-                    const result = await getEmployeeSales(employeeId, productName, category, dateRange);
-                    // console.log("Sales Report: ", result);
-                    const length = Object.keys(result).length;
-                    
-                    if (length > 0) {
-                        const reportTitle = [["EMPLOYEE SALES REPORT", `Date: ${dateRange}`]];
-                        const headers = [
-                            ["Date", "Reference No.", "Category", "Product Name", "Price", "Delivery Fee", "Quantity", "Payment Type", "TrxRefNo Type", "Status", "Sold By", "Total"]
-                        ];
-
-                        const rows = Object.entries(result).flatMap(([date, records]) => {
-                            return records.map(record => {
-                                const total = parseFloat(record.price) * parseFloat(record.quantity);
-                                return [
-                                    date,
-                                    record.soldRefNo,
-                                    record.category,
-                                    record.productName,
-                                    record.price,
-                                    record.deliveryFee,
-                                    record.quantity,
-                                    record.paymentType,
-                                    record.transacRefNo,
-                                    record.status,
-                                    record.fullName,
-                                    total
-                                ];
-                            });
-                        });
-
-                        const data = [...reportTitle, ...headers, ...rows];
-
-                        let wb = XLSX.utils.book_new();
-
-                        let ws = XLSX.utils.aoa_to_sheet(data);
-
-                        const colWidths = data.reduce((acc, row) => {
-                            row.forEach((cell, i) => {
-                                const valueLength = cell ? cell.toString().length : 10;
-                                if (!acc[i]) acc[i] = { wch: valueLength };
-                                else if (acc[i].wch < valueLength) acc[i].wch = valueLength;
-                            });
-                            return acc;
-                        }, []);
-
-                        ws['!cols'] = colWidths;
-
-                        XLSX.utils.book_append_sheet(wb, ws, `Sales Report`);
-
-                        let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-
-                        function s2ab(s) {
-                            let buf = new ArrayBuffer(s.length);
-                            let view = new Uint8Array(buf);
-                            for (let i = 0; i < s.length; i++) {
-                                view[i] = s.charCodeAt(i) & 0xFF;
-                            }
-                            return buf;
-                        }
-
-                        saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), `Employee_Sales_Report_${dateRange}.xlsx`);
-                    }else{
-                        warningInfo("Notice", "No Data within in the date range.");
-                    }
-                } catch (error) {
-                    console.error("Error fetching employee sales:", error);
-                    warningInfo("Notice", "Failed to retrieve data.");
-                } finally {
-                    hideLoading()
-                }
-            }
-        });
-
-        //@ Employee Sales Report PDF
-        $(document).on("click", "#salesReportPdf", async function () {
-            const employeeId = $("#employeeId").val();
-            const productName = $("#productId").val();
-            const category = $("#salesCategoryId").val();
-            const dateRange = formatDate($('#dateRange').val());
-            let fullName = "";
-            let message = "";
-            if(employeeId == 'ALL'){
-                fullName = "";
-            }else{
-                fullName = $("#employee").val();
-            }
-
-            if (employeeId == '') {
-                message += "Employee, ";
-            }
-
-            if (productName == '') {
-                message += "Product, ";
-            }
-
-            if (category == '') {
-                message += "Category, ";
-            }
-
-            if (message != '') {
-                warning('Warning!', `${message} is Empty`)
-            } else {
-                try {
-                    Loading("Processing...");
-                    const result = await getEmployeeSales(employeeId, productName, category, dateRange);
-                    const data = {
-                        processeddata: result,
-                        template: 'SALES REPORT',
-                        employee: fullName,
-                        date: dateRange,
-                    }
-                    Upsert("POST", "/index/processpdfdata", data, result => {
-                        console.log("MSG: ", result.msg)
-                        if (result.msg == "success") {
-                            window.open(`/index/generatepdf`, "_blank");
-                            success("Success", "PDF generate successfully!");
-                            $("#employee").val("");
-                            $("#employeeId").val("");
-                            $("#product").val("");
-                            $("#productId").val("");
-                            $("#salesCategory").val("");
-                            $("#salesCategoryId").val("");
-                        } else {
-                            warningInfo("Notice", "No Data within in the date range.");
-                        }
-                    })
-                } catch (error) {
-                    console.error("Error fetching employee sales:", error);
-                    warningInfo("Notice", "Failed to retrieve data.");
-                } finally {
-                    hideLoading()
-                }
-            }
-        });
-
-        async function getEmployeeSales(employeeId, productName, category, dateRange) {
-            const data = {
-                employeeId: employeeId,
-                productName: productName,
-                category: category,
-                dateRange: dateRange
-            };
-            console.log(data);
-            return new Promise((resolve, reject) => {
-                Upsert("POST", "/report/employee-sales", data, result => {
-                    if (result.msg == "success") {
-                        mergeReportData(result.data).then(mergedData => {
-                            resolve(mergedData);
-                        }).catch(err => {
-                            reject(err);
-                        });
-                    } else {
-                        reject(new Error("No Data within the date range."));
-                    }
-                });
-            });
+          )
+        } catch (error) {
+          console.error('Error fetching sold products:', error)
+          warningInfo('Notice', 'Failed to retrieve data.')
+        } finally {
+          hideLoading()
         }
+      }
+    })
 
-        async function mergeReportData(data) {
-            return data.reduce((result, current) => {
-                if (current.status === 'PAID' || current.status === 'PARTIALLY PAID' || current.status === 'NOT PAID') {
-                    const date = current.date;
+    $(document).on('click', '#soldProductPDF', async function () {
+      const productId = $('#soldProductId').val()
+      const category = $('#soldCategoryId').val()
+      const dateRange = formatDate($('#dateRange').val())
+      let message = ''
 
-                    if (!result[date]) {
-                        result[date] = [];
-                    }
+      if (productId == '') {
+        message += 'Product, '
+      }
 
-                    const matchingEntry = result[date].find(entry =>
-                        entry.soldRefNo === current.soldRefNo &&
-                        entry.transacRefNo === current.transacRefNo &&
-                        entry.productName === current.productName &&
-                        entry.category === current.category &&
-                        entry.price === current.price &&
-                        entry.deliveryFee === current.deliveryFee
-                    );
+      if (category == '') {
+        message += 'Category, '
+      }
 
-                    if (matchingEntry) {
-                        matchingEntry.quantity += current.quantity;
-                    } else {
-                        result[date].push({ ...current });
-                    }
+      if (message != '') {
+        warning('Warning!', `${message} is Empty`)
+      } else {
+        try {
+          Loading('Processing...')
+          $('#soldProduct').val('')
+          $('#soldProductId').val('')
+          $('#soldCategory').val('')
+          $('#soldCategoryId').val('')
+
+          Upsert(
+            'POST',
+            '/product/byNameByCategory',
+            { itemId: productId, categoryId: category, dateRange: dateRange },
+            (result) => {
+              //console.log(result)
+              if (result.length == 0) {
+                warningInfo('Notice', 'No Data within in the date range.')
+                return
+              } else {
+                const data = {
+                  processeddata: result.data,
+                  template: 'SOLD PRODUCTS REPORT',
+                  employee: 'santos',
+                  date: dateRange,
                 }
-                return result;
-            }, {});
+                Upsert('POST', '/index/processpdfdata', data, (result) => {
+                  console.log('MSG: ', result.msg)
+                  if (result.msg == 'success') {
+                    window.open(`/index/generatepdf`, '_blank')
+                    success('Success', 'PDF generate successfully!')
+                  } else {
+                    warningInfo('Notice', 'No Data within in the date range.')
+                  }
+                })
+              }
+            }
+          )
+        } catch (error) {
+          console.error('Error fetching sold products:', error)
+          warningInfo('Notice', 'Failed to retrieve data.')
+        } finally {
+          hideLoading()
         }
-        //#endregion
+      }
+    })
+    //#endregion
 
-    });
+    //#region Employee Sales Report
+    //@ Employee Sales Report Excel
+    $(document).on('click', '#salesReportExcel', async function () {
+      const employeeId = $('#employeeId').val()
+      const productName = $('#productId').val()
+      const category = $('#salesCategoryId').val()
+      const dateRange = formatDate($('#dateRange').val())
+      let fullName = ''
+      let message = ''
+
+      if (employeeId == 'ALL') {
+        fullName = ''
+      } else {
+        fullName = $('#employee').val()
+      }
+
+      if (employeeId == '') {
+        message += 'Employee, '
+      }
+
+      if (productName == '') {
+        message += 'Product, '
+      }
+
+      if (category == '') {
+        message += 'Category, '
+      }
+
+      if (message != '') {
+        warning('Warning!', `${message} is Empty`)
+      } else {
+        try {
+          Loading('Processing...')
+          $('#employee').val('')
+          $('#employeeId').val('')
+          $('#product').val('')
+          $('#productId').val('')
+          $('#salesCategory').val('')
+          $('#salesCategoryId').val('')
+
+          const result = await getEmployeeSales(employeeId, productName, category, dateRange)
+          // console.log("Sales Report: ", result);
+          const length = Object.keys(result).length
+
+          if (length > 0) {
+            const reportTitle = [['EMPLOYEE SALES REPORT', `Date: ${dateRange}`]]
+            const headers = [
+              [
+                'Date',
+                'Reference No.',
+                'Category',
+                'Product Name',
+                'Price',
+                'Delivery Fee',
+                'Quantity',
+                'Payment Type',
+                'TrxRefNo Type',
+                'Status',
+                'Sold By',
+                'Total',
+              ],
+            ]
+
+            const rows = Object.entries(result).flatMap(([date, records]) => {
+              return records.map((record) => {
+                const total = parseFloat(record.price) * parseFloat(record.quantity)
+                return [
+                  date,
+                  record.soldRefNo,
+                  record.category,
+                  record.productName,
+                  record.price,
+                  record.deliveryFee,
+                  record.quantity,
+                  record.paymentType,
+                  record.transacRefNo,
+                  record.status,
+                  record.fullName,
+                  total,
+                ]
+              })
+            })
+
+            const data = [...reportTitle, ...headers, ...rows]
+
+            let wb = XLSX.utils.book_new()
+
+            let ws = XLSX.utils.aoa_to_sheet(data)
+
+            const colWidths = data.reduce((acc, row) => {
+              row.forEach((cell, i) => {
+                const valueLength = cell ? cell.toString().length : 10
+                if (!acc[i]) acc[i] = { wch: valueLength }
+                else if (acc[i].wch < valueLength) acc[i].wch = valueLength
+              })
+              return acc
+            }, [])
+
+            ws['!cols'] = colWidths
+
+            XLSX.utils.book_append_sheet(wb, ws, `Sales Report`)
+
+            let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' })
+
+            function s2ab(s) {
+              let buf = new ArrayBuffer(s.length)
+              let view = new Uint8Array(buf)
+              for (let i = 0; i < s.length; i++) {
+                view[i] = s.charCodeAt(i) & 0xff
+              }
+              return buf
+            }
+
+            saveAs(
+              new Blob([s2ab(wbout)], { type: 'application/octet-stream' }),
+              `Employee_Sales_Report_${dateRange}.xlsx`
+            )
+          } else {
+            warningInfo('Notice', 'No Data within in the date range.')
+          }
+        } catch (error) {
+          console.error('Error fetching employee sales:', error)
+          warningInfo('Notice', 'Failed to retrieve data.')
+        } finally {
+          hideLoading()
+        }
+      }
+    })
+
+    //@ Employee Sales Report PDF
+    $(document).on('click', '#salesReportPdf', async function () {
+      const employeeId = $('#employeeId').val()
+      const productName = $('#productId').val()
+      const category = $('#salesCategoryId').val()
+      const dateRange = formatDate($('#dateRange').val())
+      let fullName = ''
+      let message = ''
+      if (employeeId == 'ALL') {
+        fullName = ''
+      } else {
+        fullName = $('#employee').val()
+      }
+
+      if (employeeId == '') {
+        message += 'Employee, '
+      }
+
+      if (productName == '') {
+        message += 'Product, '
+      }
+
+      if (category == '') {
+        message += 'Category, '
+      }
+
+      if (message != '') {
+        warning('Warning!', `${message} is Empty`)
+      } else {
+        try {
+          Loading('Processing...')
+          const result = await getEmployeeSales(employeeId, productName, category, dateRange)
+          const data = {
+            processeddata: result,
+            template: 'SALES REPORT',
+            employee: fullName,
+            date: dateRange,
+          }
+          Upsert('POST', '/index/processpdfdata', data, (result) => {
+            console.log('MSG: ', result.msg)
+            if (result.msg == 'success') {
+              window.open(`/index/generatepdf`, '_blank')
+              success('Success', 'PDF generate successfully!')
+              $('#employee').val('')
+              $('#employeeId').val('')
+              $('#product').val('')
+              $('#productId').val('')
+              $('#salesCategory').val('')
+              $('#salesCategoryId').val('')
+            } else {
+              warningInfo('Notice', 'No Data within in the date range.')
+            }
+          })
+        } catch (error) {
+          console.error('Error fetching employee sales:', error)
+          warningInfo('Notice', 'Failed to retrieve data.')
+        } finally {
+          hideLoading()
+        }
+      }
+    })
+
+    async function getEmployeeSales(employeeId, productName, category, dateRange) {
+      const data = {
+        employeeId: employeeId,
+        productName: productName,
+        category: category,
+        dateRange: dateRange,
+      }
+      //console.log(error);
+      return new Promise((resolve, reject) => {
+        Upsert('POST', '/report/employee-sales', data, (result) => {
+          if (result.msg == 'success') {
+            mergeReportData(result.data)
+              .then((mergedData) => {
+                resolve(mergedData)
+              })
+              .catch((err) => {
+                reject(err)
+              })
+          } else {
+            reject(new Error('No Data within the date range.'))
+          }
+        })
+      })
+    }
+
+    async function mergeReportData(data) {
+      return data.reduce((result, current) => {
+        if (
+          current.status === 'PAID' ||
+          current.status === 'PARTIALLY PAID' ||
+          current.status === 'NOT PAID'
+        ) {
+          const date = current.date
+
+          if (!result[date]) {
+            result[date] = []
+          }
+
+          const matchingEntry = result[date].find(
+            (entry) =>
+              entry.soldRefNo === current.soldRefNo &&
+              entry.transacRefNo === current.transacRefNo &&
+              entry.productName === current.productName &&
+              entry.category === current.category &&
+              entry.price === current.price &&
+              entry.deliveryFee === current.deliveryFee
+          )
+
+          if (matchingEntry) {
+            matchingEntry.quantity += current.quantity
+          } else {
+            result[date].push({ ...current })
+          }
+        }
+        return result
+      }, {})
+    }
+    //#endregion
+  })
 </script>

@@ -1,23 +1,15 @@
-var express = require("express");
+var express = require('express')
 const {
   Repair,
   Product,
   RepairProduct,
   DeffectiveItem,
-  UploadDefectiveItem
-} = require("./model/spimodel");
-const {
-  Select,
-  InsertTable,
-  Update,
-  SelectParameter,
-} = require("./repository/spidb");
-const {
-  SelectStatement,
-  convertExcelDate,
-} = require("./repository/customhelper");
-const { GetValue, DFCT } = require("./repository/dictionary");
-const { Validator } = require("./controller/middleware");
+  UploadDefectiveItem,
+} = require('./model/spimodel')
+const { Select, InsertTable, Update, SelectParameter } = require('./repository/spidb')
+const { SelectStatement, convertExcelDate } = require('./repository/customhelper')
+const { GetValue, DFCT } = require('./repository/dictionary')
+const { Validator } = require('./controller/middleware')
 const {
   JsonErrorResponse,
   JsonWarningResponse,
@@ -25,22 +17,22 @@ const {
   JsonNoEntryResponse,
   MessageStatus,
   JsonDataResponse,
-} = require("./repository/responce");
-var router = express.Router();
+} = require('./repository/responce')
+var router = express.Router()
 
 /* GET home page. */
-router.get("/", function (req, res, next) {
+router.get('/', function (req, res, next) {
   // res.render("repair", { title: "Express" });
-  Validator(req, res, "defective");
-});
+  Validator(req, res, 'defective')
+})
 
-module.exports = router;
+module.exports = router
 
-router.get("/load", (req, res) => {
+router.get('/load', (req, res) => {
   try {
-    const page = req.query.page || 1;
-    const itemsPerPage = 500;
-    const offset = (page - 1) * itemsPerPage;
+    const page = req.query.page || 1
+    const itemsPerPage = 500
+    const offset = (page - 1) * itemsPerPage
 
     let sql = `select 
     d_id,
@@ -50,152 +42,145 @@ router.get("/load", (req, res) => {
     d_date,
     d_referenceno
     from deffectiveitem
-    LIMIT ${itemsPerPage} OFFSET ${offset}`;
+    LIMIT ${itemsPerPage} OFFSET ${offset}`
 
     Select(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
-      let data = DeffectiveItem(result);
+      let data = DeffectiveItem(result)
       res.json({
-        msg: "success",
+        msg: 'success',
         data: data,
-      });
-    });
+      })
+    })
   } catch (error) {
-    res.json(JsonErrorResponse());
+    res.json(JsonErrorResponse())
   }
-});
+})
 
-router.post("/save", (req, res) => {
+router.post('/save', (req, res) => {
   try {
-    const { assetcontrol, itemserial, remarks, date, referenceno } = req.body;
+    const { assetcontrol, itemserial, remarks, date, referenceno } = req.body
 
     Check_DeffectiveItem(assetcontrol, date)
       .then((result) => {
         if (result.length != 0) {
-          res.json(JsonWarningResponse("exist"));
+          res.json(JsonWarningResponse('exist'))
         } else {
-          let data = DeffectiveItem(result);
-          let deffectiveitem = [
-            [assetcontrol, itemserial, remarks, date, referenceno],
-          ];
+          let data = DeffectiveItem(result)
+          let deffectiveitem = [[assetcontrol, itemserial, remarks, date, referenceno]]
 
-          let status = GetValue(DFCT());
-          let update_product =
-            "update product set p_status=? where p_assetcontrol=?";
-          let update_product_data = [status, assetcontrol];
+          let status = GetValue(DFCT())
+          let update_product = 'update product set p_status=? where p_assetcontrol=?'
+          let update_product_data = [status, assetcontrol]
 
           Update(update_product, update_product_data, (err, result) => {
-            if (err) console.error("Error: ", err);
-            // console.log(result);
-          });
+            if (err) console.error('Error: ', err)
+            // //console.log(result);
+          })
 
-          InsertTable("deffectiveitem", deffectiveitem, (err, result) => {
-            if (err) console.error("Error: ", err);
-            console.log(result);
-            res.json(JsonSuccess());
-          });
+          InsertTable('deffectiveitem', deffectiveitem, (err, result) => {
+            if (err) console.error('Error: ', err)
+            //console.log(result);
+            res.json(JsonSuccess())
+          })
         }
       })
       .catch((error) => {
-        res.json(JsonErrorResponse(error));
-      });
+        res.json(JsonErrorResponse(error))
+      })
   } catch (error) {
-    res.json(JsonErrorResponse(error));
+    res.json(JsonErrorResponse(error))
   }
-});
+})
 
-router.post("/upload", (req, res) => {
+router.post('/upload', (req, res) => {
   try {
-    const { data } = req.body;
-    let dataJson = UploadDefectiveItem(JSON.parse(data));
-    console.log(dataJson);
-    let failed = 0;
-    let completed = 0;
-    let defective = [];
-    let counter = 0;
-    let existing = [];
+    const { data } = req.body
+    let dataJson = UploadDefectiveItem(JSON.parse(data))
+    console.log(dataJson)
+    let failed = 0
+    let completed = 0
+    let defective = []
+    let counter = 0
+    let existing = []
 
     dataJson.forEach((item) => {
       Check_DeffectiveItem(item.assetcontrol, convertExcelDate(item.date))
         .then((result) => {
-          counter += 1;
-          if(result.length == 0){
-            completed += 1;
+          counter += 1
+          if (result.length == 0) {
+            completed += 1
             defective.push([
               item.assetcontrol,
               item.itemserial,
               item.remarks,
               convertExcelDate(item.date),
               item.referenceno,
-            ]);
-            
-            let status = GetValue(DFCT());
-            let update_product =
-              "update product set p_status=? where p_assetcontrol=?";
-            let update_product_data = [status, item.assetcontrol];
+            ])
+
+            let status = GetValue(DFCT())
+            let update_product = 'update product set p_status=? where p_assetcontrol=?'
+            let update_product_data = [status, item.assetcontrol]
 
             Update(update_product, update_product_data, (err, result) => {
-              if (err) console.error("Error: ", err);
-              // console.log(result);
-            });
+              if (err) console.error('Error: ', err)
+              // //console.log(result);
+            })
 
             if (counter == dataJson.length) {
-              Insert();
+              Insert()
             }
-          }else {
-            failed += 1;
-            existing.push("SERIAL_"+item.itemserial+"_ALREADY_EXISTS");
+          } else {
+            failed += 1
+            existing.push('SERIAL_' + item.itemserial + '_ALREADY_EXISTS')
             if (counter == dataJson.length) {
-              Insert();
+              Insert()
             }
           }
-          
         })
         .catch((error) => {
-          console.error(error);
-          return res.json(JsonErrorResponse(error));
-        });
-    });
+          console.error(error)
+          return res.json(JsonErrorResponse(error))
+        })
+    })
 
-    function Insert(){
+    function Insert() {
       let info = {
         completed: completed,
         failed: failed,
-        existing: existing
+        existing: existing,
       }
-      
-      console.log("Existing: ", existing);
-      console.log("Done: ");
-      if(defective.length != 0){
-        InsertTable("deffectiveitem", defective, (err, result) => {
-          if (err) console.error("Error: ", err);
-          console.log("success?", result);
 
-          return res.json(JsonDataResponse(info));
-        });
-      }else{
-        return res.json(JsonWarningResponse(MessageStatus.EXIST, info));
+      console.log('Existing: ', existing)
+      console.log('Done: ')
+      if (defective.length != 0) {
+        InsertTable('deffectiveitem', defective, (err, result) => {
+          if (err) console.error('Error: ', err)
+          console.log('success?', result)
+
+          return res.json(JsonDataResponse(info))
+        })
+      } else {
+        return res.json(JsonWarningResponse(MessageStatus.EXIST, info))
       }
     }
-    
   } catch (error) {
-    res.json(JsonErrorResponse(error));
+    res.json(JsonErrorResponse(error))
   }
-});
+})
 
 //#region Function
 function Check_DeffectiveItem(assetcontrol, date) {
   return new Promise((resolve, reject) => {
-    let sql =
-      "select * from deffectiveitem where d_assetcontrol=? and d_date=?";
-    let commad = SelectStatement(sql, [assetcontrol, date]);
+    let sql = 'select * from deffectiveitem where d_assetcontrol=? and d_date=?'
+    let commad = SelectStatement(sql, [assetcontrol, date])
 
     Select(commad, (err, result) => {
-      if (err) reject(err);
+      if (err) reject(err)
 
-      resolve(result);
-    });
-  });
+      resolve(result)
+    })
+  })
 }
 //#endregion

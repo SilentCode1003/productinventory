@@ -64,7 +64,7 @@ router.post('/save', (req, res) => {
           InsertTable('master_access', master_access, (err, result) => {
             if (err) console.error('Error: ', err)
 
-            console.log(result)
+            //console.log(result)
             res.json({
               msg: 'success',
             })
@@ -109,7 +109,7 @@ router.post('/edit', (req, res) => {
         Update(sql_Update, data, (err, result) => {
           if (err) console.error('Error: ', err)
 
-          console.log(result)
+          //console.log(result)
 
           res.json({
             msg: 'success',
@@ -161,7 +161,7 @@ function Check_Access(name) {
     SelectParameter(sql, [name], (err, result) => {
       if (err) reject(err)
 
-      console.log(result)
+      //console.log(result)
       resolve(result)
     })
   })

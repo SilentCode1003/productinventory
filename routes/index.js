@@ -1,24 +1,24 @@
-var express = require('express');
-const pdfmake = require("pdfmake");
-const fs = require("fs");
-const path = require("path");
+var express = require('express')
+const pdfmake = require('pdfmake')
+const fs = require('fs')
+const path = require('path')
 
-const { Validator } = require('./controller/middleware');
-var router = express.Router();
-const { Select } = require("./repository/spidb");
-const { Deploy } = require("./model/spimodel");
-const { Generate } = require("./repository/pdf.js");
-const { GetCurrentDate } = require('./repository/customhelper.js');
+const { Validator } = require('./controller/middleware')
+var router = express.Router()
+const { Select } = require('./repository/spidb')
+const { Deploy } = require('./model/spimodel')
+const { Generate } = require('./repository/pdf.js')
+const { GetCurrentDate } = require('./repository/customhelper.js')
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
   // res.render('index', { title: 'Express' });
-  Validator(req, res, "index");
-});
+  Validator(req, res, 'index')
+})
 
-module.exports = router;
+module.exports = router
 
-router.post("/sold", (req, res) => {
+router.post('/sold', (req, res) => {
   try {
     let sql = `SELECT 
           s_id AS id, 
@@ -44,33 +44,32 @@ router.post("/sold", (req, res) => {
       INNER JOIN 
           master_item_price ON mip_itemid = mi_id 
       WHERE 
-          YEAR(s_date) = YEAR(CURDATE()) AND MONTH(s_date) = MONTH(CURDATE());`;
+          YEAR(s_date) = YEAR(CURDATE()) AND MONTH(s_date) = MONTH(CURDATE());`
 
     Select(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
       if (result.length != 0) {
-        console.log(result);
+        //console.log(result);
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       } else {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.get("/deployed", (req, res) => {
+router.get('/deployed', (req, res) => {
   try {
-
     let sql = `SELECT 
         d_id,
         d_assetcontrol,
@@ -82,41 +81,35 @@ router.get("/deployed", (req, res) => {
       FROM deploy
       INNER JOIN employee on e_id = d_deployby
       WHERE 
-        YEAR(d_date) = YEAR(CURDATE()) AND MONTH(d_date) = MONTH(CURDATE());`;
+        YEAR(d_date) = YEAR(CURDATE()) AND MONTH(d_date) = MONTH(CURDATE());`
 
     Select(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
-      let data = Deploy(result);
+      let data = Deploy(result)
       res.json({
-        msg: "success",
+        msg: 'success',
         data: data,
-      });
-    });
+      })
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/getsoldcount", (req, res) => {
+router.post('/getsoldcount', (req, res) => {
   try {
-    let daterange = req.body.daterange;
-    let [startDate, endDate] = daterange.split(" - ");
+    let daterange = req.body.daterange
+    let [startDate, endDate] = daterange.split(' - ')
 
-    let formattedStartDate = startDate.split("/").reverse().join("-");
-    let formattedEndDate = endDate.split("/").reverse().join("-");
+    let formattedStartDate = startDate.split('/').reverse().join('-')
+    let formattedEndDate = endDate.split('/').reverse().join('-')
 
-    formattedStartDate = formattedStartDate.replace(
-      /(\d{4})-(\d{2})-(\d{2})/,
-      "$1-$3-$2"
-    );
-    formattedEndDate = formattedEndDate.replace(
-      /(\d{4})-(\d{2})-(\d{2})/,
-      "$1-$3-$2"
-    );
-      console.log("Date: ",formattedStartDate, formattedEndDate)
+    formattedStartDate = formattedStartDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1-$3-$2')
+    formattedEndDate = formattedEndDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1-$3-$2')
+    console.log('Date: ', formattedStartDate, formattedEndDate)
     let sql = `SELECT s_id as id, s_assetcontrol as assetcontrol, s_serial as serial, mi_name as productname, 
               mc_name as category, p_status as status, e_fullname as soldby, s_date as date, mip_fobprice as price
               FROM sold 
@@ -125,85 +118,81 @@ router.post("/getsoldcount", (req, res) => {
               INNER JOIN master_category on mc_id = p_category
               INNER JOIN employee on e_id = s_soldby
               INNER JOIN master_item_price on mip_itemid = mi_id 
-              WHERE s_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`;
+              WHERE s_date BETWEEN '${formattedStartDate}' AND '${formattedEndDate}'`
 
     Select(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
       if (result.length != 0) {
-        console.log(result);
+        //console.log(result);
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       } else {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-}); 
+})
 
-let pdfBuffer = "";
-let filename = "";
-let date = "";
+let pdfBuffer = ''
+let filename = ''
+let date = ''
 
-router.post("/processpdfdata", (req, res) => {
+router.post('/processpdfdata', (req, res) => {
   try {
-    let data = req.body.processeddata;
-    let template = req.body.template;
-    let employee = req.body.employee;
-    let date = req.body.date;
+    let data = req.body.processeddata
+    let template = req.body.template
+    let employee = req.body.employee
+    let date = req.body.date
     // console.log("Processed Data: ", data);
 
     if (data.length != 0 && data != undefined) {
       Generate(data, template, employee, date)
-      .then((result) => {
+        .then((result) => {
+          pdfBuffer = result
+          filename = template
+          date = GetCurrentDate()
 
-        pdfBuffer = result;
-        filename = template;
-        date = GetCurrentDate();
-
-        res.json({
-          msg: "success",
-          data: result,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        return res.json({
-          msg: error,
-        });
-      });
-    }else{
+          res.json({
+            msg: 'success',
+            data: result,
+          })
+        })
+        .catch((error) => {
+          console.log(error)
+          return res.json({
+            msg: error,
+          })
+        })
+    } else {
       res.json({
-        msg: "nodata",
-      });
+        msg: 'nodata',
+      })
     }
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.get("/generatepdf", (req, res) => {
+router.get('/generatepdf', (req, res) => {
   try {
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=${filename}_${date}.pdf`
-    );
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}_${date}.pdf`)
 
-    res.send(pdfBuffer);
+    res.send(pdfBuffer)
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})

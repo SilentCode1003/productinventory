@@ -1,13 +1,13 @@
 <script>
   $(document).ready(function () {
     //Functionality
-    let isFetchingData = false;
-    let hasMoreData = true;
-    let currentPage = 1;
-    let assetcontrol = "";
-    let activeSerial = [];
-    let activeDeployLocation = [];
-    let activeEmployee = [];
+    let isFetchingData = false
+    let hasMoreData = true
+    let currentPage = 1
+    let assetcontrol = ''
+    let activeSerial = []
+    let activeDeployLocation = []
+    let activeEmployee = []
 
     const loader = `  
         <tr class="loading-row">
@@ -18,123 +18,123 @@
           <td><div class="custom-loader"></div></td>
           <td><div class="custom-loader"></div></td>
           <td><div class="custom-loader"></div></td>
-        </tr>`;
+        </tr>`
 
-    const tbody = $('#datatable tbody');
-    for(let i = 0; i < 7; i++){
-      tbody.append(loader);
+    const tbody = $('#datatable tbody')
+    for (let i = 0; i < 7; i++) {
+      tbody.append(loader)
     }
 
-    LoadTable();
+    LoadTable()
 
-    $("#data-table tbody").on("click", "tr", function () {
-      var dataRow = [];
+    $('#data-table tbody').on('click', 'tr', function () {
+      var dataRow = []
       $(this)
-        .closest("tr")
-        .find("td")
+        .closest('tr')
+        .find('td')
         .each(function () {
-          dataRow.push($(this).text());
-        });
+          dataRow.push($(this).text())
+        })
       // console.log(dataRow);
-      assetcontrol = dataRow[0];
-    });
+      assetcontrol = dataRow[0]
+    })
 
-    $(document).on("input", "#location", function () {
-      $("#hiddenValue").val("");
-    });
+    $(document).on('input', '#location', function () {
+      $('#hiddenValue').val('')
+    })
 
-    $(document).on("input", "#employee", function () {
-      $("#hiddenemmployeevalue").val("");
-    });
+    $(document).on('input', '#employee', function () {
+      $('#hiddenemmployeevalue').val('')
+    })
 
-    $(document).on("input", "#serialname", function () {
-      $("#hiddenSerialValue").val("");
-    });
+    $(document).on('input', '#serialname', function () {
+      $('#hiddenSerialValue').val('')
+    })
 
-    $(document).on("click", "#addBtn", function () {
+    $(document).on('click', '#addBtn', function () {
       // const actualValue = $('#hiddenSerialValue').val();
-      let location = $("#hiddenValue").val();
-      let serialasset = $("#hiddenSerialValue").val();
-      let data = $("#serialname").val();
-      let soldto = $("#location").val();
-      let soldby = $("#hiddenemmployeevalue").val();
-      let employee = $("#employee").val();
-      let referenceno = $("#referenceno").val();
-      let date = $("#date").val();
-      let remarks = $("#remarks").val();
-      let sellingprice = $("#sellingprice").val();
-      let paymenttype = $("#paymenttype").val();
-      let transactionstatus = $("#transactionstatus").val();
-      let transactionref = $("#transactionref").val();
-      let deliveryfee= $("#deliveryfee").val();
+      let location = $('#hiddenValue').val()
+      let serialasset = $('#hiddenSerialValue').val()
+      let data = $('#serialname').val()
+      let soldto = $('#location').val()
+      let soldby = $('#hiddenemmployeevalue').val()
+      let employee = $('#employee').val()
+      let referenceno = $('#referenceno').val()
+      let date = $('#date').val()
+      let remarks = $('#remarks').val()
+      let sellingprice = $('#sellingprice').val()
+      let paymenttype = $('#paymenttype').val()
+      let transactionstatus = $('#transactionstatus').val()
+      let transactionref = $('#transactionref').val()
+      let deliveryfee = $('#deliveryfee').val()
 
-      var message = "";
+      var message = ''
 
-      if (serialasset == "") {
-        message += "Serial and Asset Control does not Exist " + `${data}, `;
+      if (serialasset == '') {
+        message += 'Serial and Asset Control does not Exist ' + `${data}, `
       }
-      if (soldto == "") {
-        message += "Empty Sold To, ";
+      if (soldto == '') {
+        message += 'Empty Sold To, '
       }
-      if (soldby == "") {
-        message += "Employee does not Exist " + `${employee}, `;
+      if (soldby == '') {
+        message += 'Employee does not Exist ' + `${employee}, `
       }
-      if (referenceno == "") {
-        message += "Empty Reference Number, ";
+      if (referenceno == '') {
+        message += 'Empty Reference Number, '
       }
-      if (date == "") {
-        message += "Empty Date, ";
+      if (date == '') {
+        message += 'Empty Date, '
       }
-      if (remarks == "") {
-        message += "Empty Remarks, ";
+      if (remarks == '') {
+        message += 'Empty Remarks, '
       }
-      if (sellingprice == "") {
-        message += "Empty Selling Price, ";
+      if (sellingprice == '') {
+        message += 'Empty Selling Price, '
       }
-      if (paymenttype == "") {
-        message += "Empty Payment Type, ";
+      if (paymenttype == '') {
+        message += 'Empty Payment Type, '
       }
-      if (transactionstatus == "") {
-        message += "Empty Transaction Status, ";
+      if (transactionstatus == '') {
+        message += 'Empty Transaction Status, '
       }
-      if (transactionref == "") {
-        message += "Empty Transaction Reference No., ";
+      if (transactionref == '') {
+        message += 'Empty Transaction Reference No., '
       }
-      if (deliveryfee == "") {
-        message += "Empty Delivery Fee, ";
+      if (deliveryfee == '') {
+        message += 'Empty Delivery Fee, '
       }
 
-      if (message != "") {
-        warning("Required", `Please fill up ${message}`);
+      if (message != '') {
+        warning('Required', `Please fill up ${message}`)
       } else {
-        let splitData = data.split(" ");
-        let serial = splitData[0];
-        let assetControl = splitData[1].replace("(", "").replace(")", "");
+        let splitData = data.split(' ')
+        let serial = splitData[0]
+        let assetControl = splitData[1].replace('(', '').replace(')', '')
         // console.log(assetControl, serial, date, soldby, soldto, referenceno);
         // console.log("locationdata: ", location);
-      
-        if (location != "") {
-          let match = location.match(/\((.*?)\)\s*\((.*?)\)/);
-          let branch = match[1].trim();
-          let company = match[2].trim();
+
+        if (location != '') {
+          let match = location.match(/\((.*?)\)\s*\((.*?)\)/)
+          let branch = match[1].trim()
+          let company = match[2].trim()
 
           // console.log("Branch: ", branch);
           // console.log("Company: ", company);
           $.ajax({
-            type: "POST",
-            url: "/client/checklocation",
+            type: 'POST',
+            url: '/client/checklocation',
             data: {
               company: company,
               branch: branch,
             },
             success: function (result) {
-              if (result.msg == "notexist") {
-                warning("Not Exist", `${location} does not exist!`);
+              if (result.msg == 'notexist') {
+                warning('Not Exist', `${location} does not exist!`)
               } else {
-                success("Exist", `${location} exist!`);
+                success('Exist', `${location} exist!`)
                 $.ajax({
-                  type: "POST",
-                  url: "/sold/save",
+                  type: 'POST',
+                  url: '/sold/save',
                   data: {
                     assetcontrol: assetControl,
                     serial: serial,
@@ -150,481 +150,476 @@
                     remarks: remarks,
                   },
                   success: function (result) {
-                    if (result.msg == "success") {
-                      success("Saved", "Successfully");
-                      resettable();
-                      $("#location").val("");
-                      $("#employee").val("");
-                      $("#hiddenemmployeevalue").val("");
-                      $("#referenceno").val("");
-                      $("#serialname").val("");
-                      $("#hiddenSerialValue").val("");
-                      $("#date").val("");
-                      $("#sellingprice").val("");
-                      $("#paymenttype").val("");
-                      $("#transactionref").val("");
-                      $("#deliveryfee").val("");
-                      $("#hiddenValue").val("");
+                    if (result.msg == 'success') {
+                      success('Saved', 'Successfully')
+                      resettable()
+                      $('#location').val('')
+                      $('#employee').val('')
+                      $('#hiddenemmployeevalue').val('')
+                      $('#referenceno').val('')
+                      $('#serialname').val('')
+                      $('#hiddenSerialValue').val('')
+                      $('#date').val('')
+                      $('#sellingprice').val('')
+                      $('#paymenttype').val('')
+                      $('#transactionref').val('')
+                      $('#deliveryfee').val('')
+                      $('#hiddenValue').val('')
                     }
 
-                    if (result.msg == "exist") {
-                      warning("Exist", `${serial} already exist!`);
+                    if (result.msg == 'exist') {
+                      warning('Exist', `${serial} already exist!`)
                     }
                   },
                   error: function (err) {
-                    errormsg(err);
+                    errormsg(err)
                   },
-                });
+                })
               }
             },
             error: function (err) {
-              errormsg(err);
+              errormsg(err)
             },
-          });
+          })
         } else {
-          warning("Not Exist", `Location does not exist!`);
+          warning('Not Exist', `Location does not exist!`)
         }
       }
-    });
+    })
 
     function populatetable(data) {
-      // console.log(data);
-      const tableBody = $("#datatable tbody");
+      //  //console.log(error);
+      const tableBody = $('#datatable tbody')
 
       if (data.length === 0) {
-        const tr = $("<tr>").append(
-          $("<td>", {
+        const tr = $('<tr>').append(
+          $('<td>', {
             colspan: 7,
-            class: "text-center",
-            text: "No Data Matched",
+            class: 'text-center',
+            text: 'No Data Matched',
           })
-        );
-        tableBody.append(tr);
+        )
+        tableBody.append(tr)
       } else {
         data.forEach((item) => {
-          const tr = $("<tr>").append(
-            $("<td>", {
+          const tr = $('<tr>').append(
+            $('<td>', {
               text: item.id,
-              "data-label": "ID",
-              class: "custom-mobile-align",
+              'data-label': 'ID',
+              class: 'custom-mobile-align',
             }),
-            $("<td>", {
+            $('<td>', {
               text: item.assetcontrol,
-              "data-label": "Asset Control",
-              class: "custom-mobile-align",
+              'data-label': 'Asset Control',
+              class: 'custom-mobile-align',
             }),
-            $("<td>", {
+            $('<td>', {
               text: item.serial,
-              "data-label": "Serial",
-              class: "custom-mobile-align",
+              'data-label': 'Serial',
+              class: 'custom-mobile-align',
             }),
-            $("<td>", {
+            $('<td>', {
               text: item.date,
-              "data-label": "Date",
-              class: "custom-mobile-align no-wrap",
+              'data-label': 'Date',
+              class: 'custom-mobile-align no-wrap',
             }),
-            $("<td>", {
+            $('<td>', {
               text: item.soldby,
-              "data-label": "Sold By",
-              class: "custom-mobile-align no-wrap",
+              'data-label': 'Sold By',
+              class: 'custom-mobile-align no-wrap',
             }),
-            $("<td>", {
+            $('<td>', {
               text: item.soldto,
-              "data-label": "Sold To",
-              class: "custom-mobile-align no-wrap",
+              'data-label': 'Sold To',
+              class: 'custom-mobile-align no-wrap',
             }),
-            $("<td>", {
+            $('<td>', {
               text: item.referenceno,
-              "data-label": "Reference No.",
-              class: "custom-mobile-align",
+              'data-label': 'Reference No.',
+              class: 'custom-mobile-align',
             })
-          );
-          tableBody.append(tr);
-        });
+          )
+          tableBody.append(tr)
+        })
         // applyScrollReveal();
       }
     }
 
     function LoadTable() {
       if (!hasMoreData) {
-        return;
+        return
       }
-      $(".progress").hide();
-      $(".progress").slideDown();
+      $('.progress').hide()
+      $('.progress').slideDown()
       $.ajax({
-        url: "/sold/load",
-        method: "GET",
-        dataType: "json",
+        url: '/sold/load',
+        method: 'GET',
+        dataType: 'json',
         data: { page: currentPage },
         xhrFields: {
           onprogress: function (e) {
             if (e.lengthComputable) {
-              var percentComplete = (e.loaded / e.total) * 100;
-              $(".progress-bar").css("width", percentComplete + "%");
+              var percentComplete = (e.loaded / e.total) * 100
+              $('.progress-bar').css('width', percentComplete + '%')
             }
           },
         },
         success: function (data) {
           setTimeout(function () {
-            $(".progress").slideUp(function () {
-              hasMoreData = data.data.length > 0;
+            $('.progress').slideUp(function () {
+              hasMoreData = data.data.length > 0
               if (!hasMoreData) {
-                const tableBody = $("#datatable tbody");
-                var loadingstate = document.querySelectorAll('.loading-row');
+                const tableBody = $('#datatable tbody')
+                var loadingstate = document.querySelectorAll('.loading-row')
                 loadingstate.forEach(function (row) {
-                  row.remove();
-                });
-                const tr = $("<tr>").append(
-                  $("<td>", {
+                  row.remove()
+                })
+                const tr = $('<tr>').append(
+                  $('<td>', {
                     colspan: 9,
-                    class: "text-center",
-                    text: "No More Data",
+                    class: 'text-center',
+                    text: 'No More Data',
                   })
-                );
-                tableBody.append(tr);
+                )
+                tableBody.append(tr)
               } else {
-                if (data.msg === "success") {
-                  var loadingstate = document.querySelectorAll('.loading-row');
+                if (data.msg === 'success') {
+                  var loadingstate = document.querySelectorAll('.loading-row')
                   loadingstate.forEach(function (row) {
-                    row.remove();
-                  });
-                  populatetable(data.data);
-                  currentPage++;
+                    row.remove()
+                  })
+                  populatetable(data.data)
+                  currentPage++
                 } else {
-                  console.error(data.msg);
+                  console.error(data.msg)
                 }
               }
-              isFetchingData = false;
-            });
-          }, 1000);
+              isFetchingData = false
+            })
+          }, 1000)
         },
         error: function (error) {
-          console.error(error);
-          isFetchingData = false;
-          hasMoreData = false;
+          console.error(error)
+          isFetchingData = false
+          hasMoreData = false
         },
-      });
+      })
     }
 
-    $(".scrollable-table-container").scroll(function () {
-      const container = $(this);
+    $('.scrollable-table-container').scroll(function () {
+      const container = $(this)
       if (isFetchingData) {
-        return;
+        return
       }
-      if (
-        container.scrollTop() + container.innerHeight() >=
-        container[0].scrollHeight - 10
-      ) {
+      if (container.scrollTop() + container.innerHeight() >= container[0].scrollHeight - 10) {
         //console.log("Append Triggered!");
-        isFetchingData = true;
-        LoadTable();
+        isFetchingData = true
+        LoadTable()
       }
-    });
+    })
 
     function resettable() {
-      const tableBody = $("#datatable tbody");
-      tableBody.empty();
-      currentPage = 1;
-      hasMoreData = true;
-      LoadTable();
+      const tableBody = $('#datatable tbody')
+      tableBody.empty()
+      currentPage = 1
+      hasMoreData = true
+      LoadTable()
     }
     //#region CUSTOM DROPDOWN INPUT
 
     function LoadList() {
       // console.log("triggered");
       $.ajax({
-        type: "GET",
-        url: "/product/load",
+        type: 'GET',
+        url: '/product/load',
         success: function (result) {
-          let container = result.data;
+          let container = result.data
           // console.log(container);
           $.each(container, (key, item) => {
-            if (item.status != "DEPLOYED" && item.status != "SOLD" && item.status != "DEFECTIVE") {
-              let newname = item.serial + " (" + item.assetcontrol + ")";
-              activeSerial.push({ display: newname, value: item.serial });
+            if (item.status != 'DEPLOYED' && item.status != 'SOLD' && item.status != 'DEFECTIVE') {
+              let newname = item.serial + ' (' + item.assetcontrol + ')'
+              activeSerial.push({ display: newname, value: item.serial })
             }
-          });
-          populateCustomDropdown1();
+          })
+          populateCustomDropdown1()
         },
         error: function (err) {
-          errormsg(err);
+          errormsg(err)
         },
-      });
+      })
 
       $.ajax({
-        type: "GET",
-        url: "/client/load",
+        type: 'GET',
+        url: '/client/load',
         success: function (result) {
-          let container = result.data;
+          let container = result.data
           $.each(container, (key, item) => {
-            let displayname = item.company + " - " + item.branch;
-            let hiddenData = "(" + item.branch + ") (" + item.company + ")";
+            let displayname = item.company + ' - ' + item.branch
+            let hiddenData = '(' + item.branch + ') (' + item.company + ')'
             activeDeployLocation.push({
               display: displayname,
               value: hiddenData,
-            });
-          });
-          populateCustomDropdown();
+            })
+          })
+          populateCustomDropdown()
         },
         error: function (err) {
-          errormsg(err);
+          errormsg(err)
         },
-      });
+      })
 
       $.ajax({
-        type: "GET",
-        url: "/employee/load",
+        type: 'GET',
+        url: '/employee/load',
         success: function (result) {
-          let container = result.data;
+          let container = result.data
           // console.log(container)
           $.each(container, (key, item) => {
-            let displayname = item.fullname;
-            let dataid = item.id;
+            let displayname = item.fullname
+            let dataid = item.id
             activeEmployee.push({
               display: displayname,
               value: dataid,
-            });
-          });
-          populateCustomDropdown2();
+            })
+          })
+          populateCustomDropdown2()
         },
         error: function (err) {
-          errormsg(err);
+          errormsg(err)
         },
-      });
+      })
     }
 
     function populateCustomDropdown2() {
       for (const employee of activeEmployee) {
-        addOption3("employeeDropdown", employee.display, employee.value);
+        addOption3('employeeDropdown', employee.display, employee.value)
       }
     }
 
     function populateCustomDropdown1() {
       for (const serial of activeSerial) {
-        addOption2("serialDropdown", serial.display, serial.value);
+        addOption2('serialDropdown', serial.display, serial.value)
       }
     }
 
     function populateCustomDropdown() {
       for (const deploy of activeDeployLocation) {
-        addOption1("locationDropdown", deploy.display, deploy.value);
+        addOption1('locationDropdown', deploy.display, deploy.value)
       }
     }
 
     function setupCustomDropdown(inputId, dropdownId, optionClass) {
-      const inputElement = document.getElementById(inputId);
-      const dropdownElement = document.getElementById(dropdownId);
-      const options = dropdownElement.getElementsByClassName(optionClass);
+      const inputElement = document.getElementById(inputId)
+      const dropdownElement = document.getElementById(dropdownId)
+      const options = dropdownElement.getElementsByClassName(optionClass)
 
-      inputElement.addEventListener("click", function () {
-        dropdownElement.style.display = "block";
-      });
+      inputElement.addEventListener('click', function () {
+        dropdownElement.style.display = 'block'
+      })
 
       for (const option of options) {
-        option.addEventListener("click", function () {
-          inputElement.value = option.textContent;
-          const actualValue = option.getAttribute("data-value");
-          inputElement.setAttribute("data-actual-value", actualValue);
-          dropdownElement.style.display = "none";
-        });
+        option.addEventListener('click', function () {
+          inputElement.value = option.textContent
+          const actualValue = option.getAttribute('data-value')
+          inputElement.setAttribute('data-actual-value', actualValue)
+          dropdownElement.style.display = 'none'
+        })
       }
 
-      inputElement.addEventListener("input", function () {
-        const value = inputElement.value.toUpperCase();
+      inputElement.addEventListener('input', function () {
+        const value = inputElement.value.toUpperCase()
         for (const option of options) {
           if (option.textContent.toUpperCase().includes(value)) {
-            option.style.display = "block";
+            option.style.display = 'block'
           } else {
-            option.style.display = "none";
+            option.style.display = 'none'
           }
         }
-        dropdownElement.style.display = "block";
-      });
+        dropdownElement.style.display = 'block'
+      })
 
-      document.addEventListener("click", function (event) {
-        const target = event.target;
+      document.addEventListener('click', function (event) {
+        const target = event.target
         if (!dropdownElement.contains(target) && target !== inputElement) {
-          dropdownElement.style.display = "none";
+          dropdownElement.style.display = 'none'
         }
-      });
+      })
     }
 
     function addOption3(dropdownId, displayText, actualValue) {
-      const dropdownElement = document.getElementById(dropdownId);
-      const hiddenInput = document.getElementById("hiddenemmployeevalue");
+      const dropdownElement = document.getElementById(dropdownId)
+      const hiddenInput = document.getElementById('hiddenemmployeevalue')
 
-      const newOption = document.createElement("div");
-      newOption.className = "dropdown-option";
-      newOption.textContent = displayText;
-      newOption.setAttribute("data-value", actualValue);
+      const newOption = document.createElement('div')
+      newOption.className = 'dropdown-option'
+      newOption.textContent = displayText
+      newOption.setAttribute('data-value', actualValue)
 
-      newOption.addEventListener("click", function () {
-        const inputElement = document.getElementById("employee");
-        inputElement.value = displayText;
-        hiddenInput.value = actualValue;
-        dropdownElement.style.display = "none";
-      });
+      newOption.addEventListener('click', function () {
+        const inputElement = document.getElementById('employee')
+        inputElement.value = displayText
+        hiddenInput.value = actualValue
+        dropdownElement.style.display = 'none'
+      })
 
-      dropdownElement.appendChild(newOption);
+      dropdownElement.appendChild(newOption)
     }
 
     function addOption2(dropdownId, displayText, actualValue) {
-      const dropdownElement = document.getElementById(dropdownId);
-      const hiddenInput = document.getElementById("hiddenSerialValue");
+      const dropdownElement = document.getElementById(dropdownId)
+      const hiddenInput = document.getElementById('hiddenSerialValue')
 
-      const newOption = document.createElement("div");
-      newOption.className = "dropdown-option";
-      newOption.textContent = displayText;
-      newOption.setAttribute("data-value", actualValue);
+      const newOption = document.createElement('div')
+      newOption.className = 'dropdown-option'
+      newOption.textContent = displayText
+      newOption.setAttribute('data-value', actualValue)
 
-      newOption.addEventListener("click", function () {
-        const inputElement = document.getElementById("serialname");
-        inputElement.value = displayText;
-        hiddenInput.value = actualValue;
-        dropdownElement.style.display = "none";
-      });
+      newOption.addEventListener('click', function () {
+        const inputElement = document.getElementById('serialname')
+        inputElement.value = displayText
+        hiddenInput.value = actualValue
+        dropdownElement.style.display = 'none'
+      })
 
-      dropdownElement.appendChild(newOption);
+      dropdownElement.appendChild(newOption)
     }
 
     function addOption1(dropdownId, displayText, actualValue) {
-      const dropdownElement = document.getElementById(dropdownId);
-      const hiddenInput = document.getElementById("hiddenValue");
+      const dropdownElement = document.getElementById(dropdownId)
+      const hiddenInput = document.getElementById('hiddenValue')
 
-      const newOption = document.createElement("div");
-      newOption.className = "dropdown-option";
-      newOption.textContent = displayText;
-      newOption.setAttribute("data-value", actualValue);
+      const newOption = document.createElement('div')
+      newOption.className = 'dropdown-option'
+      newOption.textContent = displayText
+      newOption.setAttribute('data-value', actualValue)
 
-      newOption.addEventListener("click", function () {
-        const inputElement = document.getElementById("location");
-        inputElement.value = displayText;
-        hiddenInput.value = actualValue;
-        dropdownElement.style.display = "none";
-      });
+      newOption.addEventListener('click', function () {
+        const inputElement = document.getElementById('location')
+        inputElement.value = displayText
+        hiddenInput.value = actualValue
+        dropdownElement.style.display = 'none'
+      })
 
-      dropdownElement.appendChild(newOption);
+      dropdownElement.appendChild(newOption)
     }
 
-    setupCustomDropdown("serialname", "serialDropdown", "dropdown-option");
-    setupCustomDropdown("location", "locationDropdown", "dropdown-option");
-    setupCustomDropdown("employee", "employeeDropdown", "dropdown-option");
-    LoadList();
+    setupCustomDropdown('serialname', 'serialDropdown', 'dropdown-option')
+    setupCustomDropdown('location', 'locationDropdown', 'dropdown-option')
+    setupCustomDropdown('employee', 'employeeDropdown', 'dropdown-option')
+    LoadList()
     //#endregion
 
     function filterTableRows() {
-      const searchQuery = $("#search").val().trim().toLowerCase();
-      let foundMatches = false;
+      const searchQuery = $('#search').val().trim().toLowerCase()
+      let foundMatches = false
 
-      $("#no-match-row").remove();
+      $('#no-match-row').remove()
 
-      $("#datatable tbody tr").each(function () {
-        const rowData = $(this).text().toLowerCase();
+      $('#datatable tbody tr').each(function () {
+        const rowData = $(this).text().toLowerCase()
         if (rowData.includes(searchQuery)) {
-          $(this).show();
-          foundMatches = true;
+          $(this).show()
+          foundMatches = true
         } else {
-          $(this).hide();
+          $(this).hide()
         }
-      });
+      })
 
       if (!foundMatches) {
-        const noMatchRow = $("<tr>").append(
-          $("<td>", {
+        const noMatchRow = $('<tr>').append(
+          $('<td>', {
             colspan: 9,
-            class: "text-center",
-            text: "No Data Matched",
+            class: 'text-center',
+            text: 'No Data Matched',
           })
-        );
-        $("#datatable tbody").append(noMatchRow);
-        noMatchRow.attr("id", "no-match-row");
+        )
+        $('#datatable tbody').append(noMatchRow)
+        noMatchRow.attr('id', 'no-match-row')
       }
     }
 
-    $("#search").on("input", filterTableRows);
+    $('#search').on('input', filterTableRows)
 
     //#region Upload
-    $(document).on("click", "#uploadButton", function () {
+    $(document).on('click', '#uploadButton', function () {
       //   console.log("clicked!");
-      let uploaddata = $("#fileinput").val();
-      if (uploaddata != "") {
-        Loading('Uploading, Please wait for a moment...');
-        UploadProcess();
+      let uploaddata = $('#fileinput').val()
+      if (uploaddata != '') {
+        Loading('Uploading, Please wait for a moment...')
+        UploadProcess()
       } else {
-        warning("Warning!", "No File Chosen!");
+        warning('Warning!', 'No File Chosen!')
       }
-    });
+    })
 
     function UploadProcess() {
       //Reference the FileUpload element.
-      var fileUpload = document.getElementById("fileinput");
+      var fileUpload = document.getElementById('fileinput')
 
       //Validate whether File is valid Excel file.
-      var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx|.csv|.ods)$/;
+      var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx|.csv|.ods)$/
       if (regex.test(fileUpload.value.toLowerCase())) {
-        if (typeof FileReader != "undefined") {
-          var reader = new FileReader();
+        if (typeof FileReader != 'undefined') {
+          var reader = new FileReader()
 
           //For Browsers other than IE.
           if (reader.readAsBinaryString) {
             reader.onload = function (e) {
-              GetTableFromExcel(e.target.result);
-            };
-            reader.readAsBinaryString(fileUpload.files[0]);
+              GetTableFromExcel(e.target.result)
+            }
+            reader.readAsBinaryString(fileUpload.files[0])
           } else {
             //For IE Browser.
             reader.onload = function (e) {
-              var data = "";
-              var bytes = new Uint8Array(e.target.result);
+              var data = ''
+              var bytes = new Uint8Array(e.target.result)
               for (var i = 0; i < bytes.byteLength; i++) {
-                data += String.fromCharCode(bytes[i]);
+                data += String.fromCharCode(bytes[i])
               }
-              GetTableFromExcel(data);
-            };
-            reader.readAsArrayBuffer(fileUpload.files[0]);
+              GetTableFromExcel(data)
+            }
+            reader.readAsArrayBuffer(fileUpload.files[0])
           }
         } else {
-          warning("Upload", "This browser does not support HTML5.");
+          warning('Upload', 'This browser does not support HTML5.')
         }
       } else {
-        warning("Upload", "Please upload a valid Excel file.");
+        warning('Upload', 'Please upload a valid Excel file.')
       }
     }
 
     function GetTableFromExcel(data) {
       //Read the Excel File data in binary
       var workbook = XLSX.read(data, {
-        type: "binary",
-      });
+        type: 'binary',
+      })
 
       //get the name of First Sheet.
-      var Sheet = workbook.SheetNames[0];
+      var Sheet = workbook.SheetNames[0]
 
       //Read all rows from First Sheet into an JSON array.
-      var excelRows = XLSX.utils.sheet_to_row_object_array(
-        workbook.Sheets[Sheet]
-      );
-      var columns = Object.keys(excelRows[0]);
+      var excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[Sheet])
+      var columns = Object.keys(excelRows[0])
 
       //Create a HTML Table element.
-      var myTable = document.createElement("table");
-      myTable.border = "1";
+      var myTable = document.createElement('table')
+      myTable.border = '1'
 
       //Add the header row.
-      var row = myTable.insertRow(-1);
+      var row = myTable.insertRow(-1)
 
-      var dataExcelArr = [];
+      var dataExcelArr = []
       //Add the data rows from Excel file.
       for (var i = 0; i < excelRows.length; i++) {
         //Add the data row.
-        var data = [];
-        var row = myTable.insertRow(-1);
+        var data = []
+        var row = myTable.insertRow(-1)
         for (var j = 0; j < columns.length; j++) {
-          var cell = row.insertCell(-1);
-          cell.innerHTML = excelRows[i][columns[j]];
+          var cell = row.insertCell(-1)
+          cell.innerHTML = excelRows[i][columns[j]]
           data.push({
             item: excelRows[i][columns[j]],
-          });
+          })
         }
         dataExcelArr.push({
           serial: data[0].item,
@@ -639,68 +634,67 @@
           transactionref: data[9].item,
           transactionstatus: data[10].item,
           remarks: data[11].item,
-        });
+        })
       }
-      excelDataSave(dataExcelArr);
+      excelDataSave(dataExcelArr)
     }
 
     function excelDataSave(data) {
-      var dataraw = JSON.stringify(data, null, 2);
-      console.log(dataraw);
+      var dataraw = JSON.stringify(data, null, 2)
+      console.log(dataraw)
       $.ajax({
-        type: "POST",
-        url: "/sold/upload",
+        type: 'POST',
+        url: '/sold/upload',
         data: {
           data: dataraw,
         },
         success: function (result) {
-          
-          hideLoading();
-          console.log("Message: ", result.msg);
-          console.log("Info: ", result.info);
-          let info = result.info;
-          if (result.msg != "success") {
+          hideLoading()
+          console.log('Message: ', result.msg)
+          console.log('Info: ', result.info)
+          let info = result.info
+          if (result.msg != 'success') {
             warningInfo(
-              "Info",
+              'Info',
               `Completed: ${info.completed} Failed: ${info.failed}<br>Some data are invalid or already exist in the database. <br> <div class="row justify-content-center mt-1">
                   <button class="btn btn-sm btn-success" id="txtBtn">Download</button>
               </div>`
-            );
-            
-            $(document).on("click", "#txtBtn", function () {
-              downloadTxtFile(result.data, 'existing_invalid_data.txt');
-            });
+            )
 
-            resettable();
-          } else{
-            success("Saved!", "Data saved!");
-            resettable();
+            $(document).on('click', '#txtBtn', function () {
+              downloadTxtFile(result.data, 'existing_invalid_data.txt')
+            })
+
+            resettable()
+          } else {
+            success('Saved!', 'Data saved!')
+            resettable()
           }
         },
         error: function (result) {
-          console.error(result);
+          console.error(result)
         },
-      });
+      })
     }
 
     function downloadTxtFile(data, filename) {
-      data = data.toString().replace(/,/g, '\n');
+      data = data.toString().replace(/,/g, '\n')
 
-      const blob = new Blob([data], { type: 'text/plain' });
+      const blob = new Blob([data], { type: 'text/plain' })
 
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob)
 
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
+      const link = document.createElement('a')
+      link.href = url
+      link.download = filename
 
-      document.body.appendChild(link);
+      document.body.appendChild(link)
 
-      link.click();
+      link.click()
 
-      URL.revokeObjectURL(url);
-      document.body.removeChild(link);
+      URL.revokeObjectURL(url)
+      document.body.removeChild(link)
     }
     //#endregion
-  });
+  })
 </script>
