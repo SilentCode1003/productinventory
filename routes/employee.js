@@ -1,115 +1,107 @@
-var express = require("express");
-const {
-  SelectParameter,
-  Select,
-  InsertTable,
-  Update,
-  SelectResult,
-} = require("./repository/spidb");
+var express = require('express')
+const { SelectParameter, Select, InsertTable, Update, SelectResult } = require('./repository/spidb')
 const {
   Employee,
   EmployeeUpload,
   MasterDepartment,
   MasterPosition,
   MasterAccess,
-} = require("./model/spimodel");
-const { GetValue, ACT, INACT } = require("./repository/dictionary");
-const { GetCurrentDatetime } = require("./repository/customhelper");
-const { Encrypter } = require("./repository/cryptography");
-const { Validator } = require("./controller/middleware");
-const { JsonErrorResponse, JsonSuccess } = require("./repository/responce");
-var router = express.Router();
+} = require('./model/spimodel')
+const { GetValue, ACT, INACT } = require('./repository/dictionary')
+const { GetCurrentDatetime } = require('./repository/customhelper')
+const { Encrypter } = require('./repository/cryptography')
+const { Validator } = require('./controller/middleware')
+const { JsonErrorResponse, JsonSuccess } = require('./repository/responce')
+var router = express.Router()
 
 /* GET home page. */
-router.get("/", function (req, res, next) {
+router.get('/', function (req, res, next) {
   // res.render("employee", { title: "Express" });
-  Validator(req, res, "employee");
-});
+  Validator(req, res, 'employee')
+})
 
-module.exports = router;
+module.exports = router
 
-router.get("/load", (req, res) => {
+router.get('/load', (req, res) => {
   try {
     let sql = `SELECT e_id as e_id, e_fullname as e_fullname, mp_name as e_position, md_name as e_department, e_username as e_username, 
     e_password as e_password, ma_name as e_access, e_status as e_status, e_createdby as e_createdby, e_createddate as e_createddate
     FROM employee 
     INNER JOIN master_access on ma_id = e_access
     INNER JOIN master_department on md_id = e_department
-    INNER JOIN master_position on mp_id = e_position`;
+    INNER JOIN master_position on mp_id = e_position`
     Select(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
-      // console.log(result);
+      if (err) console.error('Error: ', err)
+      // //console.log(result);
       if (result.length != 0) {
-        let data = Employee(result);
-        // console.log(data);
+        let data = Employee(result)
+        //  //console.log(error);
         res.json({
-          msg: "success",
+          msg: 'success',
           data: data,
-        });
+        })
       } else {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.get("/sales-employee", (req, res) => {
+router.get('/sales-employee', (req, res) => {
   try {
     let sql = `SELECT DISTINCT e_id AS employeeId, e_fullname AS fullName, mp_name AS position, md_name AS department, ma_name AS access
       FROM cyberpowerproduct.sales_report
       INNER JOIN  employee ON sr_soldby = e_id
       INNER JOIN master_access on ma_id = e_access
       INNER JOIN master_department on md_id = e_department
-      INNER JOIN master_position on mp_id = e_position;`;
+      INNER JOIN master_position on mp_id = e_position;`
     SelectResult(sql, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
       if (result.length != 0) {
         res.json({
-          msg: "success",
+          msg: 'success',
           data: result,
-        });
+        })
       } else {
         res.json({
-          msg: "no data",
-        });
+          msg: 'no data',
+        })
       }
-    });
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/save", (req, res) => {
+router.post('/save', (req, res) => {
   try {
-    const { fullname, username, password, position, department, access } =
-      req.body;
-    let status = GetValue(ACT());
-    let createdby =
-      req.session.fullname == null ? "creator" : req.session.fullname;
-    let createddate = GetCurrentDatetime();
+    const { fullname, username, password, position, department, access } = req.body
+    let status = GetValue(ACT())
+    let createdby = req.session.fullname == null ? 'creator' : req.session.fullname
+    let createddate = GetCurrentDatetime()
 
     Encrypter(password, (err, encrypted) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
-      console.log(encrypted);
+      console.log(encrypted)
 
       Check_Employee(fullname)
         .then((result) => {
-          let data = Employee(result);
+          let data = Employee(result)
 
           if (data.length != 0) {
             return res.json({
-              msg: "exist",
-            });
+              msg: 'exist',
+            })
           } else {
             let employee = [
               [
@@ -123,65 +115,65 @@ router.post("/save", (req, res) => {
                 createdby,
                 createddate,
               ],
-            ];
-            InsertTable("employee", employee, (err, result) => {
-              if (err) console.error("Error: ", err);
+            ]
+            InsertTable('employee', employee, (err, result) => {
+              if (err) console.error('Error: ', err)
 
-              console.log(result);
+              //console.log(result)
               res.json({
-                msg: "success",
-              });
-            });
+                msg: 'success',
+              })
+            })
           }
         })
-        .catch(() => {});
-    });
+        .catch(() => {})
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/upload", (req, res) => {
+router.post('/upload', (req, res) => {
   try {
-    const { data } = req.body;
-    let dataJson = EmployeeUpload(JSON.parse(data));
-    let _employee = [];
-    let _counter = 0;
-    let _dupentry = [];
-    let message = "";
+    const { data } = req.body
+    let dataJson = EmployeeUpload(JSON.parse(data))
+    let _employee = []
+    let _counter = 0
+    let _dupentry = []
+    let message = ''
 
     dataJson.forEach((employee) => {
-      let user = `${employee.firstname[0]}${employee.lastname}`;
+      let user = `${employee.firstname[0]}${employee.lastname}`
       Encrypter(user, (err, encrypted) => {
-        if (err) console.error(err);
+        if (err) console.error(err)
 
         GetDepartment(employee.department)
           .then((result) => {
-            let _department = MasterDepartment(result);
-            let departmentid = _department[0].id;
+            let _department = MasterDepartment(result)
+            let departmentid = _department[0].id
             GetPosition(employee.position)
               .then((result) => {
-                let _position = MasterPosition(result);
-                let positionid = _position[0].id;
+                let _position = MasterPosition(result)
+                let positionid = _position[0].id
 
                 GetAccesss(employee.access)
                   .then((result) => {
-                    let _access = MasterAccess(result);
-                    let accessid = _access[0].id;
-                    let status = GetValue(ACT());
-                    let createdby = req.session.fullname;
-                    let createddate = GetCurrentDatetime();
-                    let fullname = `${employee.firstname} ${employee.lastname}`;
+                    let _access = MasterAccess(result)
+                    let accessid = _access[0].id
+                    let status = GetValue(ACT())
+                    let createdby = req.session.fullname
+                    let createddate = GetCurrentDatetime()
+                    let fullname = `${employee.firstname} ${employee.lastname}`
 
                     Check_Employee(fullname)
                       .then((result) => {
-                        let check_employee = Employee(result);
-                        _counter += 1;
+                        let check_employee = Employee(result)
+                        _counter += 1
 
                         if (check_employee != 0) {
-                          _dupentry.push(fullname);
+                          _dupentry.push(fullname)
                         } else {
                           _employee.push([
                             fullname,
@@ -193,215 +185,205 @@ router.post("/upload", (req, res) => {
                             status,
                             createdby,
                             createddate,
-                          ]);
+                          ])
                         }
 
-                        console.log(
-                          "Counter: ",
-                          _counter,
-                          "Data Length: ",
-                          dataJson.length
-                        );
+                        console.log('Counter: ', _counter, 'Data Length: ', dataJson.length)
                         if (_counter == dataJson.length) {
                           if (_employee != 0) {
-                            InsertTable(
-                              "employee",
-                              _employee,
-                              (err, result) => {
-                                if (err) console.error("Error: ", err);
+                            InsertTable('employee', _employee, (err, result) => {
+                              if (err) console.error('Error: ', err)
 
-                                console.log(result);
-                              }
-                            );
+                              //console.log(result)
+                            })
                           } else {
-                            message += "dupentry";
+                            message += 'dupentry'
                           }
 
-                          if (message != "") {
+                          if (message != '') {
                             return res.json({
                               msg: message,
                               data: {
                                 dupentry: _dupentry,
                               },
-                            });
+                            })
                           } else {
                             res.json({
-                              msg: "success",
-                            });
+                              msg: 'success',
+                            })
                           }
                         }
                       })
                       .catch((error) => {
-                        console.log(error);
+                        console.log(error)
                         return res.json({
                           msg: error,
-                        });
-                      });
+                        })
+                      })
                   })
                   .catch((error) => {
-                    console.log(error);
+                    console.log(error)
                     return res.json({
                       msg: error,
-                    });
-                  });
+                    })
+                  })
               })
               .catch((error) => {
-                console.log(error, employee.position);
+                console.log(error, employee.position)
                 return res.json({
                   msg: error,
-                });
-              });
+                })
+              })
           })
           .catch((error) => {
-            console.log(employee.department);
-            console.log(error);
+            console.log(employee.department)
+            console.log(error)
             return res.json({
               msg: error,
-            });
-          });
-      });
-    });
+            })
+          })
+      })
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
-router.post("/edit", (req, res) => {
+router.post('/edit', (req, res) => {
   try {
-    const { employeeid, position, access, department, fullname } = req.body;
+    const { employeeid, position, access, department, fullname } = req.body
 
-    let data = [];
-    let sql_update = "update employee set";
+    let data = []
+    let sql_update = 'update employee set'
 
     if (position) {
-      sql_update += " e_position=?,";
-      data.push(position);
+      sql_update += ' e_position=?,'
+      data.push(position)
     }
     if (department) {
-      sql_update += " e_department=?,";
-      data.push(department);
+      sql_update += ' e_department=?,'
+      data.push(department)
     }
     if (access) {
-      sql_update += " e_access=?,";
-      data.push(access);
+      sql_update += ' e_access=?,'
+      data.push(access)
     }
     if (fullname) {
-      sql_update += " e_fullname=?,";
-      data.push(fullname);
+      sql_update += ' e_fullname=?,'
+      data.push(fullname)
     }
 
-    sql_update = sql_update.slice(0, -1);
-    sql_update += " where e_id=?";
+    sql_update = sql_update.slice(0, -1)
+    sql_update += ' where e_id=?'
 
-    data.push(employeeid);
+    data.push(employeeid)
 
     // console.log(sql_update)
 
     Update(sql_update, data, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
-      console.log(result);
-      res.json(JsonSuccess());
-    });
+      //console.log(result)
+      res.json(JsonSuccess())
+    })
   } catch (error) {
-    res.json(JsonErrorResponse(error));
+    res.json(JsonErrorResponse(error))
   }
-});
+})
 
-router.post("/changepassword", (req, res) => {
+router.post('/changepassword', (req, res) => {
   try {
-    const { password, employeeid } = req.body;
+    const { password, employeeid } = req.body
 
     Encrypter(password, (err, encrypted) => {
-      if (err) console.error("Error: ", err);
-      let employee = [encrypted, employeeid];
-      let sql = "update employee set e_password=? where e_id=?";
+      if (err) console.error('Error: ', err)
+      let employee = [encrypted, employeeid]
+      let sql = 'update employee set e_password=? where e_id=?'
 
       Update(sql, employee, (err, result) => {
-        if (err) console.error("Error: ", err);
-        res.json(JsonSuccess());
-      });
-    });
+        if (err) console.error('Error: ', err)
+        res.json(JsonSuccess())
+      })
+    })
   } catch (error) {
-    res.json(JsonErrorResponse(error));
+    res.json(JsonErrorResponse(error))
   }
-});
+})
 
-router.post("/status", (req, res) => {
+router.post('/status', (req, res) => {
   try {
-    let id = req.body.id;
-    let status =
-      req.body.status == GetValue(ACT()) ? GetValue(INACT()) : GetValue(ACT());
-    let data = [status, id];
-    console.log(data);
+    let id = req.body.id
+    let status = req.body.status == GetValue(ACT()) ? GetValue(INACT()) : GetValue(ACT())
+    let data = [status, id]
+    //console.log(error);
     let sql_Update = `UPDATE employee 
                      SET e_status = ?
-                     WHERE e_id = ?`;
+                     WHERE e_id = ?`
 
-    console.log(data);
+    //console.log(error);
 
     Update(sql_Update, data, (err, result) => {
-      if (err) console.error("Error: ", err);
+      if (err) console.error('Error: ', err)
 
       res.json({
-        msg: "success",
-      });
-    });
+        msg: 'success',
+      })
+    })
   } catch (error) {
     res.json({
       msg: error,
-    });
+    })
   }
-});
+})
 
 //#region Function
 function Check_Employee(fullname) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from employee where e_fullname=?";
+    let sql = 'select * from employee where e_fullname=?'
     SelectParameter(sql, [fullname], (err, result) => {
-      if (err) reject(err);
-      console.log(result);
+      if (err) reject(err)
+      //console.log(result)
 
-      resolve(result);
-    });
-  });
+      resolve(result)
+    })
+  })
 }
 
 function GetDepartment(name) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from master_department where md_name=?";
+    let sql = 'select * from master_department where md_name=?'
 
     SelectParameter(sql, [name], (err, result) => {
-      if (err) reject(err);
+      if (err) reject(err)
 
-      resolve(result);
-    });
-  });
+      resolve(result)
+    })
+  })
 }
 
 function GetPosition(name) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from master_position where mp_name=?";
+    let sql = 'select * from master_position where mp_name=?'
 
     SelectParameter(sql, [name], (err, result) => {
-      if (err) reject(err);
+      if (err) reject(err)
 
-      resolve(result);
-    });
-  });
+      resolve(result)
+    })
+  })
 }
 
 function GetAccesss(name) {
   return new Promise((resolve, reject) => {
-    let sql = "select * from master_access where ma_name=?";
+    let sql = 'select * from master_access where ma_name=?'
 
     SelectParameter(sql, [name], (err, result) => {
-      if (err) reject(err);
+      if (err) reject(err)
 
-      resolve(result);
-    });
-  });
+      resolve(result)
+    })
+  })
 }
 //#endregion

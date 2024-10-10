@@ -2,6 +2,10 @@ const fs = require('fs')
 const moment = require('moment')
 const LINQ = require('node-linq').LINQ
 const { format } = require('date-fns')
+const os = require("os");
+const interfaces = os.networkInterfaces();
+const axios = require('axios');
+
 
 //#region READ & WRITE JSON FILES
 exports.ReadJSONFile = function (filepath) {
@@ -508,7 +512,7 @@ exports.getNetwork = () => {
       interfaces[interfaceName].forEach((iface) => {
         // Filter for IPv4 addresses
         if (iface.family === 'IPv4' && !iface.internal) {
-          console.log(`${interfaceName}: ${iface.address}`)
+          // console.log(`${interfaceName}: ${iface.address}`)
           resolve(`${iface.address}`)
         }
       })
